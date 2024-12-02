@@ -178,7 +178,8 @@ export default {
         getPageData(num, size) {             //得到分页数据
             this.$http.get("cmns/v1/cmn", { params: { pageNum: num, pageSize: size } }).then((response) => {
                 this.pageInfo = response.data
-                this.tableData = this.pageInfo.list
+                console.log(this.pageInfo)
+                this.tableData = this.pageInfo.records
                 console.log(this.tableData)
                 console.log("success")
             })

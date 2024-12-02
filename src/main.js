@@ -21,5 +21,5 @@ import store from './store/index.js'
 
 const app = createApp(App)
 app.component('e-charts',ECharts).use(router).use(store).use(ViewUIPlus).use(ElementPlus).mount('#app')
-axios.defaults.baseURL="http://localhost:8080"
+axios.defaults.baseURL="http://localhost:10086"
 app.config.globalProperties.$http=axios
