@@ -111,7 +111,7 @@ export default {
     data() {
         return {
 
-            name: '题目信息',
+            name: "题目信息",
             queryStr: "",
 
             currentPage: 1,
@@ -120,12 +120,12 @@ export default {
 
             tableData: [],
             form: {},
-            formLabelWidth: '150px',
+            formLabelWidth: "150px",
 
             dialogFormVisible: false,
             dialogDetailVisible: false,
-            title: '',
-            btnName: '',
+            title: "",
+            btnName: "",
 
             multipleSelection: [],
             catInfoData: [
@@ -133,8 +133,6 @@ export default {
                 { category_id: 2, cat_name: '物理' },
                 { category_id: 3, cat_name: '化学' },
             ],
-
-
         };
     },
     methods: {
@@ -166,11 +164,11 @@ export default {
         addQuestion() {
             this.$http.post('/qst/v1', this.form).then((response) => {
                 if (response.data == 1) {
-                    ElMessage({ message: '题目信息添加成功！', type: 'success' });
+                    ElMessage({ message: '题目信息添加成功！', type: "success" });
                     this.getPageData(this.currentPage, this.pageSize);
                     this.dialogFormVisible = false;
                 } else {
-                    ElMessage({ message: '题目信息添加失败！', type: 'error' });
+                    ElMessage({ message: '题目信息添加失败！', type: "error" });
                 }
             });
         },
@@ -203,10 +201,10 @@ export default {
             }).then(() => {
                 this.$http.delete(`/qst/v1/${questionId}`).then((response) => {
                     if (response.data == 1) {
-                        ElMessage({ message: '删除成功', type: 'success' });
+                        ElMessage({ message: '删除成功', type: "success" });
                         this.getPageData(this.currentPage, this.pageSize);
                     } else {
-                        ElMessage({ message: '删除失败', type: 'warning' });
+                        ElMessage({ message: '删除失败', type: "warning" });
                     }
                 });
             }).catch(() => { });
@@ -221,15 +219,15 @@ export default {
                 }).then(() => {
                     this.$http.post('/qst/v1', this.multipleSelection).then((response) => {
                         if (response.data == 1) {
-                            ElMessage({ message: '批量删除成功', type: 'success' });
+                            ElMessage({ message: '批量删除成功', type: "success" });
                             this.getPageData(this.currentPage, this.pageSize);
                         } else {
-                            ElMessage({ message: '批量删除失败', type: 'warning' });
+                            ElMessage({ message: '批量删除失败', type: "warning" });
                         }
                     });
                 }).catch(() => { });
             } else {
-                ElMessage({ message: '请选择要删除的记录', type: 'warning' });
+                ElMessage({ message: '请选择要删除的记录', type: "warning" });
             }
         },
 
@@ -248,11 +246,11 @@ export default {
         updateQuestion() {
             this.$http.put(`/qst/v1/${this.form.question_id}`, this.form).then((response) => {
                 if (response.data == 1) {
-                    ElMessage({ message: '更新成功', type: 'success' });
+                    ElMessage({ message: '更新成功', type: "success" });
                     this.getPageData(this.currentPage, this.pageSize);
                     this.dialogFormVisible = false;
                 } else {
-                    ElMessage({ message: '更新失败', type: 'error' });
+                    ElMessage({ message: '更新失败', type: "error" });
                 }
             });
         }
