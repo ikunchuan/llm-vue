@@ -12,24 +12,30 @@
             </div>
 
             <!-- 用户列表 -->
-            <el-table :data="users" style="width: 100%">
-                <el-table-column prop="user_name" label="用户名" width="180"></el-table-column>
-                <el-table-column prop="user_sex" label="性别" width="100" >
+            <el-table :data="tableData" style="width: 100%">
+                <el-table-column prop="userName" label="用户名" width="180"></el-table-column>
+                <el-table-column prop="userSex" label="性别" width="100" >
                     <template #default="scope">
                         {{ scope.row.stu_sex==1?'男':'女' }}
                     </template>
                 </el-table-column>
-                <el-table-column prop="user_password" label="密码" width="180"></el-table-column>
-                <el-table-column prop="user_phone" label="联系方式" width="180"></el-table-column>
-                <el-table-column prop="user_profilePicture" label="用户头像" width="180"></el-table-column>
-                <el-table-column prop="user_bio" label="用户描述" width="180"></el-table-column>
-                <el-table-column prop="user_email" label="邮箱" width="180"></el-table-column>
+                <el-table-column prop="userPassword" label="密码" width="180"></el-table-column>
+                <el-table-column prop="userPhone" label="联系方式" width="180"></el-table-column>
+                <el-table-column prop="userProfilePicture" label="用户头像" width="180"></el-table-column>
+                <el-table-column prop="userBio" label="用户描述" width="180"></el-table-column>
+                <el-table-column prop="userEmail" label="邮箱" width="180"></el-table-column>
                 <el-table-column label="操作">
                     <template #default="scope">
+            
                         <el-button link type="primary" size="small" @click="openDetailDialog(scope.row.stuid)">详情</el-button>
+
                     </template>
                 </el-table-column>
             </el-table>
+            <el-pagination v-model:current-page="pageNum" v-model:page-size="pageSize" :page-sizes="[2, 3, 4, 5]"
+            :background="true" layout="total, sizes, prev, pager, next, jumper" :total="pageInfo.total"
+            @size-change="handleSizeChange" @current-change="handleCurrentChange" />
+
         </el-card>
     </div>
 
@@ -37,27 +43,27 @@
 <el-dialog v-model="dialogDetailVisible" :title="学生详细信息记录表" width="500">
     <el-form :model="form">
         <el-form-item label="用户名" :label-width="formLabelWidth">
-            <el-form-item :label="form.user_name" ></el-form-item>
+            <el-form-item :label="form.userName" ></el-form-item>
         </el-form-item>
 
         <el-form-item label="性别" :label-width="formLabelWidth">
-            {{ form.user_sex==1?'男':'女' }}
+            {{ form.userSex==1?'男':'女' }}
         </el-form-item>
 
         <el-form-item label="密码" :label-width="formLabelWidth">
-            <el-form-item :label="form.user_password" ></el-form-item>
+            <el-form-item :label="form.userPassword" ></el-form-item>
         </el-form-item>
         <el-form-item label="联系方式" :label-width="formLabelWidth">
-            <el-form-item :label="form.user_phone"  ></el-form-item>
+            <el-form-item :label="form.userPhone"  ></el-form-item>
         </el-form-item>
         <el-form-item label="用户头像" :label-width="formLabelWidth">
-            <el-form-item :label="form.user_profilePicture"  ></el-form-item>
+            <el-form-item :label="form.userProfilePicture"  ></el-form-item>
         </el-form-item>
         <el-form-item label="用户描述" :label-width="formLabelWidth">
-            <el-form-item :label="form.user_bio"  ></el-form-item>
+            <el-form-item :label="form.userBio"  ></el-form-item>
         </el-form-item>
         <el-form-item label="Email" :label-width="formLabelWidth">
-            <el-form-item :label="form.user_email"  ></el-form-item>
+            <el-form-item :label="form.userEmail"  ></el-form-item>
         </el-form-item>
     </el-form>
     <template #footer>
@@ -70,6 +76,9 @@
 </template>
 
 <script>
+import { ElMessage, ElMessageBox } from 'element-plus';
+import { handleCurrentChange } from 'element-plus/es/components/tree/src/model/util.mjs';
+import { Plus } from '@element-plus/icons-vue';
 export default {
     data() {
         return {
@@ -80,7 +89,7 @@ export default {
             queryData:[],
             pageInfo:{},  //分页对象
             pageSize:3,   //当前页条数
-            currentPage:1,//当前页号
+            pageNum:1,//当前页号
             form:{},//对话框表单数据
             formLabelWidth:"140px",//对话框label宽度
             title:"",//对话框标题
@@ -90,61 +99,81 @@ export default {
     },
     methods: {
         handleSizeChange(pageSize){   //选择每个页面显示的记录数
-            this.pageSize=pageSize
-            this.getPageData(this.currentPage,this.pageSize)
+            this.currentSize=pageSize;
+            this.getPageData(this.currentSize,this.pageSize);
             console.log("size:",pageSize);
 
         },
         handleCurrentChange(pageNum){   //切换页号时得到当时页号
-            this.currentPage=pageNum
-            this.getPageData(this.currentPage,this.pageSize)
+            this.currentNum=pageNum
+            this.getPageData(this.currentNum,this.pageNum)
             console.log("num:",pageNum);
 
         },
-        getPageData(num,size){         //得到分页数据
-            this.$http.get("/uis/v1/ui",{params:{pageNum:num,pageSize:size}}).then((response)=>{
-                this.pageInfo=response.data
-                this.tableData=this.pageInfo.list
-                console.log(this.tableData);
-                
-            })
+        getPageData(num, size) {
+            this.$http.get("/uis/v1/ui", { params: { pageNum: num, pageSize: size } })
+                .then(response => {
+                    this.pageInfo = response.data;
+                    this.tableData = this.pageInfo.records;
+
+                    // // 初始化或保护原始数据缓存
+                    // if (!this.queryData || this.queryData.length === 0) {
+                    //     this.queryData = [...this.tableData];
+                    // }
+
+                    console.log("Data loaded successfully:", this.tableData);
+                });
         },
+        closeDialog() {
+            this.form = []
+            console.log("closeDialog.....")
+        },
+
         //详情显示
-        openDetailDialog(userid){
+        openDetailDialog(userId){
             var _this=this
-            this.$http.get("/uis/v1/ui"+userid).then(function(response){
+            this.$http.get("/uis/v1/page"+userId).then(function(response){
             console.log(response.data);
             _this.form=response.data
         })
-
-
-
             this.dialogDetailVisible=true
         },
         //查询
-        queryInfo(){
-            if(this.queryStr.trim().length>0){
-                this.tableData=this.tableData.filter(item=>(item.user_name).match(this.queryStr.trim()))
-            }else{
-                this.tableData=this.queryData
+        queryInfo() {
+            if (!this.queryData || this.queryData.length === 0) {
+                console.error("Original data is not cached. Please check data loading logic.");
+                return;
             }
-            console.log("queryInfo().....");
+
+            if (this.queryStr.trim().length > 0) {
+                this.tableData = this.queryData.filter(item =>
+                    item.communityName.includes(this.queryStr.trim())
+                );
+            } else {
+                this.tableData = [...this.queryData];
+            }
+
+            console.log("Query executed. Current data:", this.tableData);
         },
+
+    },
+    components: {
+        Plus
     },
     mounted() {
-        this.getPageData(1,3)
+        this.getPageData(this.pageNum,this.pageSize)
         // var _this=this;
         // this.$http.get("/stu/v1/stus").then(function(response){
         //     console.log(response.data);
         //     _this.tableData=response.data;
         //     _this.queryData=response.data;
         // })
-        this.$http.get("/uis/v1/ui").then((response)=>{
-            this.clsInfoData=response.data
-            console.log(this.clsInfoData);
+        // this.$http.get("/uis/v1/pages").then((response)=>{
+        //     this.userInfoData=response.data
+        //     console.log('userInfoData:', this.userInfoData);
             
 
-        })
+        // })
     }
 };
 </script>
