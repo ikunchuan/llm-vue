@@ -156,6 +156,8 @@ export default {
             imageUrl: ""                     //图片URL
         };
     },
+
+
     methods: {
         // handleSuccess(response) {            //图片上传成功后的回调函数
         //     console.log(response);
@@ -163,27 +165,33 @@ export default {
         //     this.form.stu_image_url = response
         // },
 
-        handleSizeChange(pageSize) {            //选择每一页显示的记录数
+        handleSizeChange(pageSize) {                 //选择每一页显示的记录数
             this.currentSize = pageSize
             this.getPageData(this.currentSize, this.pageSize)
             console.log("size:", pageSize);
         },
 
-        handleCurrentChange(pageNum) {      //切换页号时得到当时页号
+        handleCurrentChange(pageNum) {              //切换页号时得到当时页号
             this.currentNum = pageNum
             this.getPageData(this.currentNum, this.pageNum)
             console.log("num:", pageNum);
         },
 
-        getPageData(num, size) {             //得到分页数据
-            this.$http.get("cmns/v1/cmn", { params: { pageNum: num, pageSize: size } }).then((response) => {
-                this.pageInfo = response.data
-                console.log(this.pageInfo)
-                this.tableData = this.pageInfo.records
-                console.log(this.tableData)
-                console.log("success")
-            })
+        getPageData(num, size) {
+            this.$http.get("cmns/v1/cmn", { params: { pageNum: num, pageSize: size } })
+                .then(response => {
+                    this.pageInfo = response.data;
+                    this.tableData = this.pageInfo.records;
+
+                    // 初始化或保护原始数据缓存
+                    if (!this.queryData || this.queryData.length === 0) {
+                        this.queryData = [...this.tableData];
+                    }
+
+                    console.log("Data loaded successfully:", this.tableData);
+                });
         },
+
 
         closeDialog() {
             this.form = []
@@ -278,6 +286,7 @@ export default {
             }
             this.dialogFormVisible = false
         },
+
         singleDelete(cmnid) {
             console.log("singleDelete().....")
 
@@ -313,6 +322,7 @@ export default {
 
                 })
         },
+
         multiDelete() {
             console.log("multiDelete()...")
 
@@ -345,22 +355,28 @@ export default {
                         message: '你成功删除' + num + '条记录',
                     })
 
-
-
-
                 })
                 .catch(() => {
 
                 })
 
         },
-        queryInfo() {           //查询功能
-            if (this.queryStr.trim().length > 0) {
-                this.tableData = this.tableData.filter(item => (item.community_name).match(this.queryStr.trim()))
-            } else {
-                this.tableData = this.queryData
+
+        queryInfo() {
+            if (!this.queryData || this.queryData.length === 0) {
+                console.error("Original data is not cached. Please check data loading logic.");
+                return;
             }
-            console.log("queryInfo()...")
+
+            if (this.queryStr.trim().length > 0) {
+                this.tableData = this.queryData.filter(item =>
+                    item.communityName.includes(this.queryStr.trim())
+                );
+            } else {
+                this.tableData = [...this.queryData];
+            }
+
+            console.log("Query executed. Current data:", this.tableData);
         },
 
         handleSelectionChange(val) {            //多行选择
@@ -375,20 +391,21 @@ export default {
 
     mounted() {
         this.getPageData(1, 3)
-        
+
         // this.$http.get("/cmns/v1/cmn").then((response) => {
         //     this.cmnsInfoData = response.data
         //     console.log(this.cmnsInfoData)
         // })
 
         this.$http.get("/cmns/v1/cmn").then((response) => {
-        this.cmnsInfoData = response.data;
-        console.log('cmnsInfoData:', this.cmnsInfoData);
-        console.log("huhuhu")
-        // 确保这里的 tableData 被正确赋值
-        // this.tableData = this.cmnsInfoData;
-        // console.log('tableData:', this.tableData);
-    });
+            this.cmnsInfoData = response.data;
+            console.log('cmnsInfoData:', this.cmnsInfoData);
+            console.log("huhuhu")
+            // 确保这里的 tableData 被正确赋值
+            // this.tableData = this.cmnsInfoData;
+            // console.log('tableData:', this.tableData);
+        });
+        
     }
 
 }
