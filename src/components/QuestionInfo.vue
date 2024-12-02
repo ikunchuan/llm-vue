@@ -12,12 +12,12 @@
 
         <el-table :data="tableData" style="width: 100%" @selection-change="handleSelectionChange">
             <el-table-column fixed type="selection" width="55" />
-            <el-table-column prop="category_id" label="类别" width="120" />
-            <el-table-column prop="question_title" label="题目标题" width="150" />
-            <el-table-column prop="question_text" label="题目内容" width="200" />
-            <el-table-column prop="correct_answer" label="正确答案" width="120" />
-            <el-table-column prop="updated_time" label="更新时间" width="150" />
-            <el-table-column prop="created_time" label="创建时间" width="150" />
+            <el-table-column prop="categoryId" label="类别" width="120" />
+            <el-table-column prop="questionTitle" label="题目标题" width="150" />
+            <el-table-column prop="questionText" label="题目内容" width="200" />
+            <el-table-column prop="correctAnswer" label="正确答案" width="120" />
+            <el-table-column prop="updatedTime" label="更新时间" width="150" />
+            <el-table-column prop="createdTime" label="创建时间" width="150" />
             <el-table-column fixed="right" label="操作" min-width="180">
                 <template #default="scope">
                     <el-button link size="small" @click="openDetailDialog(scope.row.question_id)">详情</el-button>
@@ -258,6 +258,8 @@ export default {
 
     mounted() {
         this.getPageData(this.currentPage, this.pageSize);
+
+
     },
 };
 </script>
