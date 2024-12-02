@@ -6,9 +6,7 @@
 
         <p>QuestionInfo显示内容</p>
 
-<<<<<<< HEAD
-=======
-        <el-table :data="tableData" style="width: 100%" @selection-change="handleSelectionChange">
+        <<<<<<< HEAD=======<el-table :data="tableData" style="width: 100%" @selection-change="handleSelectionChange">
             <el-table-column fixed type="selection" width="55" />
             <el-table-column prop="categoryId" label="类别" width="120" />
             <el-table-column prop="questionTitle" label="题目标题" width="150" />
@@ -23,17 +21,12 @@
                     <el-button link size="small" @click="openUpdateDialog(scope.row)">编辑</el-button>
                 </template>
             </el-table-column>
-        </el-table>
->>>>>>> 2bc01fd879cc70a03f3bcffafe26e983195dfee9
-
+            </el-table>
     </el-card>
 </template>
 
 <script>
 export default {
-<<<<<<< HEAD
-    name: 'QuestionInfo'
-=======
     data() {
         return {
 
@@ -187,7 +180,6 @@ export default {
 
 
     },
->>>>>>> 2bc01fd879cc70a03f3bcffafe26e983195dfee9
 };
 </script>
 
