@@ -5,8 +5,7 @@
         </div>
 
         <p>QuestionInfo显示内容</p>
-
-        <<<<<<< HEAD=======<el-table :data="tableData" style="width: 100%" @selection-change="handleSelectionChange">
+        <el-table :data="tableData" style="width: 100%" @selection-change="handleSelectionChange">
             <el-table-column fixed type="selection" width="55" />
             <el-table-column prop="categoryId" label="类别" width="120" />
             <el-table-column prop="questionTitle" label="题目标题" width="150" />
@@ -21,7 +20,7 @@
                     <el-button link size="small" @click="openUpdateDialog(scope.row)">编辑</el-button>
                 </template>
             </el-table-column>
-            </el-table>
+        </el-table>
     </el-card>
 </template>
 
