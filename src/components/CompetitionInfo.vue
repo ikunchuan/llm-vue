@@ -66,19 +66,20 @@ export default {
     data() {
         return {
             competitions: [],
-            competitionId: ''
+            competitionId: '',
+            pageInfo:{},
         };
     },
     methods: {
         handleSizeChange(pageSize){            //选择每一页显示的记录数
-            // this.pageSize = pageSize
-            // this.getPageData(this.currentPage,this.pageSize)
+            this.pageSize = pageSize
+            this.getPageData(this.currentPage,this.pageSize)
             console.log("size",pageSize);
 
             },
         handleCurrentChange(pageNum){          //切换当前页号
-            // this.currentPage = pageNum
-            // this.getPageData(this.currentPage,this.pageSize)
+            this.currentPage = pageNum
+            this.getPageData(this.currentPage,this.pageSize)
             console.log("num",pageNum);
 
             },
@@ -86,7 +87,7 @@ export default {
 
             this.$http.get("http://localhost:10086/comp/v1/v1",{params:{pageNum:num,pageSize:size}}).then((response)=>{
             this.pageInfo  = response.data
-            this.tableData =  this.pageInfo.list
+            this.competitions =  this.pageInfo.list
             console.log(this.tableData);
             })
             },
@@ -114,6 +115,7 @@ export default {
         }
     },
     mounted() {
+       // this.getPageData(1,3)
         this.fetchData();
     }
 };
