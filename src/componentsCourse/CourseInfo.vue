@@ -60,12 +60,26 @@
     <!-- 编辑、添加对话框 -->
     <el-dialog v-model="dialogFormVisible" :title="title" width="500">
         <el-form :model="form">
-            <el-form-item label="类别" :label-width="formLabelWidth">
+            <!-- 父类选择框 -->
+            <el-form-item label="父类" :label-width="formLabelWidth">
+                <el-select v-model="form.parentId" placeholder="请选择父类" @change="handleParentCategoryChange">
+                    <el-option v-for="category in parentCategories" :key="category.categoryId" :label="category.categoryName" :value="category.categoryId" />
+                </el-select>
+            </el-form-item>
+            
+            <!-- 子类选择框 -->    
+            <el-form-item label="子类" :label-width="formLabelWidth">
+                <el-select v-model="form.subCategoryId" placeholder="请选择子类" :disabled="subCategories.length === 0">
+                    <el-option v-for="category in subCategories" :key="category.categoryId" :label="category.categoryName" :value="category.categoryId" />
+                </el-select>
+            </el-form-item>
+
+            <!-- <el-form-item label="类别" :label-width="formLabelWidth">
                 <el-select v-model="form.categoryId" placeholder="请选择类别">
                     <el-option v-for="cat in catInfoData" :key="cat.categoryId" :label="cat.catName"
                         :value="cat.categoryId" />
                 </el-select>
-            </el-form-item>
+            </el-form-item> -->
 
             <el-form-item label="课程名称" :label-width="formLabelWidth">
                 <el-input v-model="form.courseName" type="textarea" autocomplete="off" />
@@ -164,11 +178,19 @@ export default {
             btnName: '',
 
             multipleSelection: [],
-            catInfoData: [
-                { categoryId: 1, catName: '计算机科学' },
-                { categoryId: 2, catName: '数学' },
-                { categoryId: 3, catName: '物理' },
-            ],
+            parentCategories: [],  // 父类列表
+            subCategories: [],     // 子类列表
+            form: {
+                parentCategoryId: null,
+                subCategoryId: null,
+                courseName: '',
+                courseDescription: '',
+            },
+            // catInfoData: [
+            //     { categoryId: 1, catName: '计算机科学' },
+            //     { categoryId: 2, catName: '数学' },
+            //     { categoryId: 3, catName: '物理' },
+            // ],
         };
     },
     methods: {
@@ -209,7 +231,44 @@ export default {
             this.dialogFormVisible = true;
         },
 
+        // 获取所有父类
+        fetchParentCategories() {
+            this.$http.get('/cat/parent').then(response => {
+                this.parentCategories = response.data;
+            }).catch(error => {
+                console.error("获取父类失败:", error);
+            });
+        },
+
+        // 根据选择的父类，获取对应的子类
+        handleParentCategoryChange(parentId) {
+            if (parentId) {
+                this.$http.get(`/cat/subs/${parentId}`).then(response => {
+                    this.subCategories = response.data; // 获取并更新子类数据
+                }).catch(error => {
+                    console.error("获取子类失败:", error);
+                    this.subCategories = [];
+                });
+            } else {
+                this.subCategories = []; // 如果没有选择父类，清空子类列表
+            }
+        },
+
+        // // 清空表单数据
+        // clearForm() {
+        //         this.form.parentId = null;
+        //         this.form.subCategoryId = null;
+        //         this.form.courseName = '';
+        //         this.form.courseDescription = '';
+        // },
+
+        // 添加课程
         addCourse() {
+            if (!this.form.parentId || !this.form.subCategoryId || !this.form.courseName || !this.form.courseDescription) {
+                this.$message.error("请填写完整信息并选择父类和子类！");
+                return;
+            }
+            // 发送请求到后台添加课程
             this.$http.post('/crs/v1', this.form).then((response) => {
                 if (response.data === 1) {
                     ElMessage({ message: '课程信息添加成功！', type: 'success' });
@@ -218,8 +277,24 @@ export default {
                 } else {
                     ElMessage({ message: '课程信息添加失败！', type: 'error' });
                 }
+            }).catch((error) => {
+                console.error("添加课程失败:", error);
+                ElMessage({ message: '添加课程失败！', type: 'error' });
             });
         },
+
+
+        // addCourse() {
+        //     this.$http.post('/crs/v1', this.form).then((response) => {
+        //         if (response.data === 1) {
+        //             ElMessage({ message: '课程信息添加成功！', type: 'success' });
+        //             this.getPageData(this.currentPage, this.pageSize);
+        //             this.dialogFormVisible = false;
+        //         } else {
+        //             ElMessage({ message: '课程信息添加失败！', type: 'error' });
+        //         }
+        //     });
+        // },
 
 
         //打开详情页
@@ -237,15 +312,6 @@ export default {
             });
         },
 
-        // queryInfo() {
-        //     if (this.queryStr.trim().length > 0) {
-        //         this.tableData = this.pageInfo.records.filter(item =>
-        //             item.courseName && item.courseName.match(this.queryStr.trim())
-        //         );
-        //     } else {
-        //         this.tableData = this.pageInfo.records;// 恢复原数据
-        //     }
-        // },
 
         // 查询方法，根据选择的字段和输入的查询内容进行查询
         queryInfo() {
@@ -283,35 +349,7 @@ export default {
             }).catch(() => { });
         },
 
-        // // 批量删除
-        // multipleDelete() {
-        //     if (this.multipleSelection.length > 0) {
-        //         // 从选中的课程中提取课程 ID
-        //         const ids = this.multipleSelection.map(item => item.courseId); // 确保 item 中有 courseId
-
-        //         ElMessageBox.confirm('是否删除选中的所有数据?', '批量删除提示', {
-        //             confirmButtonText: '确定',
-        //             cancelButtonText: '取消',
-        //             type: "warning",
-        //         }).then(() => {
-        //             const ids = this.multipleSelection.map(item => item.questionId);
-        //             // ${ids.join(",")}
-        //             this.$http.delete(`/crs/v1`, { data: ids }).then((response) => {
-        //                 if (response.data > 0) {
-        //                     ElMessage({ message: '批量删除成功', type: "success" });
-        //                     this.getPageData(this.currentPage, this.pageSize); // 刷新数据
-        //                 } else {
-        //                     ElMessage({ message: '批量删除失败', type: "warning" });
-        //                 }
-        //             }).catch(() => {
-        //                 ElMessage({ message: '请求失败，请重试', type: "error" });
-        //             });
-        //         }).catch(() => { });
-        //     } else {
-        //         ElMessage({ message: '请选择要删除的记录', type: "warning" });
-        //     }
-        // },
-
+        //  批量删除
         multipleDelete() {
             // 确保有选中的课程
             if (this.multipleSelection.length > 0) {
@@ -412,6 +450,8 @@ export default {
 
     mounted() {
         this.getPageData(this.currentPage, this.pageSize);
+        // 初始化加载父类数据
+        this.fetchParentCategories();
     },
 };
 </script>
