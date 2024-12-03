@@ -12,7 +12,7 @@
 
         <el-table :data="tableData" style="width: 100%" @selection-change="handleSelectionChange">
             <el-table-column fixed type="selection" width="55" />
-            <el-table-column prop="competitionId" label="竞赛ID" width="120" />
+            
             <el-table-column prop="competitionName" label="竞赛名称" width="120" />
             <el-table-column prop="categoryId"  label="竞赛类别ID" width="120" />
             <el-table-column prop="levelId" label="竞赛等级ID" width="120" />
@@ -223,6 +223,26 @@ export default {
             this.form = {};  // 清空表单数据
             this.dialogFormVisible = true;
         },
+     // 添加竞赛信息
+        addQuestion() {
+            // 确保所有必填字段都已填写
+            if (!this.form.competitionName || !this.form.competitionImgUrl || !this.form.competitionStatus || !this.form.categoryId || !this.form.levelId) {
+                ElMessage({ message: '请填写完整的竞赛信息！', type: "warning" });
+                return;
+            }
+            // 发送 POST 请求以添加竞赛信息
+            this.$http.post('http://localhost:10086/comp/v1/compe', this.form).then((response) => {
+                if (response.data == 1) {
+                    ElMessage({ message: '竞赛信息添加成功！', type: "success" });
+                    this.getPageData(this.currentPage, this.pageSize); // 刷新数据
+                    this.dialogFormVisible = false; // 关闭对话框
+                } else {
+                    ElMessage({ message: '信息添加失败！', type: "error" });
+                }
+            }).catch((err) => {
+                ElMessage({ message: '请求失败，请重试', type: "error" });
+            });
+        },
 
         // 打开编辑对话框
         openUpdateDialog(row) {
@@ -297,7 +317,7 @@ export default {
                     type: "warning",
                 }).then(() => {
                     const ids = this.multipleSelection.map(item => item.competitionId);
-                    this.$http.post(`http://localhost:10086/comp/v1/compe/${ids}`,).then((response) => {
+                    this.$http.delete(`http://localhost:10086/comp/v1/compe/${ids}`,).then((response) => {
                         if (response.data == 1) {
                             ElMessage({ message: '批量删除成功', type: "success" });
                             this.getPageData(this.currentPage, this.pageSize); // 刷新数据

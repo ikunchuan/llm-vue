@@ -194,7 +194,7 @@ export default {
             this.dialogFormVisible = true;
         },
 
-        // 添加题目信息
+        // 添加竞赛信息
         addQuestion() {
             if (!this.form.categoryId || !this.form.questionTitle || !this.form.questionText || !this.form.correctAnswer) {
                 ElMessage({ message: '请填写完整的题目信息！', type: "warning" });
