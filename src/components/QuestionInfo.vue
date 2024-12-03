@@ -18,14 +18,10 @@
             <el-table-column prop="correctAnswer" label="正确答案" width="300" />
             <el-form-item prop="reMark" label="备注" width="250" />
             <el-table-column prop="updatedTime" label="更新时间" width="200">
-                <template #default="{ row }">
-                    <span>{{ formatDate(row.updatedTime) }}</span>
-                </template>
+                <span>{{ formattedUpdatedTime }}</span>
             </el-table-column>
             <el-table-column prop="createdTime" label="创建时间" width="250">
-                <template #default="{ row }">
-                    <span>{{ formatDate(row.createdTime) }}</span>
-                </template>
+                <span>{{ formattedCreatedTime }}</span>
             </el-table-column>
             <el-table-column fixed="right" label="操作" min-width="180">
                 <template #default="scope">
@@ -44,7 +40,7 @@
 
     <!-- 编辑、添加对话框 -->
     <el-dialog v-model="dialogFormVisible" :title="title" width="500">
-        <el-form :model="form">
+        <el-form :model="form" :rules="rules" ref="formRef">
             <el-form-item label="类别" :label-width="formLabelWidth">
                 <el-select v-model="form.categoryId" placeholder="-- 请选择类别 --">
                     <el-option v-for="cat in catInfoData" :key="cat.categoryId" :label="cat.catName"
@@ -79,7 +75,7 @@
 
     <!-- 详情对话框 -->
     <el-dialog v-model="dialogDetailVisible" title="题目信息详情" width="800">
-        <el-form :model="form">
+        <el-form :model="form" :rules="rules" ref="formRef">
             <el-form-item label="题目标题：" :label-width="formLabelWidth">
                 <el-form-item :label="form.questionTitle" style="overflow-X: scroll;" />
             </el-form-item>
@@ -97,11 +93,11 @@
             </el-form-item>
 
             <el-form-item label="更新时间：" :label-width="formLabelWidth">
-                <el-form-item :label="form.updatedTime" />
+                <el-form-item :label="formattedUpdatedTime" />
             </el-form-item>
 
             <el-form-item label="创建时间：" :label-width="formLabelWidth">
-                <el-form-item :label="form.createdTime" />
+                <el-form-item :label="formattedCreatedTime" />
             </el-form-item>
         </el-form>
 
@@ -119,6 +115,13 @@ import { ElMessage, ElMessageBox } from 'element-plus';
 export default {
     data() {
         return {
+            rules: {
+                categoryId: [{ required: true, message: '请选择类别', trigger: 'change' }],
+                questionTitle: [{ required: true, message: '请输入题目标题', trigger: 'blur' }],
+                questionText: [{ required: true, message: '请输入题目内容', trigger: 'blur' }],
+                correctAnswer: [{ required: true, message: '请输入正确答案', trigger: 'blur' }]
+            },
+
             name: '题目信息',
             queryStr: "",
 
@@ -227,7 +230,7 @@ export default {
                 ElMessage({ message: '请填写完整的题目信息！', type: "warning" });
                 return;
             }
-            this.$http.put(`/qst/v1/${this.form.questionId}`, this.form).then((response) => {
+            this.$http.put(`/qst/v1`, this.form).then((response) => {
                 if (response.data == 1) {
                     ElMessage({ message: '更新成功', type: "success" });
                     this.getPageData(this.currentPage, this.pageSize); // 刷新数据
@@ -284,8 +287,9 @@ export default {
                     type: "warning",
                 }).then(() => {
                     const ids = this.multipleSelection.map(item => item.questionId);
-                    this.$http.post(`/qst/v1/${ids}`,).then((response) => {
-                        if (response.data == 1) {
+                    // ${ids.join(",")}
+                    this.$http.delete(`/qst/v1`, { data: ids }).then((response) => {
+                        if (response.data > 0) {
                             ElMessage({ message: '批量删除成功', type: "success" });
                             this.getPageData(this.currentPage, this.pageSize); // 刷新数据
                         } else {
@@ -310,13 +314,37 @@ export default {
                 this.tableData = this.pageInfo.records;  // 恢复原数据
             }
         },
+        // queryInfo() {
+        //     this.$http.get('/qst/v1/page', {
+        //         params: {
+        //             pageNum: this.currentPage,
+        //             pageSize: this.pageSize,
+        //             queryStr: this.queryStr.trim()
+        //         }
+        //     }).then(response => {
+        //         this.pageInfo = response.data;
+        //         this.tableData = this.pageInfo.records;
+        //     }).catch(() => {
+        //         ElMessage({ message: '查询失败，请重试', type: "error" });
+        //     });
+        // },
 
         handleSelectionChange(val) {
             this.multipleSelection = val;
         },
     },
+
     mounted() {
         this.getPageData(this.currentPage, this.pageSize);
+    },
+
+    computed: {
+        formattedUpdatedTime() {
+            return this.formatDate(this.form.updatedTime);
+        },
+        formattedCreatedTime() {
+            return this.formatDate(this.form.createdTime);
+        }
     },
 };
 </script>

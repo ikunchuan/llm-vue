@@ -1,6 +1,7 @@
 // import { createRouter, createWebHashHistory } from 'vue-router';
 // import Home from '../components/Home.vue';
 // import Login from '../components/Login.vue';
+
 // import UserList from '../components/UserList.vue'; // 用户基本信息管理
 // import UserMonitor from '../components/UserMonitor.vue'; // 用户行为监控管理
 // import UserViolation from '../components/UserViolation.vue'; // 违规用户处理
@@ -18,6 +19,7 @@
 
 // const routes = [
 //     { path: '/', component: Login },
+  
 //     { 
 //         path: '/home', 
 //         component: Home, 
@@ -46,8 +48,6 @@
 // });
 
 // export default router;
-
-
 
 
 
