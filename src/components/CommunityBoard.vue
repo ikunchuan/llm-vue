@@ -39,6 +39,9 @@
                     <el-button link type="primary" size="small" @click="openUpdateDialog(scope.row)">
                         编辑
                     </el-button>
+                    <el-button link type="primary" size="small" @click="openUserDialog(scope.row.communityId)">
+                        所有用户
+                    </el-button>
                 </template>
 
             </el-table-column>
@@ -46,7 +49,7 @@
 
         <br />
 
-        <el-pagination v-model:current-page="pageNum" v-model:page-size="pageSize" :page-sizes="[2, 3, 4, 5]"
+        <el-pagination v-model:current-page="currentPage" v-model:page-size="pageSize" :page-sizes="[2, 3, 4, 5]"
             :background="true" layout="total, sizes, prev, pager, next, jumper" :total="pageInfo.total"
             @size-change="handleSizeChange" @current-change="handleCurrentChange" />
 
@@ -59,6 +62,10 @@
             <el-row :gutter="20">
                 <el-col :span="16">
 
+                    <el-form-item label="社区类别" :label-width="formLabelWidth">
+                        <el-input v-model="form.categoryId" autocomplete="off" />
+                    </el-form-item>
+
                     <el-form-item label="社区名" :label-width="formLabelWidth">
                         <el-input v-model="form.communityName" autocomplete="off" />
                     </el-form-item>
@@ -67,21 +74,11 @@
                         <el-input v-model="form.communityDescription" autocomplete="off" />
                     </el-form-item>
 
-
+                    <el-form-item label="创建者" :label-width="formLabelWidth">
+                        <el-input v-model="form.createdBy" autocomplete="off" />
+                    </el-form-item>
 
                 </el-col>
-
-                <!-- <el-col :span="8">
-                    <el-upload class="avatar-uploader" action="http://localhost:8080/stu/v1/upload"
-                        :show-file-list="false" :on-success="handleSuccess" :before-upload="beforeAvatarUpload">
-                        <img v-if="form.stu_image_url"
-                            :src="'http://localhost:8080/images/upload/' + form.stu_image_url" class="avatar" />
-                        <el-icon v-else class="avatar-uploader-icon">
-                            <Plus />
-                        </el-icon>
-                    </el-upload>
-                </el-col> -->
-
             </el-row>
         </el-form>
 
@@ -96,9 +93,9 @@
         </template>
     </el-dialog>
 
-    <!-- 详情对话框 -->
 
-    <el-dialog v-model="dialogDetailVisible" title="学生详细信息显示" width="500">
+    <!-- 详情对话框 -->
+    <el-dialog v-model="dialogDetailVisible" title="社区详细信息显示" width="500">
         <el-form :model="form">
             <el-form-item label="社区类别" :label-width="formLabelWidth">
                 <el-form-item :label="form.categoryId"></el-form-item>
@@ -115,17 +112,34 @@
             <el-form-item label="创建人" :label-width="formLabelWidth">
                 <el-form-item :label="form.createdBy"></el-form-item>
             </el-form-item>
-
-
         </el-form>
 
         <template #footer>
             <div class="dialog-footer">
-                <el-button @click="dialogFormVisible = false">取消</el-button>
+                <el-button @click="dialogDetailVisible = false">取消</el-button>
 
             </div>
         </template>
     </el-dialog>
+
+
+    <!-- 用户详细表 -->
+
+        <el-dialog v-model="dialogUserInfoVisible" title="用户详细信息显示" width="600px">
+            
+            <el-table :data="users" style="width: 100%">
+                <el-table-column prop="createTime" label="Date" width="180" />
+                <el-table-column prop="createBy" label="Name" width="180" />
+            </el-table>
+
+            <template #footer>
+                <div class="dialog-footer">
+                    <el-button @click="dialogUserInfoVisible = false">取消</el-button>
+                </div>
+            </template>
+        </el-dialog>
+
+
 
 
 </template>
@@ -139,15 +153,19 @@ export default {
     data() {
         return {
             // cmnsInfoData:[],
+            dialogUserInfoVisible: false,
             dialogDetailVisible: false,   //详细对话框
             dialogFormVisible: false,  //对话框是否展示,默认为不展示
+
             queryStr: "",                   //查询条件
             multipleSelection: [],       //多选删除
             tableData: [],    //社区信息数据
+            userData: [],        //用户信息数据
             queryData: [],
             pageInfo: {},       //分页信息对象
             pageSize: 3,        //当前页条数
             pageNum: 1,     //当前页号
+            users: {},
             form: {},                       //对话框表单数据
             formLabelWidth: "140px",    //对话框label宽度
             title: "",                           //对话框标题
@@ -165,15 +183,14 @@ export default {
         //     this.form.stu_image_url = response
         // },
 
-        handleSizeChange(pageSize) {                 //选择每一页显示的记录数
-            this.currentSize = pageSize
-            this.getPageData(this.currentSize, this.pageSize)
+        handleSizeChange(pageSize) {            //选择每一页显示的记录数
+            this.pageSize = pageSize;
+            this.getPageData(this.currentPage, this.pageSize)
             console.log("size:", pageSize);
         },
-
-        handleCurrentChange(pageNum) {              //切换页号时得到当时页号
-            this.currentNum = pageNum
-            this.getPageData(this.currentNum, this.pageNum)
+        handleCurrentChange(pageNum) {      //切换页号时得到当时页号
+            this.currentPage = pageNum;
+            this.getPageData(this.currentPage, this.pageSize)
             console.log("num:", pageNum);
         },
 
@@ -188,10 +205,20 @@ export default {
                         this.queryData = [...this.tableData];
                     }
 
-                    console.log("Data loaded successfully:", this.tableData);
+                    console.log(this.tableData);
                 });
         },
 
+        openUserDialog(cmnid) {
+            var _this = this
+            this.$http.get("/ucmns/v1/ucmn/user/" + cmnid).then(function (response) {
+                console.log(response.data);
+                _this.users = response.data
+            })
+
+            this.dialogUserInfoVisible = true;
+            console.log("打开用户详细页面")
+        },
 
         closeDialog() {
             this.form = []
@@ -200,7 +227,7 @@ export default {
 
         openDetailDialog(cmnid) {
             var _this = this
-            this.$http.get("/cmns/v1/cmn" + cmnid).then(function (response) {
+            this.$http.get("/cmns/v1/cmn/" + cmnid).then(function (response) {
                 console.log(response.data);
                 _this.form = response.data
             })
@@ -225,9 +252,9 @@ export default {
             // this.form.stu_sex = this.form.stu_sex.toString()
             console.log("openUpdateDialog....");
         },
-        updateStudent() {        //修改功能
-            console.log(this.form);
 
+        updateCmn() {        //修改功能
+            console.log(this.form);
             var _this = this;
             // this.form.stu_interest = this.form.stu_interest.join(',')              //将数据转为字符串
             this.$http.put("/cmns/v1/cmn", this.form).then(function (response) {
@@ -249,7 +276,7 @@ export default {
             this.form = []
         },
 
-        addStudent() {           //添加功能
+        addCmn() {           //添加功能
             var _this = this;
             // this.form.stu_interest = this.form.stu_interest.join(',');
             this.$http.post("/cmns/v1/cmn", this.form).then(function (response) {
@@ -257,12 +284,12 @@ export default {
 
                 if (response.data == 1) {
                     ElMessage({
-                        message: '学生信息添加成功',
+                        message: '社区添加成功',
                         type: 'success',
                     })
                 } else {
                     ElMessage({
-                        message: '学生信息添加失败',
+                        message: '社区添加失败',
                         type: 'warning',
                     })
                 }
@@ -301,7 +328,7 @@ export default {
             )
                 .then(() => {
                     var _this = this;
-                    this.$http.delete("cmns/v1/cmn" + cmnid).then(function (response) {
+                    this.$http.delete("cmns/v1/cmn/" + cmnid).then(function (response) {
                         console.log(response.data);
                     })
                     if (response.data == 1) {
@@ -340,8 +367,8 @@ export default {
                     var num = 0;
                     this.multipleSelection.forEach(item => {
                         var _this = this;
-                        var cmnid = item.cmnid
-                        this.$http.delete("/cmns/v1/cmn" + cmnid).then(function (response) {
+                        var cmnid = item.communityId
+                        this.$http.delete("/cmns/v1/cmn/" + cmnid).then(function (response) {
                             console.log(response.data);
                             if (response.data == 1) {
                                 num = num + 1
@@ -363,10 +390,6 @@ export default {
         },
 
         queryInfo() {
-            if (!this.queryData || this.queryData.length === 0) {
-                console.error("Original data is not cached. Please check data loading logic.");
-                return;
-            }
 
             if (this.queryStr.trim().length > 0) {
                 this.tableData = this.queryData.filter(item =>
@@ -376,7 +399,7 @@ export default {
                 this.tableData = [...this.queryData];
             }
 
-            console.log("Query executed. Current data:", this.tableData);
+            console.log(this.tableData);
         },
 
         handleSelectionChange(val) {            //多行选择
@@ -405,7 +428,7 @@ export default {
             // this.tableData = this.cmnsInfoData;
             // console.log('tableData:', this.tableData);
         });
-        
+
     }
 
 }
@@ -445,5 +468,17 @@ export default {
     width: 178px;
     height: 178px;
     text-align: center;
+}
+</style>
+
+<style scoped>
+.dialog-footer {
+    display: flex;
+    justify-content: flex-end;
+    padding: 10px 20px;
+}
+
+.el-table {
+    margin-top: 20px;
 }
 </style>
