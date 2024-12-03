@@ -284,8 +284,9 @@ export default {
                     type: "warning",
                 }).then(() => {
                     const ids = this.multipleSelection.map(item => item.questionId);
-                    this.$http.post(`/qst/v1/${ids}`,).then((response) => {
-                        if (response.data == 1) {
+                    // ${ids.join(",")}
+                    this.$http.delete(`/qst/v1`, { data: ids }).then((response) => {
+                        if (response.data > 0) {
                             ElMessage({ message: '批量删除成功', type: "success" });
                             this.getPageData(this.currentPage, this.pageSize); // 刷新数据
                         } else {
