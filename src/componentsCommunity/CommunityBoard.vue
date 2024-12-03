@@ -1,5 +1,5 @@
 <template>
-    <el-card style="max-width: 100%">
+    <el-card class="card">
         <template #header>
 
             <div class="card-header">
@@ -472,6 +472,11 @@ export default {
 </style>
 
 <style scoped>
+.card {
+            width: 100%;
+            margin: 20px 0;
+        }
+
 .dialog-footer {
     display: flex;
     justify-content: flex-end;
