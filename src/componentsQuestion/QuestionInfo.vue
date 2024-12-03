@@ -18,10 +18,14 @@
             <el-table-column prop="correctAnswer" label="正确答案" width="300" />
             <el-form-item prop="reMark" label="备注" width="250" />
             <el-table-column prop="updatedTime" label="更新时间" width="200">
-                <span>{{ formattedUpdatedTime }}</span>
+                <template #default="{ row }">
+                    <span>{{ formatDate(row.updatedTime) }}</span>
+                </template>
             </el-table-column>
             <el-table-column prop="createdTime" label="创建时间" width="250">
-                <span>{{ formattedCreatedTime }}</span>
+                <template #default="{ row }">
+                    <span>{{ formatDate(row.createdTime) }}</span>
+                </template>
             </el-table-column>
             <el-table-column fixed="right" label="操作" min-width="180">
                 <template #default="scope">
@@ -40,7 +44,7 @@
 
     <!-- 编辑、添加对话框 -->
     <el-dialog v-model="dialogFormVisible" :title="title" width="500">
-        <el-form :model="form" :rules="rules" ref="formRef">
+        <el-form :model="form">
             <el-form-item label="类别" :label-width="formLabelWidth">
                 <el-select v-model="form.categoryId" placeholder="-- 请选择类别 --">
                     <el-option v-for="cat in catInfoData" :key="cat.categoryId" :label="cat.catName"
@@ -75,7 +79,7 @@
 
     <!-- 详情对话框 -->
     <el-dialog v-model="dialogDetailVisible" title="题目信息详情" width="800">
-        <el-form :model="form" :rules="rules" ref="formRef">
+        <el-form :model="form">
             <el-form-item label="题目标题：" :label-width="formLabelWidth">
                 <el-form-item :label="form.questionTitle" style="overflow-X: scroll;" />
             </el-form-item>
@@ -93,11 +97,11 @@
             </el-form-item>
 
             <el-form-item label="更新时间：" :label-width="formLabelWidth">
-                <el-form-item :label="formattedUpdatedTime" />
+                <el-form-item :label="form.updatedTime" />
             </el-form-item>
 
             <el-form-item label="创建时间：" :label-width="formLabelWidth">
-                <el-form-item :label="formattedCreatedTime" />
+                <el-form-item :label="form.createdTime" />
             </el-form-item>
         </el-form>
 
@@ -115,13 +119,6 @@ import { ElMessage, ElMessageBox } from 'element-plus';
 export default {
     data() {
         return {
-            rules: {
-                categoryId: [{ required: true, message: '请选择类别', trigger: 'change' }],
-                questionTitle: [{ required: true, message: '请输入题目标题', trigger: 'blur' }],
-                questionText: [{ required: true, message: '请输入题目内容', trigger: 'blur' }],
-                correctAnswer: [{ required: true, message: '请输入正确答案', trigger: 'blur' }]
-            },
-
             name: '题目信息',
             queryStr: "",
 
@@ -314,37 +311,13 @@ export default {
                 this.tableData = this.pageInfo.records;  // 恢复原数据
             }
         },
-        // queryInfo() {
-        //     this.$http.get('/qst/v1/page', {
-        //         params: {
-        //             pageNum: this.currentPage,
-        //             pageSize: this.pageSize,
-        //             queryStr: this.queryStr.trim()
-        //         }
-        //     }).then(response => {
-        //         this.pageInfo = response.data;
-        //         this.tableData = this.pageInfo.records;
-        //     }).catch(() => {
-        //         ElMessage({ message: '查询失败，请重试', type: "error" });
-        //     });
-        // },
 
         handleSelectionChange(val) {
             this.multipleSelection = val;
         },
     },
-
     mounted() {
         this.getPageData(this.currentPage, this.pageSize);
-    },
-
-    computed: {
-        formattedUpdatedTime() {
-            return this.formatDate(this.form.updatedTime);
-        },
-        formattedCreatedTime() {
-            return this.formatDate(this.form.createdTime);
-        }
     },
 };
 </script>

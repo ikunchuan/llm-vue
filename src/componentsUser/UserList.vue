@@ -2,12 +2,21 @@
     <el-card style="max-width: 100%">
         <template #header>
 
-            <div class="card-header">
+            <div slot="header" class="card-header">{{ name }}</div><br>
+            <div class="header-actions">
+                <!-- 查询字段选择：让用户选择查询的字段 -->
+                <el-select v-model="selectedField" placeholder="选择查询字段" style="width: 180px;">
+                    <el-option label="用户名" value="userName"></el-option>
+                    <el-option label="用户性别" value="userSex"></el-option>
+            
+                </el-select>&nbsp;
 
-                <div class="query">
-                    <el-input v-model="queryStr" placeholder="请输入" /> &nbsp; &nbsp;
-                    <el-button class="button" type="primary" round @click="queryInfo">查询</el-button>
-                </div>
+                <!-- 输入框：输入查询内容 -->
+                <el-input v-model="queryStr" style="width: 220px" placeholder="请输入查询内容" />&nbsp;
+
+                <!-- <el-input v-model="queryStr" style="width: 220px" placeholder="请输入课程名称" />&nbsp; -->
+                
+                <el-button type="primary"  @click="queryInfo">查询</el-button>
                 
 
             </div>
@@ -28,6 +37,17 @@
             <el-table-column prop="userEmail" label="邮箱" width="120" />
             <el-table-column prop="userProfilePicture" label="用户头像" width="120" />
             <el-table-column prop="userBio" label="用户描述" width="120" />
+            <el-table-column prop="updatedTime" label="更新时间" width="100">
+                <template #default="{ row }">
+                    <span>{{ formatDate(row.updatedTime) }}</span>
+                </template>
+            </el-table-column>
+
+            <el-table-column prop="createdTime" label="创建时间" width="100" >
+                <template #default="{ row }">
+                    <span>{{ formatDate(row.createdTime) }}</span>
+                </template>
+            </el-table-column>
 
             <el-table-column fixed="right" label="操作" min-width="160">
 
@@ -43,7 +63,7 @@
 
         <br />
 
-        <el-pagination v-model:current-page="pageNum" v-model:page-size="pageSize" :page-sizes="[2, 3, 4, 5]"
+        <el-pagination v-model:current-page="currentPage" v-model:page-size="pageSize" :page-sizes="[2, 3, 4, 5]"
             :background="true" layout="total, sizes, prev, pager, next, jumper" :total="pageInfo.total"
             @size-change="handleSizeChange" @current-change="handleCurrentChange" />
 
@@ -79,6 +99,13 @@
             <el-form-item label="用户描述" :label-width="formLabelWidth">
                 <el-form-item :label="form.userBio"></el-form-item>
             </el-form-item>
+            <el-form-item label="更新时间：" :label-width="formLabelWidth">
+                <el-form-item :label="form.updatedTime" />
+            </el-form-item>
+
+            <el-form-item label="创建时间：" :label-width="formLabelWidth">
+                <el-form-item :label="form.createdTime" />
+            </el-form-item>
 
 
         </el-form>
@@ -104,14 +131,24 @@ export default {
         return {
             // cmnsInfoData:[],
             dialogDetailVisible: false,   //详细对话框
+
+            name: '用户信息',
             queryStr: "",                   //查询条件
-            tableData: [],    //社区信息数据
+            selectedField: "",  // 选择的查询字段
+
+            currentPage: 1,
+            pageSize: 5,
+            pageInfo: {},
+
+            tableData: [],    //用户信息数据
+            form: {},                       //对话框表单数据
+            formLabelWidth: "140px",    //对话框label宽度
+
             queryData: [],
             pageInfo: {},       //分页信息对象
             pageSize: 3,        //当前页条数
             pageNum: 1,     //当前页号
-            form: {},                       //对话框表单数据
-            formLabelWidth: "140px",    //对话框label宽度
+            
             title: "",                           //对话框标题
             btnName: "",                     //对话框按钮文字
             // claInfoData: [],                  //加载到下拉框的班级信息
@@ -127,30 +164,25 @@ export default {
         //     this.form.stu_image_url = response
         // },
 
-        handleSizeChange(pageSize) {                 //选择每一页显示的记录数
-            this.currentSize = pageSize
-            this.getPageData(this.currentSize, this.pageSize)
-            console.log("size:", pageSize);
+        //选择每一页显示的记录数
+        handleSizeChange(pageSize) {
+            console.log("当前页大小: ", pageSize);
+            this.pageSize = pageSize;
+            this.getPageData(this.currentPage, this.pageSize);
         },
-
-        handleCurrentChange(pageNum) {              //切换页号时得到当时页号
-            this.currentNum = pageNum
-            this.getPageData(this.currentNum, this.pageNum)
-            console.log("num:", pageNum);
+        //切换页号时得到当时页号
+        handleCurrentChange(pageNum) {
+            console.log("当前页码: ", pageNum);
+            this.currentPage = pageNum;
+            this.getPageData(this.currentPage, this.pageSize);
         },
 
         getPageData(num, size) {
-            this.$http.get("/uis/v1/ui", { params: { pageNum: num, pageSize: size } })
-                .then(response => {
+            this.$http.get('/uis/v1/ui', { params: { pageNum: num, pageSize: size } })
+                .then((response) => {
+                    console.log(response.data);
                     this.pageInfo = response.data;
                     this.tableData = this.pageInfo.records;
-
-                    // 初始化或保护原始数据缓存
-                    if (!this.queryData || this.queryData.length === 0) {
-                        this.queryData = [...this.tableData];
-                    }
-
-                    console.log("Data loaded successfully:", this.tableData);
                 });
         },
 
@@ -160,59 +192,62 @@ export default {
             console.log("closeDialog.....")
         },
 
-        openDetailDialog(userId) {
+       //打开详情页
+        openDetailDialog(userid) {
             var _this = this
-            this.$http.get(`/uis/v1/ui/${userId}`).then(function (response) {
+            this.$http.get("/uis/v1/ui/" + userid).then(function (response) {
                 console.log(response.data);
                 _this.form = response.data
             })
 
             this.dialogDetailVisible = true;
         },
-
+        formatDate(value) {
+            if (!value) return '-';
+            const date = new Date(value);
+            return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')} ${String(date.getHours()).padStart(2, '0')}:${String(date.getMinutes()).padStart(2, '0')}:${String(date.getSeconds()).padStart(2, '0')}`;
+        },
 
         
 
         
 
         queryInfo() {
-            if (!this.queryData || this.queryData.length === 0) {
-                console.error("原始数据未被缓存，请检查数据加载逻辑。");
+    // 如果选择了查询字段和输入了查询条件
+    if (this.queryStr.trim().length > 0 && this.selectedField) {
+        let queryValue = this.queryStr.trim();
+
+        // 如果查询字段是 'userSex'，则将 '男' 转换为 1, '女' 转换为 0
+        if (this.selectedField === 'userSex') {
+            if (queryValue === '男') {
+                queryValue = 1;  // '男' 对应 1
+            } else if (queryValue === '女') {
+                queryValue = 0;  // '女' 对应 0
+            } else {
+                // 如果输入的不是 '男' 或 '女'，则不进行查询
+                ElMessage.error('请输入正确的性别（男/女）');
                 return;
             }
+        }
 
-            if (this.queryStr.trim().length > 0) {
-                this.tableData = this.queryData.filter(item =>
-                    item.communityName.includes(this.queryStr.trim())
-                );
-            } else {
-                this.tableData = [...this.queryData];
+        // 过滤数据
+        this.tableData = this.pageInfo.records.filter(item => {
+            // 根据选择的字段进行匹配
+            if (item[this.selectedField] && item[this.selectedField].toString().includes(queryValue)) {
+                return true;  // 匹配成功
             }
-
-            console.log("Query executed. Current data:", this.tableData);
-        },
-
-    },
-    components: {
-        Plus
-    },
-
-    mounted() {
-        this.getPageData(1, 3)
-
-        // this.$http.get("/cmns/v1/cmn").then((response) => {
-        //     this.cmnsInfoData = response.data
-        //     console.log(this.cmnsInfoData)
-        // })
-
-        this.$http.get("/uis/v1/ui").then((response) => {
-            this.usersInfoData = response.data;
-            console.log('usersInfoData:', this.usersInfoData);
-            console.log("huhuhu")
-            // 确保这里的 tableData 被正确赋值
-            // this.tableData = this.cmnsInfoData;
-            // console.log('tableData:', this.tableData);
+            return false;  // 不匹配
         });
+    } else {
+        // 如果没有选择字段或者没有输入查询内容，恢复原数据
+        this.tableData = this.pageInfo.records;
+    }
+}
+
+
+    }, 
+    mounted() {
+        this.getPageData(this.currentPage, this.pageSize);
         
     }
 
