@@ -12,17 +12,30 @@
 
         <el-table :data="tableData" style="width: 100%" @selection-change="handleSelectionChange">
             <el-table-column fixed type="selection" width="55" />
-            <el-table-column prop="competitionId" label="竞赛ID" width="120" />
+            <el-table-column prop="competitionId" label="竞赛ID" width="80" />
             <el-table-column prop="competitionDescription" label="竞赛详情" width="120" />
             <el-table-column prop="competitionOrganizer"  label="竞赛主办方" width="120" />
-            <el-table-column prop="startDate" label="竞赛开始日期" width="120" />
-            <el-table-column prop="endDate" label="竞赛结束日期" width="150" />
-            <el-table-column prop="competitionUrl" label="竞赛官方网站链接" width="120" />
+            <el-table-column prop="startDate" label="竞赛开始日期" width="180" >
+                <template #default="{ row }">
+                    <span>{{ formatDate(row.startDate) }}</span>
+                </template>
+            </el-table-column>
+        
+            <el-table-column prop="endDate" label="竞赛结束日期" width="180" >
+                <template #default="{ row }">
+                    <span>{{ formatDate(row.endDate) }}</span>
+                </template>
+            </el-table-column>
+            <el-table-column prop="competitionUrl" label="竞赛官方网站链接" width="150" />
             <el-table-column prop="competitionSchedule"  label="竞赛日程安排" width="120" />
-            <el-table-column prop="registrationDeadline" label="报名截止日期" width="120" />
+            <el-table-column prop="registrationDeadline" label="报名截止日期" width="180" >
+                <template #default="{ row }">
+                    <span>{{ formatDate(row.registrationDeadline) }}</span>
+                </template>
+            </el-table-column>
             <el-table-column prop="registrationGuide" label="作品提交指南" width="150" />
             <el-table-column prop="outstandingCases" label="优秀案例展示" width="120" />
-            <el-table-column prop="eligibilityCriteria" label="竞赛参赛资格要求" width="120" />
+            <el-table-column prop="eligibilityCriteria" label="竞赛参赛资格要求" width="150" />
             <el-table-column prop="judgingCriteria" label="评审标准" width="150" />
             <el-table-column prop="prizeDetails" label="奖品详情" width="120" />
             <el-table-column prop="updatedTime" label="更新时间" width="200">
@@ -199,7 +212,7 @@ export default {
 
         // 获取分页数据
         getPageData(num, size) {
-            this.$http.get('http://localhost:10086/comp/v1/v1', { params: { pageNum: num, pageSize: size } })
+            this.$http.get('http://localhost:10086/comdetail/v1/v1', { params: { pageNum: num, pageSize: size } })
                 .then((response) => {
                     console.log(response.data);  // 检查后端返回的数据
                     this.pageInfo = response.data;

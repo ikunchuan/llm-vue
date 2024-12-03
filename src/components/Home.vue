@@ -35,7 +35,7 @@
               <RouterLink to="/home/competitionInfo">竞赛信息管理</RouterLink>
             </el-menu-item>
             <el-menu-item index="2-2">
-              <RouterLink to="/home/category1">类别一级分类管理</RouterLink>
+              <RouterLink to="/home/competitionDetail">竞赛详情管理</RouterLink>
             </el-menu-item>
             <el-menu-item index="2-3">
               <RouterLink to="/home/category2">类别二级分类管理</RouterLink>

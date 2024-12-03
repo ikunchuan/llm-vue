@@ -12,17 +12,32 @@
 
         <el-table :data="tableData" style="width: 100%" @selection-change="handleSelectionChange">
             <el-table-column fixed type="selection" width="55" />
-            
-            <el-table-column prop="competitionName" label="竞赛名称" width="120" />
-            <el-table-column prop="categoryId"  label="竞赛类别ID" width="120" />
-            <el-table-column prop="levelId" label="竞赛等级ID" width="120" />
-            <el-table-column prop="competitionImgUrl" label="竞赛图片链接" width="150" />
-            <el-table-column prop="competitionStatus" label="竞赛状态" width="120" />
-            <el-table-column prop="status" label="是否激活" width="100">
-                <template #default="scope">
-                    {{ scope.row.status == 0 ? '激活' : '停用' }}
+            <el-table-column prop="competitionId" label="竞赛ID" width="80" />
+            <el-table-column prop="competitionDescription" label="竞赛详情" width="120" />
+            <el-table-column prop="competitionOrganizer"  label="竞赛主办方" width="120" />
+            <el-table-column prop="startDate" label="竞赛开始日期" width="180" >
+                <template #default="{ row }">
+                    <span>{{ formatDate(row.startDate) }}</span>
                 </template>
             </el-table-column>
+        
+            <el-table-column prop="endDate" label="竞赛结束日期" width="180" >
+                <template #default="{ row }">
+                    <span>{{ formatDate(row.endDate) }}</span>
+                </template>
+            </el-table-column>
+            <el-table-column prop="competitionUrl" label="竞赛官方网站链接" width="150" />
+            <el-table-column prop="competitionSchedule"  label="竞赛日程安排" width="120" />
+            <el-table-column prop="registrationDeadline" label="报名截止日期" width="180" >
+                <template #default="{ row }">
+                    <span>{{ formatDate(row.registrationDeadline) }}</span>
+                </template>
+            </el-table-column>
+            <el-table-column prop="registrationGuide" label="作品提交指南" width="150" />
+            <el-table-column prop="outstandingCases" label="优秀案例展示" width="120" />
+            <el-table-column prop="eligibilityCriteria" label="竞赛参赛资格要求" width="150" />
+            <el-table-column prop="judgingCriteria" label="评审标准" width="150" />
+            <el-table-column prop="prizeDetails" label="奖品详情" width="120" />
             <el-table-column prop="updatedTime" label="更新时间" width="200">
                 <template #default="{ row }">
                     <span>{{ formatDate(row.updatedTime) }}</span>
@@ -62,28 +77,61 @@
                 <el-input v-model="form.competitionId" type="textarea" autocomplete="off" />
             </el-form-item>
 
-            <el-form-item label="竞赛名称" :label-width="formLabelWidth">
-                <el-input v-model="form.competitionName" type="textarea" autocomplete="off" />
+            <el-form-item label="竞赛详情" :label-width="formLabelWidth">
+                <el-input v-model="form.competitionDescription" type="textarea" autocomplete="off" />
             </el-form-item>
 
-            <el-form-item label="竞赛类别ID" :label-width="formLabelWidth">
-                <el-input v-model="form.categoryId" type="textarea" autocomplete="off" />
+            <el-form-item label="竞赛主办方" :label-width="formLabelWidth">
+                <el-input v-model="form.competitionOrganizer" type="textarea" autocomplete="off" />
             </el-form-item>
 
-            <el-form-item label="竞赛等级ID" :label-width="formLabelWidth">
-                <el-input v-model="form.levelId" type="textarea" autocomplete="off" />
+            <el-form-item label="竞赛开始日期" :label-width="formLabelWidth">
+                <el-input v-model="form.startDate" type="textarea" autocomplete="off" />
             </el-form-item>
 
-            <el-form-item label="竞赛图片链接" :label-width="formLabelWidth">
-                <el-input v-model="form.competitionImgUrl" type="textarea" autocomplete="off" />
+            <el-form-item label="竞赛结束日期" :label-width="formLabelWidth">
+                <el-input v-model="form.endDate" type="textarea" autocomplete="off" />
             </el-form-item>
 
-            <el-form-item label="竞赛状态" :label-width="formLabelWidth">
-                <el-input v-model="form.competitionStatus" type="textarea" autocomplete="off" />
+            <el-form-item label="竞赛官方网站链接" :label-width="formLabelWidth">
+                <el-input v-model="form.competitionUrl" type="textarea" autocomplete="off" />
             </el-form-item>
 
-            <el-form-item label="是否激活" :label-width="formLabelWidth">
-                <el-input v-model="form.status" type="textarea" autocomplete="off"/>             
+            <el-form-item label="竞赛日程安排" :label-width="formLabelWidth">
+                <el-input v-model="form.competitionSchedule" type="textarea" autocomplete="off"/>             
+            </el-form-item>
+
+            
+            <el-form-item label="报名截止日期" :label-width="formLabelWidth">
+                <el-input v-model="form.registrationDeadline" type="textarea" autocomplete="off" />
+            </el-form-item>
+
+            <el-form-item label="作品提交指南" :label-width="formLabelWidth">
+                <el-input v-model="form.registrationGuide" type="textarea" autocomplete="off" />
+            </el-form-item>
+
+            <el-form-item label="优秀案例展示" :label-width="formLabelWidth">
+                <el-input v-model="form.outstandingCases" type="textarea" autocomplete="off" />
+            </el-form-item>
+
+            <el-form-item label="竞赛参赛资格要求" :label-width="formLabelWidth">
+                <el-input v-model="form.eligibilityCriteria" type="textarea" autocomplete="off" />
+            </el-form-item>
+
+            <el-form-item label="评审标准" :label-width="formLabelWidth">
+                <el-input v-model="form.judgingCriteria" type="textarea" autocomplete="off" />
+            </el-form-item>
+
+            <el-form-item label="奖品详情" :label-width="formLabelWidth">
+                <el-input v-model="form.prizeDetails" type="textarea" autocomplete="off" />
+            </el-form-item>
+
+            <el-form-item label="更新时间" :label-width="formLabelWidth">
+                <el-input v-model="form.updatedTime" type="textarea" autocomplete="off"/>             
+            </el-form-item>
+
+            <el-form-item label="创建时间" :label-width="formLabelWidth">
+                <el-input v-model="form.createdTime" type="textarea" autocomplete="off"/>             
             </el-form-item>
         </el-form>
 
@@ -99,39 +147,64 @@
     <el-dialog v-model="dialogDetailVisible" title="竞赛信息详情" width="800">
         <el-form :model="form">
             <el-form-item label="竞赛ID" :label-width="formLabelWidth">
-                <el-form-item :label="form.competitionId"  />
+                <el-input v-model="form.competitionId" type="textarea" autocomplete="off" />
             </el-form-item>
 
-            <el-form-item label="竞赛名称" :label-width="formLabelWidth">
-                <el-form-item :label="form.competitionName" />
+            <el-form-item label="竞赛详情" :label-width="formLabelWidth">
+                <el-input v-model="form.competitionDescription" type="textarea" autocomplete="off" />
             </el-form-item>
 
-            <el-form-item label="竞赛类别ID" :label-width="formLabelWidth">
-                <el-form-item :label="form.categoryId"  />
+            <el-form-item label="竞赛主办方" :label-width="formLabelWidth">
+                <el-input v-model="form.competitionOrganizer" type="textarea" autocomplete="off" />
             </el-form-item>
 
-            <el-form-item label="竞赛等级ID" :label-width="formLabelWidth">
-                <el-form-item :label="form.levelId"  />
+            <el-form-item label="竞赛开始日期" :label-width="formLabelWidth">
+                <el-input v-model="form.startDate" type="textarea" autocomplete="off" />
             </el-form-item>
+
+            <el-form-item label="竞赛结束日期" :label-width="formLabelWidth">
+                <el-input v-model="form.endDate" type="textarea" autocomplete="off" />
+            </el-form-item>
+
+            <el-form-item label="竞赛官方网站链接" :label-width="formLabelWidth">
+                <el-input v-model="form.competitionUrl" type="textarea" autocomplete="off" />
+            </el-form-item>
+
+            <el-form-item label="竞赛日程安排" :label-width="formLabelWidth">
+                <el-input v-model="form.competitionSchedule" type="textarea" autocomplete="off"/>             
+            </el-form-item>
+
             
-            <el-form-item label="竞赛图片链接" :label-width="formLabelWidth">
-                <el-form-item :label="form.competitionImgUrl"  />
-            </el-form-item>
-            
-            <el-form-item label="竞赛状态" :label-width="formLabelWidth">
-                <el-form-item :label="form.competitionStatus" />
-            </el-form-item>
-            
-            <el-form-item label="是否激活" :label-width="formLabelWidth">
-                <el-form-item :label="form.status"  />
+            <el-form-item label="报名截止日期" :label-width="formLabelWidth">
+                <el-input v-model="form.registrationDeadline" type="textarea" autocomplete="off" />
             </el-form-item>
 
-            <el-form-item label="更新时间：" :label-width="formLabelWidth">
-                <el-form-item :label="form.updatedTime" />
+            <el-form-item label="作品提交指南" :label-width="formLabelWidth">
+                <el-input v-model="form.registrationGuide" type="textarea" autocomplete="off" />
             </el-form-item>
 
-            <el-form-item label="创建时间：" :label-width="formLabelWidth">
-                <el-form-item :label="form.createdTime" />
+            <el-form-item label="优秀案例展示" :label-width="formLabelWidth">
+                <el-input v-model="form.outstandingCases" type="textarea" autocomplete="off" />
+            </el-form-item>
+
+            <el-form-item label="竞赛参赛资格要求" :label-width="formLabelWidth">
+                <el-input v-model="form.eligibilityCriteria" type="textarea" autocomplete="off" />
+            </el-form-item>
+
+            <el-form-item label="评审标准" :label-width="formLabelWidth">
+                <el-input v-model="form.judgingCriteria" type="textarea" autocomplete="off" />
+            </el-form-item>
+
+            <el-form-item label="奖品详情" :label-width="formLabelWidth">
+                <el-input v-model="form.prizeDetails" type="textarea" autocomplete="off" />
+            </el-form-item>
+
+            <el-form-item label="更新时间" :label-width="formLabelWidth">
+                <el-input v-model="form.updatedTime" type="textarea" autocomplete="off"/>             
+            </el-form-item>
+
+            <el-form-item label="创建时间" :label-width="formLabelWidth">
+                <el-input v-model="form.createdTime" type="textarea" autocomplete="off"/>             
             </el-form-item>
         </el-form>
 
@@ -149,7 +222,7 @@ import { ElMessage, ElMessageBox } from 'element-plus';
 export default {
     data() {
         return {
-            name: '竞赛信息',
+            name: '竞赛详情信息',
             queryStr: "",
 
             currentPage: 1,
@@ -197,7 +270,7 @@ export default {
 
         // 获取分页数据
         getPageData(num, size) {
-            this.$http.get('http://localhost:10086/comp/v1/v1', { params: { pageNum: num, pageSize: size } })
+            this.$http.get('http://localhost:10086/comdetail/v1/v1', { params: { pageNum: num, pageSize: size } })
                 .then((response) => {
                     console.log(response.data);  // 检查后端返回的数据
                     this.pageInfo = response.data;
@@ -223,26 +296,6 @@ export default {
             this.form = {};  // 清空表单数据
             this.dialogFormVisible = true;
         },
-     // 添加竞赛信息
-        addQuestion() {
-            // 确保所有必填字段都已填写
-            if (!this.form.competitionName || !this.form.competitionImgUrl || !this.form.competitionStatus || !this.form.categoryId || !this.form.levelId) {
-                ElMessage({ message: '请填写完整的竞赛信息！', type: "warning" });
-                return;
-            }
-            // 发送 POST 请求以添加竞赛信息
-            this.$http.post('http://localhost:10086/comp/v1/compe', this.form).then((response) => {
-                if (response.data == 1) {
-                    ElMessage({ message: '竞赛信息添加成功！', type: "success" });
-                    this.getPageData(this.currentPage, this.pageSize); // 刷新数据
-                    this.dialogFormVisible = false; // 关闭对话框
-                } else {
-                    ElMessage({ message: '信息添加失败！', type: "error" });
-                }
-            }).catch((err) => {
-                ElMessage({ message: '请求失败，请重试', type: "error" });
-            });
-        },
 
         // 打开编辑对话框
         openUpdateDialog(row) {
@@ -251,9 +304,9 @@ export default {
             this.form = { ...row }; // 填充表单数据
             this.dialogFormVisible = true;
         },
-         // 编辑修改信息
-            updateQuestion() {
-            if (!this.form.competitionName || !this.form.competitionImgUrl || !this.form.competitionStatus || !this.form.competitionId || !this.form.categoryId || !this.form.levelId ) {
+        // 编辑修改信息
+        updateQuestion() {
+            if (!this.form.competitionDescription || !this.form.competitionOrganizer || !this.form.competitionUrl || !this.form.competitionSchedule || !this.form.registrationGuide || !this.form.outstandingCases  || !this.form.eligibilityCriteria  || !this.form.judgingCriteria  ) {
                 ElMessage({ message: '请填写完整的竞赛信息！', type: "warning" });
                 return;
             }
@@ -271,9 +324,10 @@ export default {
         },
 
 
+
                     // 打开详情页
         openDetailDialog(competitionId) {
-            this.$http.get(`http://localhost:10086/comp/v1/compe/${competitionId}`).then((response) => {
+            this.$http.get(`http://localhost:10086/comdetail/v1/detail/${competitionId}`).then((response) => {
                 console.log(response.data); // 检查返回的数据
                 if (response.data) {
                     this.form = response.data;
@@ -295,7 +349,7 @@ export default {
                 cancelButtonText: '取消',
                 type: "warning",
             }).then(() => {
-                this.$http.delete(`http://localhost:10086/comp/v1/compe/${competitionId}`).then((response) => {
+                this.$http.delete(`http://localhost:10086/comdetail/v1/detail/${competitionId}`).then((response) => {
                     if (response.data === 1) {
                         ElMessage({ message: '删除成功', type: "success" });
                         this.getPageData(this.currentPage, this.pageSize); // 刷新数据
@@ -317,7 +371,7 @@ export default {
                     type: "warning",
                 }).then(() => {
                     const ids = this.multipleSelection.map(item => item.competitionId);
-                    this.$http.delete(`http://localhost:10086/comp/v1/compe/${ids}`,).then((response) => {
+                    this.$http.post(`http://localhost:10086/comdetail/v1/detail/${ids}`,).then((response) => {
                         if (response.data == 1) {
                             ElMessage({ message: '批量删除成功', type: "success" });
                             this.getPageData(this.currentPage, this.pageSize); // 刷新数据

@@ -6,6 +6,7 @@ import UserList from "../componentsUser/UserList.vue"; // 用户基本信息管�
 import UserMonitor from "../componentsUser/UserMonitor.vue"; // 用户行为监控管理
 import UserViolation from "../componentsUser/UserViolation.vue"; // 违规用户处理
 import CompetitionInfo from "../componentsCompetiton/CompetitionInfo.vue"; // 竞赛信息管理
+import CompetitionDetail from "../componentsCompetiton/CompetitionDetail.vue"; // 竞赛详情信息管理
 import Category1 from "../componentsCategory/Category1.vue"; // 类别一级分类管理
 import Category2 from "../componentsCategory/Category2.vue"; // 类别二级分类管理
 import CourseInfo from "../componentsCourse/CourseInfo.vue"; // 课程信息管理
@@ -35,6 +36,7 @@ const routes = [
       { path: "userMonitor", component: UserMonitor },
       { path: "userViolation", component: UserViolation },
       { path: "competitionInfo", component: CompetitionInfo },
+      { path: "competitionDetail", component: CompetitionDetail },
       { path: "category1", component: Category1 },
       { path: "category2", component: Category2 },
       { path: "courseInfo", component: CourseInfo },
