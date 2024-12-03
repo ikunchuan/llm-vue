@@ -105,7 +105,8 @@ export default {
             // cmnsInfoData:[],
             dialogDetailVisible: false,   //详细对话框
             queryStr: "",                   //查询条件
-            tableData: [],    //社区信息数据
+
+            tableData: [],    //用户信息数据
             queryData: [],
             pageInfo: {},       //分页信息对象
             pageSize: 3,        //当前页条数
@@ -176,20 +177,19 @@ export default {
         
 
         queryInfo() {
-            if (!this.queryData || this.queryData.length === 0) {
-                console.error("原始数据未被缓存，请检查数据加载逻辑。");
-                return;
-            }
-
-            if (this.queryStr.trim().length > 0) {
-                this.tableData = this.queryData.filter(item =>
-                    item.communityName.includes(this.queryStr.trim())
-                );
+            // 如果选择了查询字段和输入了查询条件
+            if (this.queryStr.trim().length > 0 && this.selectedField) {
+                this.tableData = this.pageInfo.records.filter(item => {
+                    // 根据选择的字段进行匹配
+                    if (item[this.selectedField] && item[this.selectedField].includes(this.queryStr.trim())) {
+                        return true;  // 匹配成功
+                    }
+                    return false;  // 不匹配
+                });
             } else {
-                this.tableData = [...this.queryData];
+                // 如果没有选择字段或者没有输入查询内容，恢复原数据
+                this.tableData = this.pageInfo.records;
             }
-
-            console.log("Query executed. Current data:", this.tableData);
         },
 
     },
