@@ -89,6 +89,31 @@
       <!-- Main Content -->
       <el-container class="content-container">
         <el-header class="header">
+          <!-- <div class="breadcrumb-container">
+            <el-breadcrumb class="breadcrumb">
+              <el-breadcrumb-item v-for="(crumb, index) in breadcrumbs" :key="index" :to="crumb.path">
+                {{ crumb.name }}
+              </el-breadcrumb-item>
+            </el-breadcrumb>
+          </div> -->
+          <div class="breadcrumb-container">
+            <el-breadcrumb class="breadcrumb" separator=">">
+              <!-- <el-breadcrumb-item to="/">
+                <el-icon class="breadcrumb-icon" name="home"></el-icon> Home
+              </el-breadcrumb-item>
+              <el-breadcrumb-item to="/components/breadcrumb">
+                <el-icon class="breadcrumb-icon" name="list"></el-icon> Components
+              </el-breadcrumb-item>
+              <el-breadcrumb-item>
+                <el-icon class="breadcrumb-icon" name="coffee"></el-icon> Breadcrumb
+              </el-breadcrumb-item> -->
+              <el-breadcrumb-item v-for="(crumb, index) in breadcrumbs" :key="index" :to="crumb.path">
+                {{ crumb.name }}
+              </el-breadcrumb-item>
+            </el-breadcrumb>
+          </div>
+
+
           <div class="header-right">
             <el-dropdown class="icon-dropdown">
               <el-button class="icon-button" icon="el-icon-bell" @click="handleNotification">
@@ -105,21 +130,8 @@
           </div>
         </el-header>
 
-        <!-- Breadcrumb -->
-        <!-- <div class="breadcrumb-container">
-          <Breadcrumb class="breadcrumb">
-            <BreadcrumbItem to="/">Home</BreadcrumbItem>
-            <BreadcrumbItem to="/components/breadcrumb">Components</BreadcrumbItem>
-            <BreadcrumbItem>Breadcrumb</BreadcrumbItem>
-          </Breadcrumb>
-        </div> -->
-        <div class="breadcrumb-container">
-          <el-breadcrumb class="breadcrumb">
-            <el-breadcrumb-item v-for="(crumb, index) in breadcrumbs" :key="index" :to="crumb.path">
-              {{ crumb.name }}
-            </el-breadcrumb-item>
-          </el-breadcrumb>
-        </div>
+
+
 
         <el-main>
           <router-view></router-view>
@@ -130,7 +142,7 @@
   </div>
 </template>
 
-<script>
+<script >
 export default {
   data() {
     return {};
@@ -140,12 +152,12 @@ export default {
       // 获取当前路由的路径部分
       const pathArray = this.$route.path.split('/').filter((part) => part);
       const breadcrumbList = [];
-      
+
       let fullPath = '/';
-      
+
       // 遍历路径，生成每一层的面包屑项
       pathArray.forEach((part, index) => {
-        fullPath += `${part}/`; // 组合当前层的路径
+        fullPath += '${part}/'; 
         breadcrumbList.push({
           name: this.getBreadcrumbName(part), // 这里的 getBreadcrumbName 是自定义的
           path: fullPath
@@ -186,12 +198,12 @@ export default {
         'communityAudit': '社区审核管理'
       };
       return names[path] || path;
-     }, // 如果没有找到对应的名称，返回路径本身
-      updateBreadcrumbs() {
+    }, // 如果没有找到对应的名称，返回路径本身
+    updateBreadcrumbs() {
       // 在这里更新面包屑数据（可选）
       // 如果你希望更精细地控制面包屑，可以在这里做更多处理。
     }
-  
+
   },
   watch: {
     // 路由变化时更新面包屑
@@ -259,36 +271,54 @@ body {
 .content-container {
   background-color: #ffffff;
   border-radius: 10px;
-  padding: 24px;
-  box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+  padding: 0px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
   margin-top: 20px;
 }
 
 /* Header */
 .header {
-  display: flex;
+  /* display: flex;
   justify-content: space-between;
   align-items: center;
   background-color: #ffffff;
   padding: 15px 24px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); */
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: #f9f9f9;
+  /* 更深的背景颜色 */
+  padding: 10 px 24px;
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+
 }
 
 .header-right {
   display: flex;
   align-items: center;
+
 }
 
 .icon-button {
-  background: transparent;
+  /* background: transparent;
   border: none;
   color: #4a90e2;
   font-size: 20px;
+  margin-left: 15px; */
+  background: #007bff;
+  border-radius: 50%;
+  border: none;
+  color: white;
+  font-size: 20px;
   margin-left: 15px;
+  padding: 8px;
 }
 
 .icon-button:hover {
-  color: #0066cc;
+  /* color: #0066cc; */
+  background: #0056b3;
+  color: white;
 }
 
 .badge {
@@ -323,11 +353,75 @@ body {
 
 /* Breadcrumb Positioning */
 .breadcrumb-container {
-  position: absolute;
+  /* position: absolute;
   top: 20px;
   right: 960px;
-  z-index: 10;
+  z-index: 10; */
+  flex-grow: 1;
 }
 
+.breadcrumb {
+  font-size: 14px;
+  color: #333;
+  display: flex;
+  align-items: center;
+  padding: 5px 0;
+  background-color: transparent;  /* 去掉背景色 */
+  border: none;  /* 去掉边框 */
+  box-shadow: none;  /* 去掉阴影 */
+  margin: 0;  /* 去掉默认的外边距 */
+}
 
+/* 面包屑项 */
+.breadcrumb-item {
+  display: flex;
+  align-items: center;
+  padding: 0 8px;
+}
+
+/* 面包屑图标 */
+.breadcrumb-icon {
+  margin-right: 8px;
+  font-size: 16px;
+  color: #007bff;  /* 设置图标颜色 */
+}
+
+/* 分隔符 */
+.el-breadcrumb__separator {
+  margin: 0 5px;
+  color: #007bff;
+}
+
+/* 面包屑项悬停效果 */
+.breadcrumb-item:hover {
+  color: #007bff;
+  cursor: pointer;
+}
+
+/* 其他样式保持不变 */
+.icon-button {
+  background: #007bff;
+  border-radius: 50%;
+  border: none;
+  color: white;
+  font-size: 20px;
+  margin-left: 15px;
+  padding: 8px;
+}
+
+.icon-button:hover {
+  background: #0056b3;
+  color: white;
+}
+
+.badge {
+  position: absolute;
+  top: 0;
+  right: 0;
+  background-color: #e74c3c;
+  color: #fff;
+  padding: 2px 5px;
+  border-radius: 50%;
+  font-size: 10px;
+}
 </style>
