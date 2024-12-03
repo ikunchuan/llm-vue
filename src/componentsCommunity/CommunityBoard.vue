@@ -1,18 +1,25 @@
 <template>
     <el-card class="card">
         <template #header>
+            <div slot="header" class="card-header">{{ 社区模块管理 }}</div><br>
 
-            <div class="card-header">
+            <div class="header-actions">
+                <!-- 查询字段选择：让用户选择查询的字段 -->
+                <el-select v-model="selectedField" placeholder="选择查询字段" style="width: 180px;">
+                    <el-option label="社区类别" value="courseName"></el-option>
+                    <el-option label="社区名" value="courseDescription"></el-option>
+                    <el-option label="社区描述" value="courseDifficultyLevel"></el-option>
+                    <el-option label="创建者" value="courseRating"></el-option>
+                </el-select>&nbsp;
 
-                <div class="query">
-                    <el-input v-model="queryStr" placeholder="Please input" /> &nbsp; &nbsp;
-                    <el-button class="button" type="primary" round @click="queryInfo">查询</el-button>
-                </div>
+                <!-- 输入框：输入查询内容 -->
+                <el-input v-model="queryStr" style="width: 220px" placeholder="请输入查询内容" />&nbsp;
 
-                <div>
-                    <el-button class="button" type="success" round @click="openAddDialog">添加</el-button>
-                    <el-button class="button" type="warning" round @click="multiDelete">多选删除</el-button>
-                </div>
+
+                <!-- <el-input v-model="queryStr" style="width: 220px" placeholder="请输入课程名称" />&nbsp; -->
+                <el-button type="primary" @click="queryInfo">查询</el-button>
+                <el-button class="button" type="success" @click="openAddDialog">添加</el-button>
+                <el-button class="button" type="warning" @click="multipleDelete">多选删除</el-button>
 
 
             </div>
@@ -24,10 +31,10 @@
 
             <el-table-column prop="categoryId" label="社区类别" width="120" />
             <el-table-column prop="communityName" label="社区名" width="120" />
-            <el-table-column prop="communityDescription" label="社区描述" width="120" />
+            <el-table-column prop="communityDescription" label="社区描述" width="100" />
             <el-table-column prop="createdBy" label="创建者" width="120" />
 
-            <el-table-column fixed="right" label="操作" min-width="160">
+            <el-table-column fixed="right" label="操作" min-width="180">
 
                 <template #default="scope">
                     <el-button link type="primary" size="small" @click="openDetailDialog(scope.row.communityId)">
@@ -49,21 +56,24 @@
 
         <br />
 
-        <el-pagination v-model:current-page="currentPage" v-model:page-size="pageSize" :page-sizes="[2, 3, 4, 5]"
-            :background="true" layout="total, sizes, prev, pager, next, jumper" :total="pageInfo.total"
-            @size-change="handleSizeChange" @current-change="handleCurrentChange" />
+        <!-- 分页 -->
+        <el-pagination v-model:current-page="currentPage" v-model:page-size="pageSize" :page-sizes="[3, 5, 10, 20]"
+            layout="total, sizes, prev, pager, next, jumper" :total="pageInfo.total" @size-change="handleSizeChange"
+            @current-change="handleCurrentChange" />
 
     </el-card>
 
     <!-- 对话框:添加,修改功能 -->
-    <el-dialog v-model="dialogFormVisible" :title="title" width="800">
+    <el-dialog v-model="dialogFormVisible" :title="title" width="500">
 
         <el-form :rules="myrules" ref="" frmRef :model="form">
-            <el-row :gutter="20">
-                <el-col :span="16">
 
-                    <el-form-item label="社区类别" :label-width="formLabelWidth">
-                        <el-input v-model="form.categoryId" autocomplete="off" />
+
+                    <el-form-item label="类别" :label-width="formLabelWidth">
+                        <el-select v-model="form.categoryId" placeholder="请选择类别">
+                            <el-option v-for="cat in catInfoData" :key="cat.categoryId" :label="cat.catName"
+                                :value="cat.categoryId" />
+                        </el-select>
                     </el-form-item>
 
                     <el-form-item label="社区名" :label-width="formLabelWidth">
@@ -78,8 +88,7 @@
                         <el-input v-model="form.createdBy" autocomplete="off" />
                     </el-form-item>
 
-                </el-col>
-            </el-row>
+
         </el-form>
 
 
@@ -125,19 +134,19 @@
 
     <!-- 用户详细表 -->
 
-        <el-dialog v-model="dialogUserInfoVisible" title="用户详细信息显示" width="600px">
-            
-            <el-table :data="users" style="width: 100%">
-                <el-table-column prop="createTime" label="Date" width="180" />
-                <el-table-column prop="createBy" label="Name" width="180" />
-            </el-table>
+    <el-dialog v-model="dialogUserInfoVisible" title="用户详细信息显示" width="600px">
 
-            <template #footer>
-                <div class="dialog-footer">
-                    <el-button @click="dialogUserInfoVisible = false">取消</el-button>
-                </div>
-            </template>
-        </el-dialog>
+        <el-table :data="users" style="width: 100%">
+            <el-table-column prop="createTime" label="Date" width="180" />
+            <el-table-column prop="createBy" label="Name" width="180" />
+        </el-table>
+
+        <template #footer>
+            <div class="dialog-footer">
+                <el-button @click="dialogUserInfoVisible = false">取消</el-button>
+            </div>
+        </template>
+    </el-dialog>
 
 
 
@@ -167,11 +176,18 @@ export default {
             pageNum: 1,     //当前页号
             users: {},
             form: {},                       //对话框表单数据
-            formLabelWidth: "140px",    //对话框label宽度
+            formLabelWidth: "150px",    //对话框label宽度
             title: "",                           //对话框标题
             btnName: "",                     //对话框按钮文字
             // claInfoData: [],                  //加载到下拉框的班级信息
-            imageUrl: ""                     //图片URL
+            imageUrl: "",                     //图片URL
+            catInfoData: [
+                { categoryId: 1, catName: '计算机科学' },
+                { categoryId: 2, catName: '数学' },
+                { categoryId: 3, catName: '物理' },
+            ],
+            selectedField: "",  // 选择的查询字段
+
         };
     },
 
@@ -413,7 +429,7 @@ export default {
     },
 
     mounted() {
-        this.getPageData(1, 3)
+        this.getPageData(1, 5)
 
         // this.$http.get("/cmns/v1/cmn").then((response) => {
         //     this.cmnsInfoData = response.data
@@ -448,42 +464,34 @@ export default {
 }
 </style>
 
-<style>
-.avatar-uploader .el-upload {
-    border: 1px dashed var(--el-border-color);
-    border-radius: 6px;
-    cursor: pointer;
-    position: relative;
-    overflow: hidden;
-    transition: var(--el-transition-duration-fast);
-}
 
-.avatar-uploader .el-upload:hover {
-    border-color: var(--el-color-primary);
-}
-
-.el-icon.avatar-uploader-icon {
-    font-size: 28px;
-    color: #8c939d;
-    width: 178px;
-    height: 178px;
-    text-align: center;
-}
-</style>
 
 <style scoped>
 .card {
-            width: 100%;
-            margin: 20px 0;
-        }
-
-.dialog-footer {
-    display: flex;
-    justify-content: flex-end;
-    padding: 10px 20px;
+    width: 100%;
+    margin: 20px 0;
 }
 
-.el-table {
-    margin-top: 20px;
+.card-header {
+    font-size: 18px;
+    font-weight: 600;
+    color: #333;
+}
+
+.header-actions {
+    display: flex;
+    align-items: center;
+}
+
+.header-actions .el-input {
+    margin-right: 10px;
+}
+
+.button {
+    margin-left: 10px;
+}
+
+.dialog-footer {
+    text-align: center;
 }
 </style>
