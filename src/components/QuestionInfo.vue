@@ -227,7 +227,7 @@ export default {
                 ElMessage({ message: '请填写完整的题目信息！', type: "warning" });
                 return;
             }
-            this.$http.put(`/qst/v1/${this.form.questionId}`, this.form).then((response) => {
+            this.$http.put(`/qst/v1`, this.form).then((response) => {
                 if (response.data == 1) {
                     ElMessage({ message: '更新成功', type: "success" });
                     this.getPageData(this.currentPage, this.pageSize); // 刷新数据
