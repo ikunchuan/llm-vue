@@ -200,11 +200,10 @@ export default {
 </script>
 
 <style scoped>
-/* Global Styles */
 body {
   font-family: 'Roboto', sans-serif;
   font-size: 14px;
-  background-color: #f4f6fc;
+  background-color: #f4f6fc;  /* 背景色 */
   margin: 0;
   padding: 0;
 }
@@ -214,13 +213,14 @@ body {
   min-height: 100vh;
   display: flex;
   flex-direction: row;
+  background-color: #f4f6fc;  /* 统一背景色 */
 }
 
 /* Sidebar */
 .sidebar {
   background: linear-gradient(180deg, #0a1f44 0%, #2e3c56 100%);
   box-shadow: 2px 0 10px rgba(0, 0, 0, 0.2);
-  border-radius: 0 10px 10px 0;
+  border-radius: 10px 0 0 10px;  /* 左右角统一的圆角 */
   padding-top: 20px;
   position: relative;
 }
@@ -270,10 +270,9 @@ body {
   justify-content: space-between;
   align-items: center;
   background-color: #f9f9f9;
-  /* 更深的背景颜色 */
-  padding: 10 px 24px;
+  padding: 10px 24px;  /* 修复了padding语法 */
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-
+  border-radius: 10px 10px 0 0;  /* 圆角，防止顶部圆角突兀 */ 
 }
 
 .header-right {
@@ -317,10 +316,6 @@ body {
   padding: 15px 0;
   font-size: 14px;
   color: #ddd;
-  box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.1);
-}
-
-.footer a {
   color: #f5f5f5;
   text-decoration: none;
 }
