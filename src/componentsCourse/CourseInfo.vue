@@ -68,8 +68,14 @@
         </el-table>
 
         <!-- 分页 -->
-        <el-pagination v-model:current-page="currentPage" v-model:page-size="pageSize" :page-sizes="[3, 5, 10, 20]"
-            layout="total, sizes, prev, pager, next, jumper" :total="pageInfo.total" @size-change="handleSizeChange"
+        <el-pagination 
+        ref="pagination" 
+        v-model:current-page="currentPage" 
+        v-model:page-size="pageSize" 
+        :page-sizes="[3, 5, 10, 20]"
+            layout="total, sizes, prev, pager, next, jumper" 
+            :total="pageInfo.total" 
+            @size-change="handleSizeChange"
             @current-change="handleCurrentChange" />
     </el-card>
 
@@ -196,14 +202,58 @@ export default {
         };
     },
     methods: {
+        // handleSizeChange(pageSize) {
+        //     console.log("当前页大小: ", pageSize);
+        //     this.pageSize = pageSize;
+        //     this.getPageData(this.currentPage, this.pageSize);
+        // },
+
+        // handleCurrentChange(pageNum) {
+        //     console.log("当前页码: ", pageNum);
+        //     this.currentPage = pageNum;
+        //     this.getPageData(this.currentPage, this.pageSize);
+        // },
+
+        // getPageData(num, size) {
+        //     this.$http.get('/crs/v1/page', { params: { pageNum: num, pageSize: size } })
+        //         .then((response) => {
+        //             console.log(response.data);
+        //             this.pageInfo = response.data;
+        //             this.tableData = this.pageInfo.records;
+        //         });
+        // },
+        // queryInfo() {
+        //     if (this.queryStr.trim().length > 0) {
+        //         this.tableData = this.pageInfo.records.filter(item =>
+        //             item.courseName && item.courseName.match(this.queryStr.trim())
+        //         );
+        //     } else {
+        //         this.tableData = this.pageInfo.records;// 恢复原数据
+        //     }
+        // },
+        //         // 查询方法，根据选择的字段和输入的查询内容进行查询
+        //         queryInfo() {
+        //     // 如果选择了查询字段和输入了查询条件
+        //     if (this.queryStr.trim().length > 0 && this.selectedField) {
+        //         this.tableData = this.pageInfo.records.filter(item => {
+        //             // 根据选择的字段进行匹配
+        //             if (item[this.selectedField] && item[this.selectedField].includes(this.queryStr.trim())) {
+        //                 return true;  // 匹配成功
+        //             }
+        //             return false;  // 不匹配
+        //         });
+        //     } else {
+        //         // 如果没有选择字段或者没有输入查询内容，恢复原数据
+        //         this.tableData = this.pageInfo.records;
+        //     }
+        // },
+
         handleSizeChange(pageSize) {
-            console.log("当前页大小: ", pageSize);
             this.pageSize = pageSize;
             this.getPageData(this.currentPage, this.pageSize);
         },
 
         handleCurrentChange(pageNum) {
-            console.log("当前页码: ", pageNum);
             this.currentPage = pageNum;
             this.getPageData(this.currentPage, this.pageSize);
         },
@@ -211,20 +261,47 @@ export default {
         getPageData(num, size) {
             this.$http.get('/crs/v1/page', { params: { pageNum: num, pageSize: size } })
                 .then((response) => {
-                    console.log(response.data);
                     this.pageInfo = response.data;
                     this.tableData = this.pageInfo.records;
                 });
         },
 
-        // // 添加或编辑按钮点击事件
-        // btnAddUpdate() {
-        //     if (this.btnName === '添加') {
-        //         this.addCourse();
-        //     } else if (this.btnName === '编辑') {
-        //         this.updateCourse();
-        //     }
-        // },
+        queryInfo() {
+            // 查询时，检查输入的查询内容和字段选择
+            if (!this.queryStr.trim()) {
+                ElMessage({ message: '请输入查询内容', type: 'warning' });
+                return;
+            }
+
+            if (!this.selectedField) {
+                ElMessage({ message: '请选择查询字段', type: 'warning' });
+                return;
+            }
+
+            // 根据选择的字段和查询内容过滤数据
+            this.tableData = this.pageInfo.records.filter(item => {
+                if (item[this.selectedField] && item[this.selectedField].includes(this.queryStr.trim())) {
+                    return true;
+                }
+                return false;
+            });
+
+            // 重置分页至第一页
+            this.currentPage = 1;
+
+            // 更新总页数
+            this.pageInfo.total = this.tableData.length;
+
+            // 使用 $nextTick 确保 DOM 已经更新
+            this.$nextTick(() => {
+                if (this.$refs.pagination) {
+                    this.$refs.pagination.setTotal(this.pageInfo.total);
+                }
+            });
+        },
+
+
+
 
         openAddDialog() {
             this.title = '添加课程信息';
@@ -261,32 +338,7 @@ export default {
             });
         },
 
-        // queryInfo() {
-        //     if (this.queryStr.trim().length > 0) {
-        //         this.tableData = this.pageInfo.records.filter(item =>
-        //             item.courseName && item.courseName.match(this.queryStr.trim())
-        //         );
-        //     } else {
-        //         this.tableData = this.pageInfo.records;// 恢复原数据
-        //     }
-        // },
 
-        // 查询方法，根据选择的字段和输入的查询内容进行查询
-        queryInfo() {
-            // 如果选择了查询字段和输入了查询条件
-            if (this.queryStr.trim().length > 0 && this.selectedField) {
-                this.tableData = this.pageInfo.records.filter(item => {
-                    // 根据选择的字段进行匹配
-                    if (item[this.selectedField] && item[this.selectedField].includes(this.queryStr.trim())) {
-                        return true;  // 匹配成功
-                    }
-                    return false;  // 不匹配
-                });
-            } else {
-                // 如果没有选择字段或者没有输入查询内容，恢复原数据
-                this.tableData = this.pageInfo.records;
-            }
-        },
 
         singleDelete(courseId) {
             ElMessageBox.confirm('确定删除这条记录吗?', '删除提示', {
@@ -307,34 +359,6 @@ export default {
             }).catch(() => { });
         },
 
-        // // 批量删除
-        // multipleDelete() {
-        //     if (this.multipleSelection.length > 0) {
-        //         // 从选中的课程中提取课程 ID
-        //         const ids = this.multipleSelection.map(item => item.courseId); // 确保 item 中有 courseId
-
-        //         ElMessageBox.confirm('是否删除选中的所有数据?', '批量删除提示', {
-        //             confirmButtonText: '确定',
-        //             cancelButtonText: '取消',
-        //             type: "warning",
-        //         }).then(() => {
-        //             const ids = this.multipleSelection.map(item => item.questionId);
-        //             // ${ids.join(",")}
-        //             this.$http.delete(`/crs/v1`, { data: ids }).then((response) => {
-        //                 if (response.data > 0) {
-        //                     ElMessage({ message: '批量删除成功', type: "success" });
-        //                     this.getPageData(this.currentPage, this.pageSize); // 刷新数据
-        //                 } else {
-        //                     ElMessage({ message: '批量删除失败', type: "warning" });
-        //                 }
-        //             }).catch(() => {
-        //                 ElMessage({ message: '请求失败，请重试', type: "error" });
-        //             });
-        //         }).catch(() => { });
-        //     } else {
-        //         ElMessage({ message: '请选择要删除的记录', type: "warning" });
-        //     }
-        // },
 
         multipleDelete() {
             // 确保有选中的课程
@@ -378,17 +402,6 @@ export default {
             }
         },
 
-        // updateCourse() {
-        //     this.$http.put(`/crs/v1/${this.form.courseId}`, this.form).then((response) => {
-        //         if (response.data === 1) {
-        //             ElMessage({ message: '更新成功', type: 'success' });
-        //             this.getPageData(this.currentPage, this.pageSize);
-        //             this.dialogFormVisible = false;
-        //         } else {
-        //             ElMessage({ message: '更新失败', type: 'error' });
-        //         }
-        //     })
-        // },
 
         // 打开编辑对话框
         openUpdateDialog(row) {
@@ -449,7 +462,7 @@ export default {
             white-space: normal; /* 允许换行 */
             padding: 5px;       /* 可选：为文本加一些内边距，使内容看起来更舒适 */
         }
-        
+
         .truncate-text {
             white-space: nowrap;
             overflow: hidden;
