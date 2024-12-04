@@ -7,17 +7,17 @@
             <div class="header-actions">
                 <!-- 选择查询字段 -->
                 <el-select v-model="selectedField" placeholder="选择查询字段" style="width: 180px;">
-                    <el-option label="题目类别" value="categoryId"></el-option>
-                    <el-option label="题目难度" value="questionLevel"></el-option>
-                    <el-option label="题目标题" value="questionTitle"></el-option>
-                    <el-option label="题目内容" value="questionText"></el-option>
+                    <el-option label="题目类别" value="1" />
+                    <el-option label="题目难度" value="2" />
+                    <el-option label="题目标题" value="3" />
+                    <el-option label="题目内容" value="4" />
                 </el-select>&nbsp;
                 <!-- 输入框 -->
                 <el-input v-model="queryStr" style="width: 220px" placeholder="请输入查询内容" />&nbsp;
                 <!-- 功能按钮 -->
-                <el-button type="primary" round @click="queryInfo">查询</el-button>
-                <el-button class="button" type="success" round @click="openAddDialog">添加</el-button>
-                <el-button class="button" type="warning" round @click="multipleDelete">多选删除</el-button>
+                <el-button type="primary" @click="queryInfo">查询</el-button>
+                <el-button class="button" type="success" @click="openAddDialog">添加</el-button>
+                <el-button class="button" type="warning" @click="multipleDelete">多选删除</el-button>
             </div>
         </template>
         <!-- 表格 -->
@@ -31,27 +31,50 @@
                     {{ formatLevel(scope.row.questionLevel) }}
                 </template>
             </el-table-column>
-            <el-table-column prop="questionTitle" label="题目标题" width="200" class="ellipsis" />
-            <el-table-column prop="questionText" label="题目内容" width="200" class="ellipsis" />
-            <el-table-column prop="correctAnswer" label="正确答案" width="300" class="ellipsis" />
 
-            <el-table-column prop="reMark" label="备注" width="250" class="ellipsis" />
+            <el-table-column prop="questionTitle" label="题目标题" width="200">
+                <template #default="scope">
+                    <span class="truncate-text">{{ scope.row.questionTitle }}</span>
+                </template>
+            </el-table-column>
+
+            <el-table-column prop="questionText" label="题目内容" width="200">
+                <template #default="scope">
+                    <span class="truncate-text">{{ scope.row.questionText }}</span>
+                </template>
+            </el-table-column>
+
+            <el-table-column prop="correctAnswer" label="正确答案" width="200">
+                <template #default="scope">
+                    <span class="truncate-text">{{ scope.row.correctAnswer }}</span>
+                </template>
+            </el-table-column>
+
+            <el-table-column prop="reMark" label="备注" width="200">
+                <template #default="scope">
+                    <span class="truncate-text">{{ scope.row.reMark }}</span>
+                </template>
+            </el-table-column>
 
             <el-table-column prop="updatedTime" label="更新时间" width="200">
                 <template v-slot:default="{ row }">
                     <span>{{ formatDate(row.updatedTime) }}</span>
                 </template>
             </el-table-column>
+
             <el-table-column prop="createdTime" label="创建时间" width="200">
                 <template v-slot:default="{ row }">
                     <span>{{ formatDate(row.createdTime) }}</span>
                 </template>
             </el-table-column>
+
             <el-table-column fixed="right" label="操作" min-width="180">
                 <template #default="scope">
-                    <el-button link size="small" @click="openDetailDialog(scope.row.questionId)">详情</el-button>
-                    <el-button link size="small" @click="singleDelete(scope.row.questionId)">删除</el-button>
-                    <el-button link size="small" @click="openUpdateDialog(scope.row)">编辑</el-button>
+                    <el-button link size="small" type="primary"
+                        @click="openDetailDialog(scope.row.questionId)">详情</el-button>
+                    <el-button link size="small" type="primary"
+                        @click="singleDelete(scope.row.questionId)">删除</el-button>
+                    <el-button link size="small" type="primary" @click="openUpdateDialog(scope.row)">编辑</el-button>
                 </template>
             </el-table-column>
         </el-table>
@@ -62,9 +85,14 @@
             @current-change="handleCurrentChange" />
     </el-card>
 
-    <!-- 编辑、添加对话框 -->
-    <el-dialog v-model="dialogFormVisible" :title="title" width="500">
+    <!-- 抽屉：添加修改 -->
+    <el-drawer v-model="dialogFormVisible" :direction="direction" size="35%">
+        <template #header>
+            <h3>{{ title }}</h3>
+        </template>
+
         <el-form :model="form">
+
             <el-form-item label="类别" :label-width="formLabelWidth">
                 <el-select v-model="form.categoryId" placeholder="-- 请选择类别 --">
                     <el-option v-for="cat in catInfoData" :key="cat.categoryId" :label="cat.catName"
@@ -74,78 +102,108 @@
 
             <el-form-item label="题目难度" :label-width="formLabelWidth">
                 <el-select v-model="form.questionLevel" placeholder="-- 请选择难度等级 --">
-                    <el-option label="简单" value="1" />
-                    <el-option label="中等" value="2" />
-                    <el-option label="困难" value="3" />
-                    <el-option label="极难" value="4" />
-                    <el-option label="专家" value="5" />
+                    <el-option label="入门" value="1" />
+                    <el-option label="简单" value="2" />
+                    <el-option label="中等" value="3" />
+                    <el-option label="困难" value="4" />
+                    <el-option label="极难" value="5" />
                 </el-select>
             </el-form-item>
 
             <el-form-item label="题目标题" :label-width="formLabelWidth">
-                <el-input v-model="form.questionTitle" type="textarea" autocomplete="off" />
+                <el-input v-model="form.questionTitle" type="textarea" autocomplete="off" autosize="true" />
             </el-form-item>
 
             <el-form-item label="题目内容" :label-width="formLabelWidth">
-                <el-input v-model="form.questionText" type="textarea" autocomplete="off" />
+                <el-input v-model="form.questionText" type="textarea" autocomplete="off" autosize="true" />
             </el-form-item>
 
             <el-form-item label="正确答案" :label-width="formLabelWidth">
-                <el-input v-model="form.correctAnswer" type="textarea" autocomplete="off" />
+                <el-input v-model="form.correctAnswer" type="textarea" autocomplete="off" autosize="true" />
             </el-form-item>
 
             <el-form-item label="备注" :label-width="formLabelWidth">
-                <el-input v-model="form.reMark" type="textarea" />
+                <el-input v-model="form.reMark" type="textarea" autosize="true" />
             </el-form-item>
         </el-form>
 
         <template #footer>
-            <div class="dialog-footer">
-                <el-button @click="dialogFormVisible = false">取消</el-button>
+            <div style="flex: auto">
+                <el-button @click="closeDetailDrawer">取消</el-button>
                 <el-button type="primary" @click="btnAddUpdate">{{ btnName }}</el-button>
             </div>
         </template>
-    </el-dialog>
+    </el-drawer>
 
-    <!-- 详情对话框 -->
-    <el-dialog v-model="dialogDetailVisible" title="题目详情信息" width="500">
-        <el-form :model="form">
 
-            <el-form-item label="题目难度：" :label-width="formLabelWidth">
-                <span>{{ formatLevel(form.questionLevel) }}</span>
-            </el-form-item>
 
-            <el-form-item label="题目标题：" :label-width="formLabelWidth">
-                <el-form-item :label="form.questionTitle" style="overflow-X: scroll;" />
-            </el-form-item>
 
-            <el-form-item label="题目内容：" :label-width="formLabelWidth">
-                <el-form-item :label="form.questionText" style="overflow-X: scroll;" />
-            </el-form-item>
+    <!-- 抽屉：详情 -->
+    <el-drawer v-model="dialogDetailVisible" :direction="direction" size="35%">
+        <el-descriptions class="margin-top" title="题目详情信息" :column="2" :size="size" border>
+            <template #extra>
+                <el-button type="primary" @click="openUpdateDialog(form)">编辑</el-button>
+            </template>
+            <el-descriptions-item>
+                <template #label>
+                    <div class="cell-item">题目难度</div>
+                </template>
+                <el-tag size="defualt">{{ formatLevel(form.questionLevel) }}</el-tag>
+            </el-descriptions-item>
 
-            <el-form-item label="正确答案：" :label-width="formLabelWidth">
-                <el-form-item :label="form.correctAnswer" style="overflow-X: scroll;" />
-            </el-form-item>
+            <el-descriptions-item>
+                <template #label>
+                    <div class="cell-item">题目标题</div>
+                </template>
+                <div class="question-detail-text">{{ form.questionTitle }}</div>
+            </el-descriptions-item>
+        </el-descriptions><br>
 
-            <el-form-item label="备注：" :label-width="formLabelWidth">
-                <el-form-item :label="form.reMark" style="overflow-X: scroll;" />
-            </el-form-item>
+        <el-descriptions :column="1" :size="size" border>
+            <el-descriptions-item>
+                <template #label>
+                    <div class="cell-item">题目内容</div>
+                </template>
+                <div class="question-detail-text">{{ form.questionText }}</div>
+            </el-descriptions-item>
 
-            <el-form-item label="更新时间：" :label-width="formLabelWidth">
-                <el-form-item :label="formatDate(form.updatedTime)" />
-            </el-form-item>
+            <el-descriptions-item>
+                <template #label>
+                    <div class="cell-item">正确答案</div>
+                </template>
+                <div class="question-detail-text">{{ form.correctAnswer }}</div>
+            </el-descriptions-item>
 
-            <el-form-item label="创建时间：" :label-width="formLabelWidth">
-                <el-form-item :label="formatDate(form.createdTime)" />
-            </el-form-item>
-        </el-form>
+            <el-descriptions-item>
+                <template #label>
+                    <div class="cell-item">备注</div>
+                </template>
+                <div class="question-detail-text">{{ form.reMark }}</div>
+            </el-descriptions-item>
+        </el-descriptions><br>
+
+        <el-descriptions class="margin-top" :column="2" :size="size" border>
+            <el-descriptions-item>
+                <template #label>
+                    <div class="cell-item">更新时间</div>
+                </template>
+                <span>{{ formatDate(form.updatedTime) }}</span>
+            </el-descriptions-item>
+            <el-descriptions-item>
+                <template #label>
+                    <div class="cell-item">创建时间</div>
+                </template>
+                <span>{{ formatDate(form.createdTime) }}</span>
+            </el-descriptions-item>
+        </el-descriptions>
 
         <template #footer>
-            <div class="dialog-footer">
-                <el-button @click="dialogDetailVisible = false">关闭</el-button>
+            <div style="flex: auto">
+                <el-button @click="closeDetailDrawer">取消</el-button>
             </div>
         </template>
-    </el-dialog>
+    </el-drawer>
+
 </template>
 
 <script>
@@ -154,10 +212,9 @@ import { ElMessage, ElMessageBox } from 'element-plus';
 export default {
     data() {
         return {
-            selectedField: "",  //选择字段
-
             name: '题目信息',
             queryStr: "",
+            selectedField: "",  //选择字段
 
             currentPage: 1,
             pageSize: 5,
@@ -167,7 +224,6 @@ export default {
             queryData: [],
             form: {},
 
-
             formLabelWidth: '150px',
 
             dialogFormVisible: false,
@@ -176,22 +232,25 @@ export default {
             btnName: '',
 
             multipleSelection: [],
-            catInfoData: [],
+            catInfoData: [
+                { categoryId: 1, catName: '计算机科学' },
+                { categoryId: 2, catName: '数学' },
+                { categoryId: 3, catName: '物理' },],
         };
     },
     methods: {
         //处理难度分级
         formatLevel(questionLevel) {
             if (questionLevel == 1) {
-                return '简单';
+                return '入门';
             } else if (questionLevel == 2) {
-                return '中等';
+                return '简单';
             } else if (questionLevel == 3) {
-                return '困难';
+                return '中等';
             } else if (questionLevel == 4) {
-                return '极难';
+                return '困难';
             } else if (questionLevel == 5) {
-                return '专家';
+                return '极难';
             }
         },
         // 处理时间格式化
@@ -311,6 +370,11 @@ export default {
             });
         },
 
+        //关闭对话框
+        closeDrawer() {
+            this.dialogDetailVisible = false;
+            this.dialogFormVisible = false;
+        },
         // 删除单个题目
         singleDelete(questionId) {
             ElMessageBox.confirm('确定删除这条记录吗?', '删除提示', {
@@ -382,19 +446,70 @@ export default {
 </script>
 
 <style scoped>
-.card {
-    padding: 20px;
+/* 为课程名称和简介添加滚动条 */
+.question-detail-text {
+    max-height: 150px;
+    /* 设置最大高度，超出部分滚动 */
+    overflow-y: auto;
+    /* 启用垂直滚动条 */
+    white-space: normal;
+    /* 允许换行 */
+    padding: 5px;
+    /* 可选：为文本加一些内边距，使内容看起来更舒适 */
 }
 
-.card-header {
-    font-size: 20px;
-    font-weight: bold;
-}
-
-.ellipsis {
-    display: block;
+.truncate-text {
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+    line-height: 1.5;
+    height: 1.5em;
+    /* 根据需要设置行高 */
+}
+
+.course-name,
+.course-description {
+    max-height: 150px;
+    /* 更大的高度限制 */
+    overflow-y: auto;
+    /* 显示垂直滚动条 */
+    word-wrap: break-word;
+    /* 自动换行 */
+    white-space: normal;
+    /* 允许换行 */
+    padding: 5px;
+}
+
+.card {
+    width: 100%;
+    margin: 20px 0;
+}
+
+.card-header {
+    font-size: 18px;
+    font-weight: 600;
+    color: #333;
+}
+
+.header-actions {
+    display: flex;
+    align-items: center;
+}
+
+.header-actions .el-input {
+    margin-right: 10px;
+}
+
+.button {
+    margin-left: 10px;
+}
+
+.dialog-footer {
+    text-align: center;
+}
+
+.cell-item {
+    display: flex;
+    align-items: center;
 }
 </style>
