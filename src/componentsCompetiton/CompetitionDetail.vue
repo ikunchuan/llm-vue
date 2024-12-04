@@ -66,12 +66,7 @@
     <!-- 编辑、添加对话框 -->
     <el-dialog v-model="dialogFormVisible" :title="title" width="500">
         <el-form :model="form">
-            <el-form-item label="类别" :label-width="formLabelWidth">
-                <el-select v-model="form.categoryId" placeholder="-- 请选择类别 --">
-                    <el-option v-for="cat in catInfoData" :key="cat.categoryId" :label="cat.catName"
-                        :value="cat.categoryId" />
-                </el-select>
-            </el-form-item>
+            
 
             <el-form-item label="竞赛ID" :label-width="formLabelWidth">
                 <el-input v-model="form.competitionId" type="textarea" autocomplete="off" />
@@ -126,13 +121,7 @@
                 <el-input v-model="form.prizeDetails" type="textarea" autocomplete="off" />
             </el-form-item>
 
-            <el-form-item label="更新时间" :label-width="formLabelWidth">
-                <el-input v-model="form.updatedTime" type="textarea" autocomplete="off"/>             
-            </el-form-item>
-
-            <el-form-item label="创建时间" :label-width="formLabelWidth">
-                <el-input v-model="form.createdTime" type="textarea" autocomplete="off"/>             
-            </el-form-item>
+            
         </el-form>
 
         <template #footer>
@@ -296,6 +285,27 @@ export default {
             this.form = {};  // 清空表单数据
             this.dialogFormVisible = true;
         },
+        // 添加竞赛信息
+        addQuestion() {
+            // 确保所有必填字段都已填写
+            if (!this.form.competitionDescription || !this.form.competitionOrganizer || !this.form.startDate||  !this.form.endDate||  !this.form.competitionUrl||  !this.form.competitionSchedule||  !this.form.startDate||  !this.form.registrationDeadline||  !this.form.registrationGuide||  !this.form.outstandingCases||  !this.form.eligibilityCriteria||  !this.form.judgingCriteria||  !this.form.prizeDetails) {
+                ElMessage({ message: '请填写完整的竞赛信息！', type: "warning" });
+                return;
+            }
+            // 发送 POST 请求以添加竞赛信息
+            this.$http.post('http://localhost:10086/comdetail/v1/detail', this.form).then((response) => {
+                if (response.data == 1) {
+                    ElMessage({ message: '信息添加成功！', type: "success" });
+                    this.getPageData(this.currentPage, this.pageSize); // 刷新数据
+                    this.dialogFormVisible = false; // 关闭对话框
+                } else {
+                    ElMessage({ message: '信息添加失败！', type: "error" });
+                }
+            }).catch((err) => {
+                ElMessage({ message: '请求失败，请重试', type: "error" });
+            });
+        },
+
 
         // 打开编辑对话框
         openUpdateDialog(row) {
@@ -310,7 +320,7 @@ export default {
                 ElMessage({ message: '请填写完整的竞赛信息！', type: "warning" });
                 return;
             }
-            this.$http.put(`http://localhost:10086/comp/v1/compe`, this.form).then((response) => {
+            this.$http.put(`http://localhost:10086/comdetail/v1/detail`, this.form).then((response) => {
                 if (response.data == 1) {
                     ElMessage({ message: '更新成功', type: "success" });
                     this.getPageData(this.currentPage, this.pageSize); // 刷新数据
@@ -389,12 +399,16 @@ export default {
 
         // 查询功能
         queryInfo() {
+            if (!this.pageInfo.records) {
+                ElMessage({ message: '请先加载数据', type: "warning" });
+                return;
+            }
             if (this.queryStr.trim().length > 0) {
                 this.tableData = this.pageInfo.records.filter(item =>
-                    item.competitionId && item.competitionId.match(this.queryStr.trim())
+                    item.competitionId && item.competitionId.toString().includes(this.queryStr.trim())
                 );
             } else {
-                this.tableData = this.pageInfo.records;  // 恢复原数据
+                this.tableData = this.pageInfo.records;
             }
         },
 

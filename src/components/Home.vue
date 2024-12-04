@@ -58,9 +58,9 @@
             <el-menu-item index="3-3">
               <RouterLink to="/home/questionInfo">题目信息管理</RouterLink>
             </el-menu-item>
-            <el-menu-item index="3-4">
+            <!-- <el-menu-item index="3-4">
               <RouterLink to="/home/questionDifficulty">题目难度管理</RouterLink>
-            </el-menu-item>
+            </el-menu-item> -->
           </el-sub-menu>
 
           <el-sub-menu index="4">
@@ -70,9 +70,9 @@
               </el-icon>
               <span class="menu-title">社区管理</span>
             </template>
-            <el-menu-item index="4-1">
+            <!-- <el-menu-item index="4-1">
               <RouterLink to="/home/communityUser">社区用户管理</RouterLink>
-            </el-menu-item>
+            </el-menu-item> -->
             <el-menu-item index="4-2">
               <RouterLink to="/home/communityBoard">社区板块管理</RouterLink>
             </el-menu-item>
@@ -89,24 +89,11 @@
       <!-- Main Content -->
       <el-container class="content-container">
         <el-header class="header">
-          <!-- <div class="breadcrumb-container">
-            <el-breadcrumb class="breadcrumb">
-              <el-breadcrumb-item v-for="(crumb, index) in breadcrumbs" :key="index" :to="crumb.path">
-                {{ crumb.name }}
-              </el-breadcrumb-item>
-            </el-breadcrumb>
-          </div> -->
+
           <div class="breadcrumb-container">
             <el-breadcrumb class="breadcrumb" separator=">">
-              <!-- <el-breadcrumb-item to="/">
-                <el-icon class="breadcrumb-icon" name="home"></el-icon> Home
-              </el-breadcrumb-item>
-              <el-breadcrumb-item to="/components/breadcrumb">
-                <el-icon class="breadcrumb-icon" name="list"></el-icon> Components
-              </el-breadcrumb-item>
-              <el-breadcrumb-item>
-                <el-icon class="breadcrumb-icon" name="coffee"></el-icon> Breadcrumb
-              </el-breadcrumb-item> -->
+              <Icon type="ios-home-outline"></Icon>
+   
               <el-breadcrumb-item v-for="(crumb, index) in breadcrumbs" :key="index" :to="crumb.path">
                 {{ crumb.name }}
               </el-breadcrumb-item>
@@ -191,8 +178,8 @@ export default {
         'courseInfo': '课程信息管理',
         'courseDetail': '课程详细内容管理',
         'questionInfo': '题目信息管理',
-        'questionDifficulty': '题目难度管理',
-        'communityUser': '社区用户管理',
+        // 'questionDifficulty': '题目难度管理',
+        // 'communityUser': '社区用户管理',
         'communityBoard': '社区板块管理',
         'communityContent': '社区内容管理',
         'communityAudit': '社区审核管理'
@@ -278,12 +265,7 @@ body {
 
 /* Header */
 .header {
-  /* display: flex;
-  justify-content: space-between;
-  align-items: center;
-  background-color: #ffffff;
-  padding: 15px 24px;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); */
+
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -301,11 +283,7 @@ body {
 }
 
 .icon-button {
-  /* background: transparent;
-  border: none;
-  color: #4a90e2;
-  font-size: 20px;
-  margin-left: 15px; */
+
   background: #007bff;
   border-radius: 50%;
   border: none;
