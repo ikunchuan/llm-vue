@@ -18,9 +18,9 @@
             <el-table-column prop="levelId" label="竞赛等级ID" width="120" />
             <el-table-column prop="competitionImgUrl" label="竞赛图片链接" width="150" />
             <el-table-column prop="competitionStatus" label="竞赛状态" width="120" />
-            <el-table-column prop="status" label="是否激活" width="100">
+            <el-table-column prop="isActive" label="是否激活" width="100">
                 <template #default="scope">
-                    {{ scope.row.status == 0 ? '激活' : '停用' }}
+                    {{ scope.row.isActive == 0 ? '激活' : '停用' }}
                 </template>
             </el-table-column>
             <el-table-column prop="updatedTime" label="更新时间" width="200">
@@ -57,10 +57,10 @@
                         :value="cat.categoryId" />
                 </el-select>
             </el-form-item>
-
             <el-form-item label="竞赛ID" :label-width="formLabelWidth">
-                <el-input v-model="form.competitionId" type="textarea" autocomplete="off" />
+                <el-input v-model="form.competitionID" type="textarea" autocomplete="off" />
             </el-form-item>
+            
 
             <el-form-item label="竞赛名称" :label-width="formLabelWidth">
                 <el-input v-model="form.competitionName" type="textarea" autocomplete="off" />
@@ -83,7 +83,7 @@
             </el-form-item>
 
             <el-form-item label="是否激活" :label-width="formLabelWidth">
-                <el-input v-model="form.status" type="textarea" autocomplete="off"/>             
+                <el-input v-model="form.isActive" type="textarea" autocomplete="off"/>             
             </el-form-item>
         </el-form>
 
@@ -123,7 +123,7 @@
             </el-form-item>
             
             <el-form-item label="是否激活" :label-width="formLabelWidth">
-                <el-form-item :label="form.status"  />
+                <el-form-item :label="form.isActive"  />
             </el-form-item>
 
             <el-form-item label="更新时间：" :label-width="formLabelWidth">
@@ -161,9 +161,11 @@ export default {
             formLabelWidth: '150px',
 
             dialogFormVisible: false,
-            dialogDetailVisible: false,
+            dialogDetailVisible: false, queryStr: "",
+            searchParams: {}, // 用于存储查询参数
             title: '',
             btnName: '',
+
 
             multipleSelection: [],
             catInfoData: [
@@ -196,16 +198,16 @@ export default {
         },
 
         // 获取分页数据
-        getPageData(num, size) {
-            this.$http.get('http://localhost:10086/comp/v1/v1', { params: { pageNum: num, pageSize: size } })
-                .then((response) => {
-                    console.log(response.data);  // 检查后端返回的数据
-                    this.pageInfo = response.data;
-                    this.tableData = this.pageInfo.records;
-                }).catch(() => {
-                    ElMessage({ message: '请求失败，请重试', type: "error" });
-                });
-        },
+        // getPageData(num, size) {
+        //     this.$http.get('http://localhost:10086/comp/v1/v1', { params: { pageNum: num, pageSize: size } })
+        //         .then((response) => {
+        //             console.log(response.data);  // 检查后端返回的数据
+        //             this.pageInfo = response.data;
+        //             this.tableData = this.pageInfo.records;
+        //         }).catch(() => {
+        //             ElMessage({ message: '请求失败，请重试', type: "error" });
+        //         });
+        // },
 
         // 添加或编辑按钮点击事件
         btnAddUpdate() {
@@ -223,7 +225,7 @@ export default {
             this.form = {};  // 清空表单数据
             this.dialogFormVisible = true;
         },
-     // 添加竞赛信息
+        // 添加竞赛信息
         addQuestion() {
             // 确保所有必填字段都已填写
             if (!this.form.competitionName || !this.form.competitionImgUrl || !this.form.competitionStatus || !this.form.categoryId || !this.form.levelId) {
@@ -335,14 +337,41 @@ export default {
 
         // 查询功能
         queryInfo() {
+            // 清空之前的选择
+            this.multipleSelection = [];
+
             if (this.queryStr.trim().length > 0) {
                 this.tableData = this.pageInfo.records.filter(item =>
-                    item.competitionId && item.competitionId.match(this.queryStr.trim())
+                    item.competitionName && item.competitionName.match(this.queryStr.trim())
                 );
             } else {
                 this.tableData = this.pageInfo.records;  // 恢复原数据
             }
+            
+            
         },
+        
+        // 获取分页数据
+        getPageData(num, size) {
+            // 合并分页参数和查询参数
+            const params = {
+                pageNum: num,
+                pageSize: size,
+                ...this.searchParams,
+            };
+            
+            this.$http.get('http://localhost:10086/comp/v1/v1', { params })
+                .then((response) => {
+                    console.log(response.data);  // 检查后端返回的数据
+                    this.pageInfo = response.data;
+                    this.tableData = this.pageInfo.records;
+                    this.currentPage = num; // 确保当前页码正确
+                    this.pageSize = size; // 确保每页大小正确
+                }).catch(() => {
+                    ElMessage({ message: '请求失败，请重试', type: "error" });
+                });
+        },
+        
 
         handleSelectionChange(val) {
             this.multipleSelection = val;
