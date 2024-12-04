@@ -6,10 +6,10 @@
             <div class="header-actions">
                 <!-- 查询字段选择：让用户选择查询的字段 -->
                 <el-select v-model="selectedField" placeholder="选择查询字段" style="width: 180px;">
-                    <el-option label="社区类别" value="courseName"></el-option>
-                    <el-option label="社区名" value="courseDescription"></el-option>
-                    <el-option label="社区描述" value="courseDifficultyLevel"></el-option>
-                    <el-option label="创建者" value="courseRating"></el-option>
+                    <el-option label="社区类别" value="1"></el-option>
+                    <el-option label="社区名" value="2"></el-option>
+                    <el-option label="社区描述" value="3"></el-option>
+                    <el-option label="创建者" value="4"></el-option>
                 </el-select>&nbsp;
 
                 <!-- 输入框：输入查询内容 -->
@@ -29,10 +29,10 @@
         <el-table :data="tableData" style="width: 100%" @selection-change="handleSelectionChange">
             <el-table-column type="selection" width="55" />
 
-            <el-table-column prop="categoryId" label="社区类别" width="120" />
+            <el-table-column prop="categoryName" label="社区类别" width="120" />
             <el-table-column prop="communityName" label="社区名" width="120" />
             <el-table-column prop="communityDescription" label="社区描述" width="100" />
-            <el-table-column prop="createdBy" label="创建者" width="120" />
+            <el-table-column prop="userName" label="创建者" width="120" />
 
             <el-table-column fixed="right" label="操作" min-width="180">
 
@@ -63,30 +63,33 @@
 
     </el-card>
 
+
+    
+
     <!-- 对话框:添加,修改功能 -->
     <el-dialog v-model="dialogFormVisible" :title="title" width="500">
 
         <el-form :rules="myrules" ref="" frmRef :model="form">
 
 
-                    <el-form-item label="类别" :label-width="formLabelWidth">
-                        <el-select v-model="form.categoryId" placeholder="请选择类别">
-                            <el-option v-for="cat in catInfoData" :key="cat.categoryId" :label="cat.catName"
-                                :value="cat.categoryId" />
-                        </el-select>
-                    </el-form-item>
+            <el-form-item label="类别" :label-width="formLabelWidth">
+                <el-select v-model="form.categoryId" placeholder="请选择类别">
+                    <el-option v-for="cat in catInfoData" :key="cat.categoryId" :label="cat.catName"
+                        :value="cat.categoryId" />
+                </el-select>
+            </el-form-item>
 
-                    <el-form-item label="社区名" :label-width="formLabelWidth">
-                        <el-input v-model="form.communityName" autocomplete="off" />
-                    </el-form-item>
+            <el-form-item label="社区名" :label-width="formLabelWidth">
+                <el-input v-model="form.communityName" autocomplete="off" />
+            </el-form-item>
 
-                    <el-form-item label="社区描述" :label-width="formLabelWidth">
-                        <el-input v-model="form.communityDescription" autocomplete="off" />
-                    </el-form-item>
+            <el-form-item label="社区描述" :label-width="formLabelWidth">
+                <el-input v-model="form.communityDescription" autocomplete="off" />
+            </el-form-item>
 
-                    <el-form-item label="创建者" :label-width="formLabelWidth">
-                        <el-input v-model="form.createdBy" autocomplete="off" />
-                    </el-form-item>
+            <el-form-item label="创建者" :label-width="formLabelWidth">
+                <el-input v-model="form.createdBy" autocomplete="off" />
+            </el-form-item>
 
 
         </el-form>
@@ -106,9 +109,6 @@
     <!-- 详情对话框 -->
     <el-dialog v-model="dialogDetailVisible" title="社区详细信息显示" width="500">
         <el-form :model="form">
-            <el-form-item label="社区类别" :label-width="formLabelWidth">
-                <el-form-item :label="form.categoryId"></el-form-item>
-            </el-form-item>
 
             <el-form-item label="社区名" :label-width="formLabelWidth">
                 <el-form-item :label="form.communityName"></el-form-item>
@@ -118,8 +118,8 @@
                 <el-form-item :label="form.communityDescription"></el-form-item>
             </el-form-item>
 
-            <el-form-item label="创建人" :label-width="formLabelWidth">
-                <el-form-item :label="form.createdBy"></el-form-item>
+            <el-form-item label="创建者" :label-width="formLabelWidth">
+                <el-form-item :label="form.userName"></el-form-item>
             </el-form-item>
         </el-form>
 
@@ -133,7 +133,6 @@
 
 
     <!-- 用户详细表 -->
-
     <el-dialog v-model="dialogUserInfoVisible" title="用户详细信息显示" width="600px">
 
         <el-table :data="users" style="width: 100%">
@@ -182,12 +181,13 @@ export default {
             // claInfoData: [],                  //加载到下拉框的班级信息
             imageUrl: "",                     //图片URL
             catInfoData: [
-                { categoryId: 1, catName: '计算机科学' },
-                { categoryId: 2, catName: '数学' },
-                { categoryId: 3, catName: '物理' },
+                { categoryId: 1, catName: '管理学' },
+                { categoryId: 8, catName: '经济学' },
+                { categoryId: 9, catName: '数学' },
             ],
             selectedField: "",  // 选择的查询字段
-
+            searchField: '',
+            searchKeyword: '',
         };
     },
 
@@ -199,31 +199,43 @@ export default {
         //     this.form.stu_image_url = response
         // },
 
-        handleSizeChange(pageSize) {            //选择每一页显示的记录数
+        handleSizeChange(pageSize) {
             this.pageSize = pageSize;
-            this.getPageData(this.currentPage, this.pageSize)
+            this.getPageData(this.currentPage, this.pageSize, this.searchField, this.queryStr);
             console.log("size:", pageSize);
         },
-        handleCurrentChange(pageNum) {      //切换页号时得到当时页号
+        handleCurrentChange(pageNum) {
             this.currentPage = pageNum;
-            this.getPageData(this.currentPage, this.pageSize)
+            this.getPageData(this.currentPage, this.pageSize, this.searchField, this.queryStr);
             console.log("num:", pageNum);
         },
+        getPageData(num, size, searchField, searchKeyword) {
+            // 构建查询条件对象，假设你希望根据 communityName 和 userName 搜索
+            let communitySearch = {
+                communityName: searchField === 'communityName' ? searchKeyword : '',
+                communityDescription: searchField === 'communityDescription' ? searchKeyword : '',
+                userName: searchField === 'userName' ? searchKeyword : '',
+                categoryName: searchField === 'categoryName' ? searchKeyword : ''
+            };
 
-        getPageData(num, size) {
-            this.$http.get("cmns/v1/cmn", { params: { pageNum: num, pageSize: size } })
+            // 发送POST请求到后端
+            this.$http.post("/v1/cmns/search?pageNum=" + num + "&pageSize=" + size, communitySearch)
                 .then(response => {
                     this.pageInfo = response.data;
-                    this.tableData = this.pageInfo.records;
-
-                    // 初始化或保护原始数据缓存
-                    if (!this.queryData || this.queryData.length === 0) {
-                        this.queryData = [...this.tableData];
-                    }
-
-                    console.log(this.tableData);
+                    this.tableData = this.pageInfo.list;
+                    console.log("查询结果:", this.tableData);
+                })
+                .catch(error => {
+                    console.error("查询出错:", error);
+                    ElMessage({
+                        type: 'error',
+                        message: '查询失败'
+                    });
                 });
         },
+
+
+
 
         openUserDialog(cmnid) {
             var _this = this
@@ -243,7 +255,7 @@ export default {
 
         openDetailDialog(cmnid) {
             var _this = this
-            this.$http.get("/cmns/v1/cmn/" + cmnid).then(function (response) {
+            this.$http.get("v1/cmns/cmn/" + cmnid).then(function (response) {
                 console.log(response.data);
                 _this.form = response.data
             })
@@ -273,7 +285,7 @@ export default {
             console.log(this.form);
             var _this = this;
             // this.form.stu_interest = this.form.stu_interest.join(',')              //将数据转为字符串
-            this.$http.put("/cmns/v1/cmn", this.form).then(function (response) {
+            this.$http.put("v1/cmns/cmn", this.form).then(function (response) {
                 console.log(response.data);
 
                 if (response.data == 1) {
@@ -295,7 +307,7 @@ export default {
         addCmn() {           //添加功能
             var _this = this;
             // this.form.stu_interest = this.form.stu_interest.join(',');
-            this.$http.post("/cmns/v1/cmn", this.form).then(function (response) {
+            this.$http.post("v1/cmns/cmn", this.form).then(function (response) {
                 console.log(response.data);
 
                 if (response.data == 1) {
@@ -344,7 +356,7 @@ export default {
             )
                 .then(() => {
                     var _this = this;
-                    this.$http.delete("cmns/v1/cmn/" + cmnid).then(function (response) {
+                    this.$http.delete("v1/cmns/cmn/" + cmnid).then(function (response) {
                         console.log(response.data);
                     })
                     if (response.data == 1) {
@@ -384,7 +396,7 @@ export default {
                     this.multipleSelection.forEach(item => {
                         var _this = this;
                         var cmnid = item.communityId
-                        this.$http.delete("/cmns/v1/cmn/" + cmnid).then(function (response) {
+                        this.$http.delete("v1/cmns/cmn/" + cmnid).then(function (response) {
                             console.log(response.data);
                             if (response.data == 1) {
                                 num = num + 1
@@ -406,17 +418,40 @@ export default {
         },
 
         queryInfo() {
+            console.log("查询内容:", this.queryStr);
+            // 检查当前页码,如果未定义则使用默认值1
+            let num = this.currentPage || 1;
+            // 检查每页大小,如果未定义则使用默认值3 
+            let size = this.pageSize || 3;
 
-            if (this.queryStr.trim().length > 0) {
-                this.tableData = this.queryData.filter(item =>
-                    item.communityName.includes(this.queryStr.trim())
-                );
-            } else {
-                this.tableData = [...this.queryData];
+            // 构建查询参数
+            let field = '';
+            let keyword = this.queryStr || '';
+
+            // 根据选择的查询字段设置field
+            switch (this.selectedField) {
+                case '1':
+                    field = 'categoryName';
+                    break;
+                case '2':
+                    field = 'communityName';
+                    break;
+                case '3':
+                    field = 'communityDescription';
+                    break;
+                case '4':
+                    field = 'userName';
+                    break;
+                default:
+                    field = '';
             }
 
-            console.log(this.tableData);
+
+            // 调用getPageData并传入所有参数
+            this.getPageData(num, size, field, keyword);
         },
+
+
 
         handleSelectionChange(val) {            //多行选择
             this.multipleSelection = val;
@@ -429,21 +464,25 @@ export default {
     },
 
     mounted() {
-        this.getPageData(1, 5)
+        // 初始化页面时调用getPageData,使用默认参数
+        this.currentPage = 1;  // 设置默认页码为1
+        this.pageSize = 3;     // 设置默认每页显示3条
+        this.getPageData(this.currentPage, this.pageSize, '', '');  // field和keyword传空字符串
+        this.getPageData(1, 3, '', '')
 
         // this.$http.get("/cmns/v1/cmn").then((response) => {
         //     this.cmnsInfoData = response.data
         //     console.log(this.cmnsInfoData)
         // })
 
-        this.$http.get("/cmns/v1/cmn").then((response) => {
-            this.cmnsInfoData = response.data;
-            console.log('cmnsInfoData:', this.cmnsInfoData);
-            console.log("huhuhu")
-            // 确保这里的 tableData 被正确赋值
-            // this.tableData = this.cmnsInfoData;
-            // console.log('tableData:', this.tableData);
-        });
+        // this.$http.get("/cmns/v1/cmn").then((response) => {
+        //     this.cmnsInfoData = response.data;
+        //     console.log('cmnsInfoData:', this.cmnsInfoData);
+        //     console.log("huhuhu")
+        //     // 确保这里的 tableData 被正确赋值
+        //     // this.tableData = this.cmnsInfoData;
+        //     // console.log('tableData:', this.tableData);
+        // });
 
     }
 

@@ -25,8 +25,24 @@
         <el-table :data="tableData" style="width: 100%" @selection-change="handleSelectionChange">
             <el-table-column fixed type="selection" width="55" />
             <el-table-column prop="categoryId" label="类别" width="70" />
-            <el-table-column prop="courseName" label="课程名称" width="100" />
-            <el-table-column prop="courseDescription" label="课程简介" width="100" />
+
+            <!-- <el-table-column prop="courseName" label="课程名称" width="100" />
+            <el-table-column prop="courseDescription" label="课程简介" width="100" /> -->
+
+            <!-- 课程名称列 -->
+            <el-table-column prop="courseName" label="课程名称" width="100">
+                <template #default="{ row }">
+                    <div class="truncate-text">{{ row.courseName }}</div>
+                </template>
+            </el-table-column>
+            
+            <!-- 课程简介列 -->
+            <el-table-column prop="courseDescription" label="课程简介" width="100">
+                <template #default="{ row }">
+                    <div class="truncate-text">{{ row.courseDescription }}</div>
+                </template>
+            </el-table-column>
+
             <el-table-column prop="courseDifficultyLevel" label="难度级别" width="100" />
             <el-table-column prop="courseRating" label="评分" width="70" />
 
@@ -52,34 +68,26 @@
         </el-table>
 
         <!-- 分页 -->
-        <el-pagination v-model:current-page="currentPage" v-model:page-size="pageSize" :page-sizes="[3, 5, 10, 20]"
-            layout="total, sizes, prev, pager, next, jumper" :total="pageInfo.total" @size-change="handleSizeChange"
+        <el-pagination 
+        ref="pagination" 
+        v-model:current-page="currentPage" 
+        v-model:page-size="pageSize" 
+        :page-sizes="[3, 5, 10, 20]"
+            layout="total, sizes, prev, pager, next, jumper" 
+            :total="pageInfo.total" 
+            @size-change="handleSizeChange"
             @current-change="handleCurrentChange" />
     </el-card>
 
     <!-- 编辑、添加对话框 -->
     <el-dialog v-model="dialogFormVisible" :title="title" width="500">
         <el-form :model="form">
-            <!-- 父类选择框 -->
-            <el-form-item label="父类" :label-width="formLabelWidth">
-                <el-select v-model="form.parentId" placeholder="请选择父类" @change="handleParentCategoryChange">
-                    <el-option v-for="category in parentCategories" :key="category.categoryId" :label="category.categoryName" :value="category.categoryId" />
-                </el-select>
-            </el-form-item>
-            
-            <!-- 子类选择框 -->    
-            <el-form-item label="子类" :label-width="formLabelWidth">
-                <el-select v-model="form.subCategoryId" placeholder="请选择子类" :disabled="subCategories.length === 0">
-                    <el-option v-for="category in subCategories" :key="category.categoryId" :label="category.categoryName" :value="category.categoryId" />
-                </el-select>
-            </el-form-item>
-
-            <!-- <el-form-item label="类别" :label-width="formLabelWidth">
+            <el-form-item label="类别" :label-width="formLabelWidth">
                 <el-select v-model="form.categoryId" placeholder="请选择类别">
                     <el-option v-for="cat in catInfoData" :key="cat.categoryId" :label="cat.catName"
                         :value="cat.categoryId" />
                 </el-select>
-            </el-form-item> -->
+            </el-form-item>
 
             <el-form-item label="课程名称" :label-width="formLabelWidth">
                 <el-input v-model="form.courseName" type="textarea" autocomplete="off" />
@@ -121,12 +129,20 @@
     <!-- 详情对话框 -->
     <el-dialog v-model="dialogDetailVisible" title="课程信息详情" width="500">
         <el-form :model="form">
-            <el-form-item label="课程名称：" :label-width="formLabelWidth">
+            <!-- <el-form-item label="课程名称：" :label-width="formLabelWidth">
                 <el-form-item :label="form.courseName" />
             </el-form-item>
 
             <el-form-item label="课程简介：" :label-width="formLabelWidth">
                 <el-form-item :label="form.courseDescription" />
+            </el-form-item> -->
+
+            <el-form-item label="课程名称：" :label-width="formLabelWidth">
+                <div class="course-detail-text">{{ form.courseName }}</div>
+            </el-form-item>
+
+            <el-form-item label="课程简介：" :label-width="formLabelWidth">
+                <div class="course-detail-text">{{ form.courseDescription }}</div>
             </el-form-item>
 
             <el-form-item label="难度级别：" :label-width="formLabelWidth">
@@ -178,30 +194,66 @@ export default {
             btnName: '',
 
             multipleSelection: [],
-            parentCategories: [],  // 父类列表
-            subCategories: [],     // 子类列表
-            form: {
-                parentCategoryId: null,
-                subCategoryId: null,
-                courseName: '',
-                courseDescription: '',
-            },
-            // catInfoData: [
-            //     { categoryId: 1, catName: '计算机科学' },
-            //     { categoryId: 2, catName: '数学' },
-            //     { categoryId: 3, catName: '物理' },
-            // ],
+            catInfoData: [
+                { categoryId: 1, catName: '计算机科学' },
+                { categoryId: 2, catName: '数学' },
+                { categoryId: 3, catName: '物理' },
+            ],
         };
     },
     methods: {
+        // handleSizeChange(pageSize) {
+        //     console.log("当前页大小: ", pageSize);
+        //     this.pageSize = pageSize;
+        //     this.getPageData(this.currentPage, this.pageSize);
+        // },
+
+        // handleCurrentChange(pageNum) {
+        //     console.log("当前页码: ", pageNum);
+        //     this.currentPage = pageNum;
+        //     this.getPageData(this.currentPage, this.pageSize);
+        // },
+
+        // getPageData(num, size) {
+        //     this.$http.get('/crs/v1/page', { params: { pageNum: num, pageSize: size } })
+        //         .then((response) => {
+        //             console.log(response.data);
+        //             this.pageInfo = response.data;
+        //             this.tableData = this.pageInfo.records;
+        //         });
+        // },
+        // queryInfo() {
+        //     if (this.queryStr.trim().length > 0) {
+        //         this.tableData = this.pageInfo.records.filter(item =>
+        //             item.courseName && item.courseName.match(this.queryStr.trim())
+        //         );
+        //     } else {
+        //         this.tableData = this.pageInfo.records;// 恢复原数据
+        //     }
+        // },
+        //         // 查询方法，根据选择的字段和输入的查询内容进行查询
+        //         queryInfo() {
+        //     // 如果选择了查询字段和输入了查询条件
+        //     if (this.queryStr.trim().length > 0 && this.selectedField) {
+        //         this.tableData = this.pageInfo.records.filter(item => {
+        //             // 根据选择的字段进行匹配
+        //             if (item[this.selectedField] && item[this.selectedField].includes(this.queryStr.trim())) {
+        //                 return true;  // 匹配成功
+        //             }
+        //             return false;  // 不匹配
+        //         });
+        //     } else {
+        //         // 如果没有选择字段或者没有输入查询内容，恢复原数据
+        //         this.tableData = this.pageInfo.records;
+        //     }
+        // },
+
         handleSizeChange(pageSize) {
-            console.log("当前页大小: ", pageSize);
             this.pageSize = pageSize;
             this.getPageData(this.currentPage, this.pageSize);
         },
 
         handleCurrentChange(pageNum) {
-            console.log("当前页码: ", pageNum);
             this.currentPage = pageNum;
             this.getPageData(this.currentPage, this.pageSize);
         },
@@ -209,20 +261,47 @@ export default {
         getPageData(num, size) {
             this.$http.get('/crs/v1/page', { params: { pageNum: num, pageSize: size } })
                 .then((response) => {
-                    console.log(response.data);
                     this.pageInfo = response.data;
                     this.tableData = this.pageInfo.records;
                 });
         },
 
-        // // 添加或编辑按钮点击事件
-        // btnAddUpdate() {
-        //     if (this.btnName === '添加') {
-        //         this.addCourse();
-        //     } else if (this.btnName === '编辑') {
-        //         this.updateCourse();
-        //     }
-        // },
+        queryInfo() {
+            // 查询时，检查输入的查询内容和字段选择
+            if (!this.queryStr.trim()) {
+                ElMessage({ message: '请输入查询内容', type: 'warning' });
+                return;
+            }
+
+            if (!this.selectedField) {
+                ElMessage({ message: '请选择查询字段', type: 'warning' });
+                return;
+            }
+
+            // 根据选择的字段和查询内容过滤数据
+            this.tableData = this.pageInfo.records.filter(item => {
+                if (item[this.selectedField] && item[this.selectedField].includes(this.queryStr.trim())) {
+                    return true;
+                }
+                return false;
+            });
+
+            // 重置分页至第一页
+            this.currentPage = 1;
+
+            // 更新总页数
+            this.pageInfo.total = this.tableData.length;
+
+            // 使用 $nextTick 确保 DOM 已经更新
+            this.$nextTick(() => {
+                if (this.$refs.pagination) {
+                    this.$refs.pagination.setTotal(this.pageInfo.total);
+                }
+            });
+        },
+
+
+
 
         openAddDialog() {
             this.title = '添加课程信息';
@@ -231,44 +310,7 @@ export default {
             this.dialogFormVisible = true;
         },
 
-        // 获取所有父类
-        fetchParentCategories() {
-            this.$http.get('/cat/parent').then(response => {
-                this.parentCategories = response.data;
-            }).catch(error => {
-                console.error("获取父类失败:", error);
-            });
-        },
-
-        // 根据选择的父类，获取对应的子类
-        handleParentCategoryChange(parentId) {
-            if (parentId) {
-                this.$http.get(`/cat/subs/${parentId}`).then(response => {
-                    this.subCategories = response.data; // 获取并更新子类数据
-                }).catch(error => {
-                    console.error("获取子类失败:", error);
-                    this.subCategories = [];
-                });
-            } else {
-                this.subCategories = []; // 如果没有选择父类，清空子类列表
-            }
-        },
-
-        // // 清空表单数据
-        // clearForm() {
-        //         this.form.parentId = null;
-        //         this.form.subCategoryId = null;
-        //         this.form.courseName = '';
-        //         this.form.courseDescription = '';
-        // },
-
-        // 添加课程
         addCourse() {
-            if (!this.form.parentId || !this.form.subCategoryId || !this.form.courseName || !this.form.courseDescription) {
-                this.$message.error("请填写完整信息并选择父类和子类！");
-                return;
-            }
-            // 发送请求到后台添加课程
             this.$http.post('/crs/v1', this.form).then((response) => {
                 if (response.data === 1) {
                     ElMessage({ message: '课程信息添加成功！', type: 'success' });
@@ -277,24 +319,8 @@ export default {
                 } else {
                     ElMessage({ message: '课程信息添加失败！', type: 'error' });
                 }
-            }).catch((error) => {
-                console.error("添加课程失败:", error);
-                ElMessage({ message: '添加课程失败！', type: 'error' });
             });
         },
-
-
-        // addCourse() {
-        //     this.$http.post('/crs/v1', this.form).then((response) => {
-        //         if (response.data === 1) {
-        //             ElMessage({ message: '课程信息添加成功！', type: 'success' });
-        //             this.getPageData(this.currentPage, this.pageSize);
-        //             this.dialogFormVisible = false;
-        //         } else {
-        //             ElMessage({ message: '课程信息添加失败！', type: 'error' });
-        //         }
-        //     });
-        // },
 
 
         //打开详情页
@@ -313,22 +339,6 @@ export default {
         },
 
 
-        // 查询方法，根据选择的字段和输入的查询内容进行查询
-        queryInfo() {
-            // 如果选择了查询字段和输入了查询条件
-            if (this.queryStr.trim().length > 0 && this.selectedField) {
-                this.tableData = this.pageInfo.records.filter(item => {
-                    // 根据选择的字段进行匹配
-                    if (item[this.selectedField] && item[this.selectedField].includes(this.queryStr.trim())) {
-                        return true;  // 匹配成功
-                    }
-                    return false;  // 不匹配
-                });
-            } else {
-                // 如果没有选择字段或者没有输入查询内容，恢复原数据
-                this.tableData = this.pageInfo.records;
-            }
-        },
 
         singleDelete(courseId) {
             ElMessageBox.confirm('确定删除这条记录吗?', '删除提示', {
@@ -349,7 +359,7 @@ export default {
             }).catch(() => { });
         },
 
-        //  批量删除
+
         multipleDelete() {
             // 确保有选中的课程
             if (this.multipleSelection.length > 0) {
@@ -392,17 +402,6 @@ export default {
             }
         },
 
-        // updateCourse() {
-        //     this.$http.put(`/crs/v1/${this.form.courseId}`, this.form).then((response) => {
-        //         if (response.data === 1) {
-        //             ElMessage({ message: '更新成功', type: 'success' });
-        //             this.getPageData(this.currentPage, this.pageSize);
-        //             this.dialogFormVisible = false;
-        //         } else {
-        //             ElMessage({ message: '更新失败', type: 'error' });
-        //         }
-        //     })
-        // },
 
         // 打开编辑对话框
         openUpdateDialog(row) {
@@ -450,13 +449,35 @@ export default {
 
     mounted() {
         this.getPageData(this.currentPage, this.pageSize);
-        // 初始化加载父类数据
-        this.fetchParentCategories();
     },
 };
 </script>
 
 <style scoped>
+
+        /* 为课程名称和简介添加滚动条 */
+        .course-detail-text {
+            max-height: 150px;  /* 设置最大高度，超出部分滚动 */
+            overflow-y: auto;   /* 启用垂直滚动条 */
+            white-space: normal; /* 允许换行 */
+            padding: 5px;       /* 可选：为文本加一些内边距，使内容看起来更舒适 */
+        }
+
+        .truncate-text {
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            line-height: 1.5;
+            height: 1.5em; /* 根据需要设置行高 */
+        }
+        
+        .course-name, .course-description {
+            max-height: 150px; /* 更大的高度限制 */
+            overflow-y: auto; /* 显示垂直滚动条 */
+            word-wrap: break-word; /* 自动换行 */
+            white-space: normal; /* 允许换行 */
+            padding: 5px;
+        }
         .card {
             width: 100%;
             margin: 20px 0;

@@ -1,29 +1,49 @@
 <template>
     <el-card class="card">
         <template #header>
+            <!-- 标题 -->
             <div slot="header" class="card-header">{{ name }}</div><br>
+            <!-- 搜索框 -->
             <div class="header-actions">
-                <el-input v-model="queryStr" style="width: 220px" placeholder="请输入题目标题" />&nbsp;
+                <!-- 选择查询字段 -->
+                <el-select v-model="selectedField" placeholder="选择查询字段" style="width: 180px;">
+                    <el-option label="题目类别" value="categoryId"></el-option>
+                    <el-option label="题目难度" value="questionLevel"></el-option>
+                    <el-option label="题目标题" value="questionTitle"></el-option>
+                    <el-option label="题目内容" value="questionText"></el-option>
+                </el-select>&nbsp;
+                <!-- 输入框 -->
+                <el-input v-model="queryStr" style="width: 220px" placeholder="请输入查询内容" />&nbsp;
+                <!-- 功能按钮 -->
                 <el-button type="primary" round @click="queryInfo">查询</el-button>
                 <el-button class="button" type="success" round @click="openAddDialog">添加</el-button>
                 <el-button class="button" type="warning" round @click="multipleDelete">多选删除</el-button>
             </div>
         </template>
-
+        <!-- 表格 -->
         <el-table :data="tableData" style="width: 100%" @selection-change="handleSelectionChange">
             <el-table-column fixed type="selection" width="55" />
+
             <el-table-column prop="categoryId" label="类别" width="120" />
-            <el-table-column prop="questionTitle" label="题目标题" width="200" />
-            <el-table-column prop="questionText" label="题目内容" width="300" />
-            <el-table-column prop="correctAnswer" label="正确答案" width="300" />
-            <el-form-item prop="reMark" label="备注" width="250" />
+
+            <el-table-column prop="questionLevel" label="题目难度" width="120">
+                <template #default="scope">
+                    {{ formatLevel(scope.row.questionLevel) }}
+                </template>
+            </el-table-column>
+            <el-table-column prop="questionTitle" label="题目标题" width="200" class="ellipsis" />
+            <el-table-column prop="questionText" label="题目内容" width="200" class="ellipsis" />
+            <el-table-column prop="correctAnswer" label="正确答案" width="300" class="ellipsis" />
+
+            <el-table-column prop="reMark" label="备注" width="250" class="ellipsis" />
+
             <el-table-column prop="updatedTime" label="更新时间" width="200">
-                <template #default="{ row }">
+                <template v-slot:default="{ row }">
                     <span>{{ formatDate(row.updatedTime) }}</span>
                 </template>
             </el-table-column>
-            <el-table-column prop="createdTime" label="创建时间" width="250">
-                <template #default="{ row }">
+            <el-table-column prop="createdTime" label="创建时间" width="200">
+                <template v-slot:default="{ row }">
                     <span>{{ formatDate(row.createdTime) }}</span>
                 </template>
             </el-table-column>
@@ -49,6 +69,16 @@
                 <el-select v-model="form.categoryId" placeholder="-- 请选择类别 --">
                     <el-option v-for="cat in catInfoData" :key="cat.categoryId" :label="cat.catName"
                         :value="cat.categoryId" />
+                </el-select>
+            </el-form-item>
+
+            <el-form-item label="题目难度" :label-width="formLabelWidth">
+                <el-select v-model="form.questionLevel" placeholder="-- 请选择难度等级 --">
+                    <el-option label="简单" value="1" />
+                    <el-option label="中等" value="2" />
+                    <el-option label="困难" value="3" />
+                    <el-option label="极难" value="4" />
+                    <el-option label="专家" value="5" />
                 </el-select>
             </el-form-item>
 
@@ -78,8 +108,13 @@
     </el-dialog>
 
     <!-- 详情对话框 -->
-    <el-dialog v-model="dialogDetailVisible" title="题目信息详情" width="800">
+    <el-dialog v-model="dialogDetailVisible" title="题目详情信息" width="500">
         <el-form :model="form">
+
+            <el-form-item label="题目难度：" :label-width="formLabelWidth">
+                <span>{{ formatLevel(form.questionLevel) }}</span>
+            </el-form-item>
+
             <el-form-item label="题目标题：" :label-width="formLabelWidth">
                 <el-form-item :label="form.questionTitle" style="overflow-X: scroll;" />
             </el-form-item>
@@ -97,11 +132,11 @@
             </el-form-item>
 
             <el-form-item label="更新时间：" :label-width="formLabelWidth">
-                <el-form-item :label="form.updatedTime" />
+                <el-form-item :label="formatDate(form.updatedTime)" />
             </el-form-item>
 
             <el-form-item label="创建时间：" :label-width="formLabelWidth">
-                <el-form-item :label="form.createdTime" />
+                <el-form-item :label="formatDate(form.createdTime)" />
             </el-form-item>
         </el-form>
 
@@ -119,6 +154,8 @@ import { ElMessage, ElMessageBox } from 'element-plus';
 export default {
     data() {
         return {
+            selectedField: "",  //选择字段
+
             name: '题目信息',
             queryStr: "",
 
@@ -127,7 +164,10 @@ export default {
             pageInfo: {},
 
             tableData: [],
+            queryData: [],
             form: {},
+
+
             formLabelWidth: '150px',
 
             dialogFormVisible: false,
@@ -136,19 +176,34 @@ export default {
             btnName: '',
 
             multipleSelection: [],
-            catInfoData: [
-                { categoryId: 1, catName: '数学' },
-                { categoryId: 2, catName: '物理' },
-                { categoryId: 3, catName: '化学' },
-            ],
+            catInfoData: [],
         };
     },
     methods: {
+        //处理难度分级
+        formatLevel(questionLevel) {
+            if (questionLevel == 1) {
+                return '简单';
+            } else if (questionLevel == 2) {
+                return '中等';
+            } else if (questionLevel == 3) {
+                return '困难';
+            } else if (questionLevel == 4) {
+                return '极难';
+            } else if (questionLevel == 5) {
+                return '专家';
+            }
+        },
         // 处理时间格式化
         formatDate(value) {
             if (!value) return '-';
             const date = new Date(value);
-            return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')} ${String(date.getHours()).padStart(2, '0')}:${String(date.getMinutes()).padStart(2, '0')}:${String(date.getSeconds()).padStart(2, '0')}`;
+            return `${date.getFullYear()}-
+                    ${String(date.getMonth() + 1).padStart(2, '0')}-
+                    ${String(date.getDate()).padStart(2, '0')} 
+                    ${String(date.getHours()).padStart(2, '0')}:
+                    ${String(date.getMinutes()).padStart(2, '0')}:
+                    ${String(date.getSeconds()).padStart(2, '0')}`;
         },
 
         // 分页大小变化
@@ -218,6 +273,7 @@ export default {
             this.title = '编辑题目信息';
             this.btnName = '编辑';
             this.form = { ...row }; // 填充表单数据
+            this.form.questionLevel = this.formatLevel(row.questionLevel);
             this.dialogFormVisible = true;
         },
 
@@ -304,20 +360,41 @@ export default {
         // 查询功能
         queryInfo() {
             if (this.queryStr.trim().length > 0) {
-                this.tableData = this.pageInfo.records.filter(item =>
-                    item.questionTitle && item.questionTitle.match(this.queryStr.trim())
+                this.tableData = this.queryData.filter(item =>
+                    item.questionTitle.includes(this.queryStr.trim())
                 );
             } else {
-                this.tableData = this.pageInfo.records;  // 恢复原数据
+                this.tableData = [...this.queryData];
             }
+            console.log(this.tableData);
         },
 
         handleSelectionChange(val) {
             this.multipleSelection = val;
+            console.log(this.multipleSelection);
         },
     },
+
     mounted() {
         this.getPageData(this.currentPage, this.pageSize);
     },
 };
 </script>
+
+<style scoped>
+.card {
+    padding: 20px;
+}
+
+.card-header {
+    font-size: 20px;
+    font-weight: bold;
+}
+
+.ellipsis {
+    display: block;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+</style>

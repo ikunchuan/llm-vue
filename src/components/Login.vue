@@ -13,13 +13,7 @@
         <el-form :model="loginForm" status-icon :rules="formRules" ref="loginForm">
           <!-- 用户名 -->
           <el-form-item prop="userName" style="margin-bottom: 20px;">
-            <!-- <div contenteditable="true" :text-content="loginForm.userName" @input="updateUserName" placeholder="请输入用户名"
-              class="editable-input" style="padding: 10px 20px; font-size: 16px; width: 100%; outline: none;">
-            </div> -->
-            <!-- <div contenteditable="true" :text-content="loginForm.userName" @input="updateUserName" placeholder="请输入用户名"
-              class="editable-input" style="padding: 10px 20px; font-size: 16px; width: 100%; outline: none; 
-            text-align: left; direction: rtl;">
-            </div> -->
+          
             <div contenteditable="true" :text-content="loginForm.userName" @input="updateUserName" placeholder="请输入用户名"
               class="editable-input" style="padding: 10px 20px; font-size: 16px; width: 100%; outline: none; 
             text-align: left;">
@@ -141,9 +135,9 @@ export default {
   transition: background-color 0.3s ease;
 }
 
-.el-button:hover {
+/* .el-button:hover {
   background-color: #4C51BF;
-}
+} */
 
 .el-button[type="text"] {
   color: #5A67D8;
