@@ -98,6 +98,7 @@
           </div> -->
           <div class="breadcrumb-container">
             <el-breadcrumb class="breadcrumb" separator=">">
+              <Icon type="ios-home-outline"></Icon>
               <!-- <el-breadcrumb-item to="/">
                 <el-icon class="breadcrumb-icon" name="home"></el-icon> Home
               </el-breadcrumb-item>
