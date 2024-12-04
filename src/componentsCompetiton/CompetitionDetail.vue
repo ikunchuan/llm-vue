@@ -12,7 +12,7 @@
 
         <el-table :data="tableData" style="width: 100%" @selection-change="handleSelectionChange">
             <el-table-column fixed type="selection" width="55" />
-            <el-table-column prop="competitionId" label="竞赛ID" width="80" />
+            <el-table-column prop="competitionName" label="竞赛名称" width="80" />
             <el-table-column prop="competitionDescription" label="竞赛详情" width="120" />
             <el-table-column prop="competitionOrganizer"  label="竞赛主办方" width="120" />
             <el-table-column prop="startDate" label="竞赛开始日期" width="180" >
@@ -70,6 +70,10 @@
 
             <el-form-item label="竞赛ID" :label-width="formLabelWidth">
                 <el-input v-model="form.competitionId" type="textarea" autocomplete="off" />
+            </el-form-item>
+
+            <el-form-item label="竞赛名称" :label-width="formLabelWidth">
+                <el-input v-model="form.competitionName" type="textarea" autocomplete="off" />
             </el-form-item>
 
             <el-form-item label="竞赛详情" :label-width="formLabelWidth">
@@ -139,6 +143,11 @@
                 <el-input v-model="form.competitionId" type="textarea" autocomplete="off" />
             </el-form-item>
 
+            <el-form-item label="竞赛名称" :label-width="formLabelWidth">
+                <el-input v-model="form.competitionName" type="textarea" autocomplete="off" />
+            </el-form-item>
+
+            
             <el-form-item label="竞赛详情" :label-width="formLabelWidth">
                 <el-input v-model="form.competitionDescription" type="textarea" autocomplete="off" />
             </el-form-item>
@@ -285,14 +294,19 @@ export default {
             this.form = {};  // 清空表单数据
             this.dialogFormVisible = true;
         },
-        // 添加竞赛信息
+        
+    
+        //// 添加竞赛信息
         addQuestion() {
-            // 确保所有必填字段都已填写
+            
+             // 确保所有必填字段都已填写
             if (!this.form.competitionDescription || !this.form.competitionOrganizer || !this.form.startDate||  !this.form.endDate||  !this.form.competitionUrl||  !this.form.competitionSchedule||  !this.form.startDate||  !this.form.registrationDeadline||  !this.form.registrationGuide||  !this.form.outstandingCases||  !this.form.eligibilityCriteria||  !this.form.judgingCriteria||  !this.form.prizeDetails) {
                 ElMessage({ message: '请填写完整的竞赛信息！', type: "warning" });
                 return;
             }
-            // 发送 POST 请求以添加竞赛信息
+
+            
+           // 发送 POST 请求以添加竞赛信息
             this.$http.post('http://localhost:10086/comdetail/v1/detail', this.form).then((response) => {
                 if (response.data == 1) {
                     ElMessage({ message: '信息添加成功！', type: "success" });
@@ -305,6 +319,9 @@ export default {
                 ElMessage({ message: '请求失败，请重试', type: "error" });
             });
         },
+
+    
+
 
 
         // 打开编辑对话框
