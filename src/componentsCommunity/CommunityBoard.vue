@@ -63,6 +63,9 @@
 
     </el-card>
 
+
+    
+
     <!-- 对话框:添加,修改功能 -->
     <el-dialog v-model="dialogFormVisible" :title="title" width="500">
 
@@ -130,7 +133,6 @@
 
 
     <!-- 用户详细表 -->
-
     <el-dialog v-model="dialogUserInfoVisible" title="用户详细信息显示" width="600px">
 
         <el-table :data="users" style="width: 100%">

@@ -1,100 +1,101 @@
 <template>
-    <el-card class="card">
-        <template #header>
-            <div slot="header" class="card-header">{{ 社区模块管理 }}</div><br>
-
-            <div class="header-actions">
-                <!-- 查询字段选择：让用户选择查询的字段 -->
-                <el-select v-model="selectedField" placeholder="选择查询字段" style="width: 180px;">
-                    <el-option label="社区名" value="communityName"></el-option>
-                    <el-option label="用户名" value="userName"></el-option>
-                    <el-option label="帖子标题" value="postTitle"></el-option>
-                    <el-option label="帖子内容" value="postContent"></el-option>
-                </el-select>&nbsp;
-
-                <!-- 输入框：输入查询内容 -->
-                <el-input v-model="queryStr" style="width: 220px" placeholder="请输入查询内容" />&nbsp;
-
-                <!-- <el-input v-model="queryStr" style="width: 220px" placeholder="请输入课程名称" />&nbsp; -->
-                <el-button type="primary" @click="queryInfo">查询</el-button>
-                <el-button class="button" type="warning" @click="multipleDelete">多选删除</el-button>
 
 
-            </div>
+    <el-tabs v-model="activeName" class="demo-tabs" @tab-click="handleClick">
+        <el-tab-pane label="帖子" name="first">
+            <el-card class="card">
+                <template #header>
+                    <div slot="header" class="card-header">{{ 社区模块管理 }}</div><br>
 
-        </template>
+                    <div class="header-actions">
+                        <!-- 查询字段选择：让用户选择查询的字段 -->
+                        <el-select v-model="selectedField" placeholder="选择查询字段" style="width: 180px;">
+                            <el-option label="社区名" value="communityName"></el-option>
+                            <el-option label="用户名" value="userName"></el-option>
+                            <el-option label="帖子标题" value="postTitle"></el-option>
+                            <el-option label="帖子内容" value="postContent"></el-option>
+                        </el-select>&nbsp;
 
-        <el-table :data="tableData" style="width: 100%" @selection-change="handleSelectionChange">
-            <el-table-column type="selection" width="55" />
-            <el-table-column prop="communityName" label="社区名" width="120" />
-            <el-table-column prop="userName" label="发帖用户" width="120" />
-            <el-table-column prop="postTitle" label="帖子标题" width="200" />
-            <el-table-column prop="postContent" label="帖子内容" width="200">
-                <template v-slot:default="{ row }">
-                    <span class="ellipsis">{{ row.postContent }}</span>
-                </template>
-            </el-table-column>
-            <el-table-column prop="createdTime" label="发帖时间" width="120">
-                <template v-slot:default="{ row }">
-                    <span>{{ formatDate(row.createdTime) }}</span>
-                </template>
-            </el-table-column>
+                        <!-- 输入框：输入查询内容 -->
+                        <el-input v-model="queryStr" style="width: 220px" placeholder="请输入查询内容" />&nbsp;
 
-            <el-table-column fixed="right" label="操作" min-width="180">
+                        <!-- <el-input v-model="queryStr" style="width: 220px" placeholder="请输入课程名称" />&nbsp; -->
+                        <el-button type="primary" @click="queryInfo">查询</el-button>
+                        <el-button class="button" type="warning" @click="multipleDelete">多选删除</el-button>
 
-                <template #default="scope">
-                    <el-button link type="primary" size="small" @click="openDetailDialog(scope.row.postId)">
-                        详情
-                    </el-button>
-                    <el-button link type="primary" size="small" @click="singleDelete(scope.row.communityId)">
-                        删除
-                    </el-button>
-                    <el-button link type="primary" size="small" @click="openUpdateDialog(scope.row)">
-                        编辑
-                    </el-button>
+
+                    </div>
 
                 </template>
 
-            </el-table-column>
-        </el-table>
+                <el-table :data="tableData" style="width: 100%" @selection-change="handleSelectionChange">
+                    <el-table-column type="selection" width="55" />
+                    <el-table-column prop="communityName" label="社区名" width="120" />
+                    <el-table-column prop="userName" label="发帖用户" width="120" />
+                    <el-table-column prop="postTitle" label="帖子标题" width="200" />
+                    <el-table-column prop="postContent" label="帖子内容" width="200">
+                        <template v-slot:default="{ row }">
+                            <span class="ellipsis">{{ row.postContent }}</span>
+                        </template>
+                    </el-table-column>
+                    <el-table-column prop="createdTime" label="发帖时间" width="120">
+                        <template v-slot:default="{ row }">
+                            <span>{{ formatDate(row.createdTime) }}</span>
+                        </template>
+                    </el-table-column>
 
-        <br />
+                    <el-table-column fixed="right" label="操作" min-width="180">
 
-        <!-- 分页 -->
-        <el-pagination v-model:current-page="currentPage" v-model:page-size="pageSize" :page-sizes="[3, 5, 10, 20]"
-            layout="total, sizes, prev, pager, next, jumper" :total="pageInfo.total" @size-change="handleSizeChange"
-            @current-change="handleCurrentChange" />
+                        <template #default="scope">
+                            <el-button link type="primary" size="small" @click="openDetailDialog(scope.row.postId)">
+                                详情
+                            </el-button>
+                            <el-button link type="primary" size="small" @click="singleDelete(scope.row.communityId)">
+                                删除
+                            </el-button>
+                            <el-button link type="primary" size="small" @click="openUpdateDialog(scope.row)">
+                                编辑
+                            </el-button>
 
-    </el-card>
+                        </template>
+
+                    </el-table-column>
+                </el-table>
+
+                <br />
+
+                <!-- 分页 -->
+                <el-pagination v-model:current-page="currentPage" v-model:page-size="pageSize"
+                    :page-sizes="[3, 5, 10, 20]" layout="total, sizes, prev, pager, next, jumper"
+                    :total="pageInfo.total" @size-change="handleSizeChange" @current-change="handleCurrentChange" />
+            </el-card>
+        </el-tab-pane>
+        <el-tab-pane label="帖子评论" name="second">PostContent</el-tab-pane>
+    </el-tabs>
+
 
     <!-- 对话框:添加,修改功能 -->
     <el-dialog v-model="dialogFormVisible" :title="title" width="500">
 
         <el-form :rules="myrules" ref="" frmRef :model="form">
 
-
-            <el-form-item label="类别" :label-width="formLabelWidth">
-                <el-select v-model="form.categoryId" placeholder="请选择类别">
-                    <el-option v-for="cat in catInfoData" :key="cat.categoryId" :label="cat.catName"
-                        :value="cat.categoryId" />
-                </el-select>
-            </el-form-item>
-
-            <el-form-item label="所属社区" :label-width="formLabelWidth">
+            <el-form-item label="社区名" :label-width="formLabelWidth">
                 <el-input v-model="form.communityName" autocomplete="off" />
             </el-form-item>
 
-            <el-form-item label="社区描述" :label-width="formLabelWidth">
-                <el-input v-model="form.communityDescription" autocomplete="off" />
+            <el-form-item label="发帖用户" :label-width="formLabelWidth">
+                <el-input v-model="form.userName" autocomplete="off" />
             </el-form-item>
 
-            <el-form-item label="创建者" :label-width="formLabelWidth">
-                <el-input v-model="form.createdBy" autocomplete="off" />
+            <el-form-item label="帖子标题" :label-width="formLabelWidth">
+                <el-input v-model="form.postTitle" autocomplete="off" />
             </el-form-item>
 
+            <el-form-item label="帖子内容" :label-width="formLabelWidth">
+                <el-input v-model="form.postContent" autocomplete="off" />
+            </el-form-item>
 
         </el-form>
-
 
         <template #footer>
             <div class="dialog-footer">
@@ -118,7 +119,7 @@
                 <el-form-item :label="form.postContent"></el-form-item>
             </el-form-item>
 
-          
+
 
 
         </el-form>
@@ -133,7 +134,6 @@
 
 
     <!-- 用户详细表 -->
-
     <el-dialog v-model="dialogUserInfoVisible" title="用户详细信息显示" width="600px">
 
         <el-table :data="users" style="width: 100%">
@@ -456,7 +456,7 @@ export default {
                     field = '';
             }
 
-            
+
             // 调用getPageData并传入所有参数
             this.getPageData(num, size, field, keyword);
         },
@@ -486,7 +486,7 @@ export default {
         //     this.postData = response.data;
         //     console.log('postData:', this.postData);
         // });
-        
+
     }
 
 }
