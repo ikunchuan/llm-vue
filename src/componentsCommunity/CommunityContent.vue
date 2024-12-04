@@ -284,10 +284,7 @@ export default {
             this.btnName = "修改"
             this.title = "修改社区信息"
             this.dialogFormVisible = true
-            //console.log(row)
             this.form = row         //得到要修改的数据,并回显到对话框的表单上
-            // this.form.stu_interest = this.form.stu_interest.split(',')
-            // this.form.stu_sex = this.form.stu_sex.toString()
             console.log("openUpdateDialog....");
         },
 
@@ -473,20 +470,6 @@ export default {
 
     mounted() {
         this.getPageData(1, 5)
-
-
-
-        // this.$http.get("/cmns/v1/cmn").then((response) => {
-        //     this.cmnsInfoData = response.data;
-        //     console.log('cmnsInfoData:', this.cmnsInfoData);
-        //     console.log("huhuhu")
-        // });
-
-        // this.$http.get("/posts/v1/postall").then((response) => {
-        //     this.postData = response.data;
-        //     console.log('postData:', this.postData);
-        // });
-
     }
 
 }
