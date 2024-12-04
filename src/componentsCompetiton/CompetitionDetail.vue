@@ -12,9 +12,8 @@
 
         <el-table :data="tableData" style="width: 100%" @selection-change="handleSelectionChange">
             <el-table-column fixed type="selection" width="55" />
-            <el-table-column prop="competitionId" label="竞赛ID" width="80" />
-            <el-table-column prop="competitionDescription" label="竞赛详情" width="120" />
-            <el-table-column prop="competitionOrganizer"  label="竞赛主办方" width="120" />
+            <el-table-column prop="competitionName" label="竞赛名称" width="80" />
+            
             <el-table-column prop="startDate" label="竞赛开始日期" width="180" >
                 <template #default="{ row }">
                     <span>{{ formatDate(row.startDate) }}</span>
@@ -33,11 +32,7 @@
                     <span>{{ formatDate(row.registrationDeadline) }}</span>
                 </template>
             </el-table-column>
-            <el-table-column prop="registrationGuide" label="作品提交指南" width="150" />
-            <el-table-column prop="outstandingCases" label="优秀案例展示" width="120" />
-            <el-table-column prop="eligibilityCriteria" label="竞赛参赛资格要求" width="150" />
-            <el-table-column prop="judgingCriteria" label="评审标准" width="150" />
-            <el-table-column prop="prizeDetails" label="奖品详情" width="120" />
+            
             <el-table-column prop="updatedTime" label="更新时间" width="200">
                 <template #default="{ row }">
                     <span>{{ formatDate(row.updatedTime) }}</span>
@@ -66,12 +61,16 @@
     <!-- 编辑、添加对话框 -->
     <el-dialog v-model="dialogFormVisible" :title="title" width="500">
         <el-form :model="form">
-            
-
             <el-form-item label="竞赛ID" :label-width="formLabelWidth">
                 <el-input v-model="form.competitionId" type="textarea" autocomplete="off" />
             </el-form-item>
 
+            <el-form-item label="竞赛名称" :label-width="formLabelWidth">
+                <el-input v-model="form.competitionName" type="textarea" autocomplete="off" >
+                </el-input>
+            </el-form-item>
+
+            
             <el-form-item label="竞赛详情" :label-width="formLabelWidth">
                 <el-input v-model="form.competitionDescription" type="textarea" autocomplete="off" />
             </el-form-item>
@@ -81,74 +80,11 @@
             </el-form-item>
 
             <el-form-item label="竞赛开始日期" :label-width="formLabelWidth">
-                <el-input v-model="form.startDate" type="textarea" autocomplete="off" />
-            </el-form-item>
-
-            <el-form-item label="竞赛结束日期" :label-width="formLabelWidth">
-                <el-input v-model="form.endDate" type="textarea" autocomplete="off" />
-            </el-form-item>
-
-            <el-form-item label="竞赛官方网站链接" :label-width="formLabelWidth">
-                <el-input v-model="form.competitionUrl" type="textarea" autocomplete="off" />
-            </el-form-item>
-
-            <el-form-item label="竞赛日程安排" :label-width="formLabelWidth">
-                <el-input v-model="form.competitionSchedule" type="textarea" autocomplete="off"/>             
-            </el-form-item>
-
-            
-            <el-form-item label="报名截止日期" :label-width="formLabelWidth">
-                <el-input v-model="form.registrationDeadline" type="textarea" autocomplete="off" />
-            </el-form-item>
-
-            <el-form-item label="作品提交指南" :label-width="formLabelWidth">
-                <el-input v-model="form.registrationGuide" type="textarea" autocomplete="off" />
-            </el-form-item>
-
-            <el-form-item label="优秀案例展示" :label-width="formLabelWidth">
-                <el-input v-model="form.outstandingCases" type="textarea" autocomplete="off" />
-            </el-form-item>
-
-            <el-form-item label="竞赛参赛资格要求" :label-width="formLabelWidth">
-                <el-input v-model="form.eligibilityCriteria" type="textarea" autocomplete="off" />
-            </el-form-item>
-
-            <el-form-item label="评审标准" :label-width="formLabelWidth">
-                <el-input v-model="form.judgingCriteria" type="textarea" autocomplete="off" />
-            </el-form-item>
-
-            <el-form-item label="奖品详情" :label-width="formLabelWidth">
-                <el-input v-model="form.prizeDetails" type="textarea" autocomplete="off" />
-            </el-form-item>
-
-            
-        </el-form>
-
-        <template #footer>
-            <div class="dialog-footer">
-                <el-button @click="dialogFormVisible = false">取消</el-button>
-                <el-button type="primary" @click="btnAddUpdate">{{ btnName }}</el-button>
-            </div>
-        </template>
-    </el-dialog>
-
-    <!-- 详情对话框 -->
-    <el-dialog v-model="dialogDetailVisible" title="竞赛信息详情" width="800">
-        <el-form :model="form">
-            <el-form-item label="竞赛ID" :label-width="formLabelWidth">
-                <el-input v-model="form.competitionId" type="textarea" autocomplete="off" />
-            </el-form-item>
-
-            <el-form-item label="竞赛详情" :label-width="formLabelWidth">
-                <el-input v-model="form.competitionDescription" type="textarea" autocomplete="off" />
-            </el-form-item>
-
-            <el-form-item label="竞赛主办方" :label-width="formLabelWidth">
-                <el-input v-model="form.competitionOrganizer" type="textarea" autocomplete="off" />
-            </el-form-item>
-
-            <el-form-item label="竞赛开始日期" :label-width="formLabelWidth">
-                <el-input v-model="form.startDate" type="textarea" autocomplete="off" />
+                <el-input v-model="form.startDate" type="textarea" autocomplete="off" >
+                <template #default="{ row }">
+                    <span>{{ formatDate(row.startDate) }}</span>
+                </template>
+                </el-input>
             </el-form-item>
 
             <el-form-item label="竞赛结束日期" :label-width="formLabelWidth">
@@ -195,18 +131,55 @@
             <el-form-item label="创建时间" :label-width="formLabelWidth">
                 <el-input v-model="form.createdTime" type="textarea" autocomplete="off"/>             
             </el-form-item>
+
+
+            
+            
         </el-form>
 
         <template #footer>
             <div class="dialog-footer">
-                <el-button @click="dialogDetailVisible = false">关闭</el-button>
+                <el-button @click="dialogFormVisible = false">取消</el-button>
+                <el-button type="primary" @click="btnAddUpdate">{{ btnName }}</el-button>
             </div>
+        </template>
+    </el-dialog>
+
+    <!-- 详情对话框 -->
+    <el-dialog v-model="dialogDetailVisible" title="竞赛信息详情" width="800px">
+        <el-form :model="form" label-position="left">
+            <el-descriptions direction="vertical"
+        :column="4":size="size" title="竞赛详细信息" column="3"  border>
+        <el-descriptions-item label="竞赛ID">{{ form.competitionId }}</el-descriptions-item>
+        <el-descriptions-item label="竞赛名称">{{ form.competitionName }}</el-descriptions-item>
+        <el-descriptions-item label="竞赛详情">{{ form.competitionDescription }}</el-descriptions-item>
+        <el-descriptions-item label="竞赛主办方">{{ form.competitionOrganizer }}</el-descriptions-item>
+        <el-descriptions-item label="竞赛开始日期">{{ form.startDate }}</el-descriptions-item>
+        <el-descriptions-item label="竞赛结束日期">{{ form.endDate }}</el-descriptions-item>
+        <el-descriptions-item label="竞赛官方网站链接">{{ form.competitionUrl }}</el-descriptions-item>
+        <el-descriptions-item label="竞赛日程安排">{{ form.competitionSchedule }}</el-descriptions-item>
+        <el-descriptions-item label="报名截止日期">{{ form.registrationDeadline }}</el-descriptions-item>
+        <el-descriptions-item label="作品提交指南">{{ form.registrationGuide }}</el-descriptions-item>
+        <el-descriptions-item label="优秀案例展示">{{ form.outstandingCases }}</el-descriptions-item>
+        <el-descriptions-item label="竞赛参赛资格要求">{{ form.eligibilityCriteria }}</el-descriptions-item>
+        <el-descriptions-item label="评审标准">{{ form.judgingCriteria }}</el-descriptions-item>
+        <el-descriptions-item label="奖品详情">{{ form.prizeDetails }}</el-descriptions-item>
+        <el-descriptions-item label="更新时间">{{ form.updatedTime }}</el-descriptions-item>
+        <el-descriptions-item label="创建时间">{{ form.createdTime }}</el-descriptions-item>
+        </el-descriptions>
+        </el-form>
+    
+        <template #footer>
+        <div class="dialog-footer">
+            <el-button @click="dialogDetailVisible = false">关闭</el-button>
+        </div>
         </template>
     </el-dialog>
 </template>
 
-<script>
-import { ElMessage, ElMessageBox } from 'element-plus';
+
+<script >
+    
 
 export default {
     data() {
@@ -285,14 +258,19 @@ export default {
             this.form = {};  // 清空表单数据
             this.dialogFormVisible = true;
         },
-        // 添加竞赛信息
+        
+    
+        //// 添加竞赛信息
         addQuestion() {
-            // 确保所有必填字段都已填写
+            
+             // 确保所有必填字段都已填写
             if (!this.form.competitionDescription || !this.form.competitionOrganizer || !this.form.startDate||  !this.form.endDate||  !this.form.competitionUrl||  !this.form.competitionSchedule||  !this.form.startDate||  !this.form.registrationDeadline||  !this.form.registrationGuide||  !this.form.outstandingCases||  !this.form.eligibilityCriteria||  !this.form.judgingCriteria||  !this.form.prizeDetails) {
                 ElMessage({ message: '请填写完整的竞赛信息！', type: "warning" });
                 return;
             }
-            // 发送 POST 请求以添加竞赛信息
+
+            
+           // 发送 POST 请求以添加竞赛信息
             this.$http.post('http://localhost:10086/comdetail/v1/detail', this.form).then((response) => {
                 if (response.data == 1) {
                     ElMessage({ message: '信息添加成功！', type: "success" });
@@ -305,6 +283,9 @@ export default {
                 ElMessage({ message: '请求失败，请重试', type: "error" });
             });
         },
+
+    
+
 
 
         // 打开编辑对话框
@@ -421,3 +402,9 @@ export default {
     },
 };
 </script>
+    
+    <style scoped>
+    .el-descriptions {
+    margin-top: 20px;
+    }
+    </style>
