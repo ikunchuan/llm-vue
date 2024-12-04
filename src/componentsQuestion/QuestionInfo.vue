@@ -24,7 +24,7 @@
         <el-table :data="tableData" style="width: 100%" @selection-change="handleSelectionChange">
             <el-table-column fixed type="selection" width="55" />
 
-            <el-table-column prop="categoryId" label="类别" width="120" />
+            <el-table-column prop="categoryName" label="类别" width="120" />
 
             <el-table-column prop="questionLevel" label="题目难度" width="120">
                 <template #default="scope">
@@ -95,8 +95,8 @@
 
             <el-form-item label="类别" :label-width="formLabelWidth">
                 <el-select v-model="form.categoryId" placeholder="-- 请选择类别 --">
-                    <el-option v-for="cat in catInfoData" :key="cat.categoryId" :label="cat.catName"
-                        :value="cat.categoryId" />
+                    <el-option v-for="cat in catInfoData" :key="cat.categoryId" :label="cat.categoryName"
+                        :value="cat.categoryName" />
                 </el-select>
             </el-form-item>
 
@@ -129,14 +129,11 @@
 
         <template #footer>
             <div style="flex: auto">
-                <el-button @click="closeDetailDrawer">取消</el-button>
+                <el-button @click="closeDrawer">取消</el-button>
                 <el-button type="primary" @click="btnAddUpdate">{{ btnName }}</el-button>
             </div>
         </template>
     </el-drawer>
-
-
-
 
     <!-- 抽屉：详情 -->
     <el-drawer v-model="dialogDetailVisible" :direction="direction" size="35%">
@@ -199,7 +196,7 @@
 
         <template #footer>
             <div style="flex: auto">
-                <el-button @click="closeDetailDrawer">取消</el-button>
+                <el-button @click="closeDrawer">取消</el-button>
             </div>
         </template>
     </el-drawer>
@@ -212,32 +209,30 @@ import { ElMessage, ElMessageBox } from 'element-plus';
 export default {
     data() {
         return {
-            name: '题目信息',
-            queryStr: "",
+            name: '题目信息',   //主体标题
+            queryStr: "",   //查询条件
             selectedField: "",  //选择字段
 
-            currentPage: 1,
-            pageSize: 5,
-            pageInfo: {},
+            currentPage: 1,    //当前页码
+            pageSize: 5,    //每页显示的条数
+            pageInfo: {},   //分页信息。单条数据用map（就是python中的字典），用`{}`表示空字典
 
-            tableData: [],
-            queryData: [],
-            form: {},
+            tableData: [],  //表格数据。单条数据用数组（就是python中的序列），用`[]`表示空字典
+            catInfoData: [], //类别信息
+            queryData: [],      //查询数据
 
-            formLabelWidth: '150px',
+            form: {},           //对话框表单数据
+            formLabelWidth: '150px',  //添加修改对话框label宽度
 
-            dialogFormVisible: false,
-            dialogDetailVisible: false,
-            title: '',
-            btnName: '',
+            dialogFormVisible: false, //添加修改对话框可见性
+            dialogDetailVisible: false,     //详细对话框可见性
+            title: '',  //添加修改对话框标题
+            btnName: '', //添加修改对话框按钮名称
 
-            multipleSelection: [],
-            catInfoData: [
-                { categoryId: 1, catName: '计算机科学' },
-                { categoryId: 2, catName: '数学' },
-                { categoryId: 3, catName: '物理' },],
+            multipleSelection: [],  //选中的数据
         };
     },
+
     methods: {
         //处理难度分级
         formatLevel(questionLevel) {
@@ -269,23 +264,37 @@ export default {
         handleSizeChange(pageSize) {
             console.log("当前页大小: ", pageSize);
             this.pageSize = pageSize;
-            this.getPageData(this.currentPage, this.pageSize);
+            this.getPageData(this.currentPage, this.pageSize, this.searchField, this.queryStr);
         },
 
         // 页码变化
         handleCurrentChange(pageNum) {
             console.log("当前页码: ", pageNum);
             this.currentPage = pageNum;
-            this.getPageData(this.currentPage, this.pageSize);
+            this.getPageData(this.currentPage, this.pageSize, this.searchField, this.queryStr);
         },
 
         // 获取分页数据
-        getPageData(num, size) {
-            this.$http.get('/qst/v1/page', { params: { pageNum: num, pageSize: size } })
+        getPageData(num, size, searchField, searchKeyword) {
+            // 构建查询条件对象，假设你希望根据 questionTitle 和 categoryName 搜索
+            let questionSearch = {
+                categoryName: searchField === 'categoryName' ? searchKeyword : '',
+                questionLevel: searchField === 'questionLevel' ? searchKeyword : '',
+                questionTitle: searchField === 'questionTitle' ? searchKeyword : '',
+                questionText: searchField === 'questionText' ? searchKeyword : ''
+            };
+
+            // this.$http.post('/qst/v1/search?pageNum=' + num + '&pageSize=' + size, questionSearch)
+            this.$http.post('/qst/v1/search', {
+                pageNum: num,
+                pageSize: size,
+                ...questionSearch
+            })
                 .then((response) => {
                     console.log(response.data);  // 检查后端返回的数据
                     this.pageInfo = response.data;
-                    this.tableData = this.pageInfo.records;
+                    this.tableData = this.pageInfo.list;
+                    this.catInfoData = this.pageInfo.categoryName;
                 }).catch(() => {
                     ElMessage({ message: '请求失败，请重试', type: "error" });
                 });
@@ -308,9 +317,9 @@ export default {
             this.dialogFormVisible = true;
         },
 
-        // 添加竞赛信息
+        // 添加题目信息
         addQuestion() {
-            if (!this.form.categoryId || !this.form.questionTitle || !this.form.questionText || !this.form.correctAnswer) {
+            if (!this.form.questionTitle || !this.form.questionText || !this.form.correctAnswer) {
                 ElMessage({ message: '请填写完整的题目信息！', type: "warning" });
                 return;
             }
@@ -334,11 +343,12 @@ export default {
             this.form = { ...row }; // 填充表单数据
             this.form.questionLevel = this.formatLevel(row.questionLevel);
             this.dialogFormVisible = true;
+            this.dialogDetailVisible = false;
         },
 
         // 编辑题目信息
         updateQuestion() {
-            if (!this.form.categoryId || !this.form.questionTitle || !this.form.questionText || !this.form.correctAnswer) {
+            if (!this.form.questionTitle || !this.form.questionText || !this.form.correctAnswer) {
                 ElMessage({ message: '请填写完整的题目信息！', type: "warning" });
                 return;
             }
@@ -370,12 +380,12 @@ export default {
             });
         },
 
-        //关闭对话框
+        //关闭抽屉
         closeDrawer() {
             this.dialogDetailVisible = false;
             this.dialogFormVisible = false;
         },
-        // 删除单个题目
+        //删除单个题目
         singleDelete(questionId) {
             ElMessageBox.confirm('确定删除这条记录吗?', '删除提示', {
                 confirmButtonText: '确定',
@@ -395,7 +405,7 @@ export default {
             }).catch(() => { });
         },
 
-        // 批量删除
+        //批量删除
         multipleDelete() {
             if (this.multipleSelection.length > 0) {
                 ElMessageBox.confirm('是否删除选中的所有数据?', '批量删除提示', {
@@ -404,7 +414,6 @@ export default {
                     type: "warning",
                 }).then(() => {
                     const ids = this.multipleSelection.map(item => item.questionId);
-                    // ${ids.join(",")}
                     this.$http.delete(`/qst/v1`, { data: ids }).then((response) => {
                         if (response.data > 0) {
                             ElMessage({ message: '批量删除成功', type: "success" });
@@ -421,18 +430,58 @@ export default {
             }
         },
 
-        // 查询功能
+        //查询功能
         queryInfo() {
-            if (this.queryStr.trim().length > 0) {
-                this.tableData = this.queryData.filter(item =>
-                    item.questionTitle.includes(this.queryStr.trim())
-                );
-            } else {
-                this.tableData = [...this.queryData];
+            console.log("查询内容:", this.queryStr);
+            // 检查当前页码,如果未定义则使用默认值1
+            let num = this.currentPage || 1;
+            // 检查每页大小,如果未定义则使用默认值3 
+            let size = this.pageSize || 3;
+
+            // 构建查询参数
+            let field = '';
+            let keyword = this.queryStr || '';
+
+            // 根据选择的查询字段设置field
+            switch (this.selectedField) {
+                case '1':
+                    field = 'categoryName';
+                    break;
+                case '2':
+                    field = 'questionLevel';
+                    break;
+                case '3':
+                    field = 'questionTitle';
+                    break;
+                case '4':
+                    field = 'questionText';
+                    break;
+                default:
+                    field = '';
             }
-            console.log(this.tableData);
+
+            // 调用getPageData并传入所有参数
+            this.getPageData(num, size, field, keyword);
+
+            // 根据选择的字段和查询内容过滤数据
+            this.tableData = this.pageInfo.list.filter(item => {
+                if (item[this.selectedField] && item[this.selectedField].includes(this.queryStr.trim())) {
+                    return true;
+                }
+                return false;
+            });
+
+            // 使用 $nextTick 确保 DOM 已经更新
+            this.$nextTick(() => {
+                if (this.$refs.pagination) {
+                    this.$refs.pagination.setTotal(this.pageInfo.total);
+                }
+            });
+
+
         },
 
+        //处理多选框
         handleSelectionChange(val) {
             this.multipleSelection = val;
             console.log(this.multipleSelection);
@@ -440,7 +489,9 @@ export default {
     },
 
     mounted() {
-        this.getPageData(this.currentPage, this.pageSize);
+        this.getPageData(this.currentPage, this.pageSize, '', '');
+        // this.$http.get('/api/question/getAllQuestionType')
+
     },
 };
 </script>
