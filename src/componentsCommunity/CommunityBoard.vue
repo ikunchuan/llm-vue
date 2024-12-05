@@ -77,55 +77,54 @@
 
 
     <!-- 对话框:添加,修改功能 -->
-    <el-dialog v-model="dialogFormVisible" :title="title" width="500">
-
-
-            <el-form-item label="类别" :label-width="formLabelWidth">
-                <el-select v-model="form.categoryId" placeholder="--请选择类别--">
-                    <el-option v-for="cat in catIdAndName" :key="cat.categoryId" :label="cat.categoryName"
-                        :value="cat.categoryId" />
+    <!-- 修改抽屉 -->
+    <el-drawer v-model="dialogFormVisible" :title="title" size="35%" direction="rtl">
+        <el-form :model="form" label-width="120px">
+            <el-form-item label="类别">
+                <el-select v-model="form.categoryName" placeholder="--请选择类别--">
+                    <el-option v-for="cat in catIdAndName" :key="cat.categoryId" :label="cat.categoryName" :value="cat.categoryId" />
                 </el-select>
             </el-form-item>
 
-            <el-form-item label="社区名" :label-width="formLabelWidth">
-                <el-input v-model="form.communityName" autocomplete="off" />
+            <el-form-item label="社区名">
+                <el-input v-model="form.communityName" />
             </el-form-item>
 
-            <el-form-item label="社区描述" :label-width="formLabelWidth">
-                <el-input v-model="form.communityDescription" type="textarea" autocomplete="off" />
-            </el-form-item>
-
-
-
-
-        <template #footer>
-            <div class="dialog-footer">
-                <el-button @click="dialogFormVisible = false">取消</el-button>
-                <el-button type="primary" @click="btnAddUpdate">{{ btnName }}</el-button>
-            </div>
-        </template>
-    </el-dialog>
-
-
-    <!-- 详情对话框 -->
-    <el-dialog v-model="dialogDetailVisible" title="社区详细信息显示" width="500">
-        <el-form :model="form">
-
-            <el-form-item label="社区名" :label-width="formLabelWidth">
-                <el-form-item :label="form.communityName"></el-form-item>
-            </el-form-item>
-
-            <el-form-item label="社区描述" :label-width="formLabelWidth">
-                <el-form-item :label="form.communityDescription"></el-form-item>
+            <el-form-item label="社区描述">
+                <el-input v-model="form.communityDescription" type="textarea" />
             </el-form-item>
         </el-form>
-
         <template #footer>
-            <div class="dialog-footer">
-                <el-button @click="dialogDetailVisible = false">取消</el-button>
-            </div>
+            <el-button @click="dialogFormVisible = false">取消</el-button>
+            <el-button type="primary" @click="btnAddUpdate">{{ btnName }}</el-button>
         </template>
-    </el-dialog>
+    </el-drawer>
+
+    <!-- 详情抽屉 -->
+    <!-- 详情抽屉 -->
+    <el-drawer v-model="dialogDetailVisible" title="社区详情" size="35%" direction="rtl">
+        <div class="scrollable">
+            <el-descriptions :column="1" border>
+                <el-descriptions-item label="社区名">{{ form.communityName }}</el-descriptions-item>
+                <el-descriptions-item label="社区描述">{{ form.communityDescription }}</el-descriptions-item>
+                <el-descriptions-item label="更新时间">{{ formatDate(form.updatedTime) }}</el-descriptions-item>
+                <el-descriptions-item label="创建时间">{{ formatDate(form.createdTime) }}</el-descriptions-item>
+            </el-descriptions>
+        </div>
+        <template #footer>
+            <el-button @click="closeDialog">关闭</el-button>
+        </template>
+    </el-drawer>
+
+    <!-- 用户信息抽屉 -->
+    <el-drawer v-model="dialogUserInfoVisible" title="用户详情" size="35%" direction="rtl">
+        <el-descriptions :column="1" border>
+                <el-descriptions-item label="用户名">{{  }}</el-descriptions-item>
+                <el-descriptions-item label="用户详情">{{  }}</el-descriptions-item>
+                <el-descriptions-item label="">{{  }}</el-descriptions-item>
+                <el-descriptions-item label="">{{  }}</el-descriptions-item>
+            </el-descriptions>
+    </el-drawer>
 
 
 </template>
@@ -138,7 +137,7 @@ import { Plus } from '@element-plus/icons-vue';
 export default {
     data() {
         return {
-            dialogUserInfoVisible: false,
+            dialogUserInfoVisible: false,//用户抽屉
             dialogDetailVisible: false,   //详细对话框
             dialogFormVisible: false,  //对话框是否展示,默认为不展示
 
@@ -218,8 +217,6 @@ export default {
         },
 
 
-
-
         openUserDialog(cmnid) {
             var _this = this
             this.$http.get("/ucmns/v1/ucmn/user/" + cmnid).then(function (response) {
@@ -230,6 +227,15 @@ export default {
             this.dialogUserInfoVisible = true;
             console.log("打开用户详细页面")
         },
+
+        resetForm() {
+            this.form = {
+                categoryId: null,
+                communityName: '',
+                communityDescription: '',
+            };
+        },
+
 
         closeDialog() {
             this.form = []
@@ -249,9 +255,12 @@ export default {
         openAddDialog() {
             this.btnName = "添加";
             this.title = "添加社区信息";
+            this.resetForm(); // 清空表单
             this.dialogFormVisible = true;
             console.log("openAddDialog....");
         },
+
+
 
         openUpdateDialog(row) {                 //打开修改对话框,修改数据回显
             this.btnName = "修改"
@@ -259,6 +268,14 @@ export default {
             this.dialogFormVisible = true
             this.form = row         //得到要修改的数据,并回显到对话框的表单上
             console.log("openUpdateDialog....");
+        },
+
+        closeDialog() {
+            this.dialogFormVisible = false;
+            this.dialogDetailVisible = false;
+            this.resetForm(); // 确保表单重置
+            this.multipleSelection = []; // 清空多选状态
+            console.log("抽屉已关闭");
         },
 
         updateCmn() {        //修改功能
@@ -279,7 +296,6 @@ export default {
                         type: 'warning',
                     })
                 }
-
             })
             this.form = []
         },
@@ -319,12 +335,15 @@ export default {
                 console.log(this.form)
                 console.log("修改操作......")
             }
-            this.dialogFormVisible = false
+            this.closeDialog(); // 关闭抽屉
+            ElMessage.success(`${this.btnName}成功`);
+            this.getPageData(this.currentPage, this.pageSize, '', ''); // 刷新数据
+
         },
+
 
         singleDelete(cmnid) {
             console.log("singleDelete().....")
-
             ElMessageBox.confirm(
                 '您确定要删除本条数据吗?',
                 'Warning',
@@ -344,23 +363,21 @@ export default {
                             type: 'success',
                             message: '删除成功',
                         })
+                        this.getPageData(this.currentPage, this.pageSize, '') // 刷新数据
                     } else {
                         ElMessage({
                             type: 'warning',
                             message: '删除失败',
                         })
                     }
-
-
                 })
                 .catch(() => {
-
+                    ElMessage.error('请求失败，请重试');
                 })
         },
 
         multiDelete() {
             console.log("multiDelete()...")
-
             ElMessageBox.confirm(
                 '您确定要删除当前选中的多条数据吗?',
                 'Warning',
@@ -381,18 +398,16 @@ export default {
                             if (response.data == 1) {
                                 num = num + 1
                             }
-
                         })
                     })
-
                     ElMessage({
                         type: 'success',
                         message: '你成功删除' + num + '条记录',
                     })
-
+                    this.getPageData(this.currentPage, this.pageSize, '', ''); // 刷新数据
                 })
                 .catch(() => {
-
+                    ElMessage.error('请求失败，请重试');
                 })
 
         },
@@ -425,13 +440,9 @@ export default {
                 default:
                     field = '';
             }
-
-
             // 调用getPageData并传入所有参数
             this.getPageData(num, size, field, keyword);
         },
-
-
 
         handleSelectionChange(val) {            //多行选择
             this.multipleSelection = val;
@@ -505,4 +516,11 @@ export default {
 .dialog-footer {
     text-align: center;
 }
+/* 滚动条 */
+.scrollable {
+    max-height: 400px;
+    overflow-y: auto;
+    padding-right: 10px;
+}
+
 </style>
