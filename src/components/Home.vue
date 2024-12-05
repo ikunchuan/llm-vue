@@ -123,7 +123,7 @@
         <el-main>
           <router-view></router-view>
         </el-main>
-        <el-footer class="footer">Footer</el-footer>
+        <!-- <el-footer class="footer">Footer</el-footer> -->
       </el-container>
     </el-container>
   </div>
@@ -267,14 +267,13 @@ body {
 
 /* Header */
 .header {
-
   display: flex;
   justify-content: space-between;
   align-items: center;
   background-color: #f9f9f9;
   padding: 10px 24px;  /* 修复了padding语法 */
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-  border-radius: 10px 10px 0 0;  /* 圆角，防止顶部圆角突兀 */ 
+  /* border-radius: 10px 10px 0 0;  /* 圆角，防止顶部圆角突兀 */  
 }
 
 .header-right {
@@ -311,7 +310,7 @@ body {
   font-size: 10px;
 }
 
-/* Footer */
+/* Footer
 .footer {
   background: linear-gradient(180deg, #0a1f44 0%, #2e3c56 100%);
   text-align: center;
@@ -324,7 +323,7 @@ body {
 
 .footer a:hover {
   color: #ffd04b;
-}
+} */
 
 /* Breadcrumb Positioning */
 .breadcrumb-container {
