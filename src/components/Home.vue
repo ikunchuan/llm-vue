@@ -100,8 +100,14 @@
             </el-breadcrumb>
           </div>
 
-
           <div class="header-right">
+    <el-badge :value="5" class="icon">
+      <el-icon class="el-icon-bell" @click="handleNotification" />
+    </el-badge>
+    <el-icon class="el-icon-setting icon" @click="handleSettings" />
+    <el-icon class="el-icon-user icon" @click="handleProfile" />
+  </div>
+          <!-- <div class="header-right">
             <el-dropdown class="icon-dropdown">
               <el-button class="icon-button" icon="el-icon-bell" @click="handleNotification">
                 <span class="badge">5</span>
@@ -111,10 +117,34 @@
                 <el-dropdown-item>Notification 2</el-dropdown-item>
                 <el-dropdown-item>Notification 3</el-dropdown-item>
               </el-dropdown-menu>
+            </el-dropdown> -->
+            <!-- <el-button class="icon-button" icon="el-icon-setting" @click="handleSettings"></el-button>
+            <el-button class="icon-button" icon="el-icon-user" @click="handleProfile"></el-button> -->
+          
+            <!-- <el-dropdown class="icon-dropdown">
+              <el-button class="icon-button" icon="el-icon-setting" @click="handleSettings">
+                <span class="badge">2</span>
+              </el-button>
+              <el-dropdown-menu slot="dropdown">
+                <el-dropdown-item>Settings Option 1</el-dropdown-item>
+                <el-dropdown-item>Settings Option 2</el-dropdown-item>
+              </el-dropdown-menu>
+            </el-dropdown> -->
+
+            <!-- Profile button with dropdown -->
+            <!-- <el-dropdown class="icon-dropdown">
+              <el-button class="icon-button" icon="el-icon-user" @click="handleProfile">
+                <span class="badge">1</span>
+              </el-button>
+              <el-dropdown-menu slot="dropdown">
+                <el-dropdown-item>Profile Option 1</el-dropdown-item>
+                <el-dropdown-item>Profile Option 2</el-dropdown-item>
+              </el-dropdown-menu>
             </el-dropdown>
-            <el-button class="icon-button" icon="el-icon-setting" @click="handleSettings"></el-button>
-            <el-button class="icon-button" icon="el-icon-user" @click="handleProfile"></el-button>
-          </div>
+          
+          
+          
+          </div> -->
         </el-header>
 
 
@@ -222,7 +252,7 @@ body {
 .sidebar {
   background: linear-gradient(180deg, #0a1f44 0%, #2e3c56 100%);
   box-shadow: 2px 0 10px rgba(0, 0, 0, 0.2);
-  border-radius: 10px 0 0 10px;
+  border-radius: 0px 0 0 0px;
   /*左右角统一的圆角*/
   padding-top: 20px;
   position: relative;
@@ -283,8 +313,27 @@ body {
 
 .header-right {
   display: flex;
+  gap: 16px;
   align-items: center;
 
+}
+.icon {
+  font-size: 24px; /* 调整图标大小 */
+  color: #5c2727; /* 默认颜色 */
+  border-radius: 0; /* 设置直角 */
+  padding: 8px;
+  cursor: pointer;
+  transition: color 0.3s ease, background-color 0.3s ease; /* 添加动画 */
+}
+
+.icon:hover {
+  color: #31511e; /* 鼠标悬停时的颜色 */
+  background-color: #f0f0f0; /* 鼠标悬停时的背景色 */
+}
+
+.icon:active {
+  color: #ffffff; /* 按下时的颜色 */
+  background-color: #31511e; /* 按下时的背景色 */
 }
 
 .icon-button {
@@ -292,16 +341,17 @@ body {
   background: #e1e1e1;
   border-radius: 50%;
   border: none;
-  color: white;
+  color: #888;
   font-size: 20px;
   margin-left: 15px;
   padding: 8px;
+  transition: background 0.3s ease;
 }
 
 .icon-button:hover {
   /* color: #0066cc; */
-  background: #0056b3;
-  color: white;
+  background: #afb3b8;
+  color: #555;
 }
 
 .badge {
@@ -313,6 +363,20 @@ body {
   padding: 2px 5px;
   border-radius: 50%;
   font-size: 10px;
+}
+
+/* Dropdown Menu */
+.el-dropdown-menu {
+  background-color: #fff;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.el-dropdown-item {
+  color: #333;
+}
+
+.el-dropdown-item:hover {
+  background-color: #f5f5f5;
 }
 
 /* Footer

@@ -62,6 +62,8 @@
 
         <!-- 用户性别分布饼图 -->
         <div class="echart" ref="myPieChart" :style="{ width: '100%', height: '400px' }"></div>
+        <!-- 用户完成视频个数图表 -->
+        <div class="echart" ref="myVideoChart" :style="{ width: '100%', height: '400px' }"></div>
     </el-card>
 </template>
 
@@ -81,6 +83,7 @@ export default {
             tableData: [],
             sexDistributionData: [], // 用于存储性别分布数据
             userTotalCount: 0, // 存储用户总数
+            videoCompletionData: [] // 存储用户完成视频个数数
         };
     },
     mounted() {
@@ -88,6 +91,8 @@ export default {
         this.getUserData();
         this.getUserTotalCount(); // 获取用户总数
         this.initPieChart();
+        this.getVideoCompletionData(); // 获取用户完成视频个数数据
+        this.initVideoChart();
     },
     methods: {
         handleSizeChange(pageSize) {
@@ -185,11 +190,62 @@ export default {
                 }]
             };
             this.myPieChart.setOption(pieOption);
+        },
+        getVideoCompletionData() {
+            this.$http.get('/uis/v1/ui/countCourseAll').then(response => {
+                this.videoCompletionData = response.data;
+                this.updateVideoChart(); // 更新图表
+            }).catch(error => {
+                ElMessage.error('获取用户完成视频个数数据失败，请稍后重试');
+            });
+        },
+        initVideoChart() {
+            this.myVideoChart = echarts.init(this.$refs.myVideoChart);
+            const option = {
+                title: {
+                    text: '用户完成视频个数',
+                    left: 'center'
+                },
+                tooltip: {
+                    trigger: 'axis'
+                },
+                xAxis: {
+                    type: 'category',
+                    data: [] // 用户名
+                },
+                yAxis: {
+                    type: 'value'
+                },
+                series: [{
+                    name: '完成视频个数',
+                    type: 'bar',
+                    data: [] // 完成视频个数
+                }]
+            };
+            this.myVideoChart.setOption(option);
+        },
+        updateVideoChart() {
+            if (!this.myVideoChart) return;
+            const userNames = this.videoCompletionData.map(item => item.user_name);
+            const completionCounts = this.videoCompletionData.map(item => item.completed_count);
+            const option = {
+                xAxis: {
+                    data: userNames
+                },
+                series: [{
+                    data: completionCounts
+                }]
+            };
+            this.myVideoChart.setOption(option);
         }
     },
     beforeDestroy() {
         this.myPieChart.dispose();
+        if (this.myVideoChart) {
+            this.myVideoChart.dispose();
+        }
     }
+    
 }
 </script>
 
