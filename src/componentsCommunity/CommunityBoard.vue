@@ -32,6 +32,7 @@
             <el-table-column prop="categoryName" label="社区类别" width="120" />
             <el-table-column prop="communityName" label="社区名" width="120" />
             <el-table-column prop="communityDescription" label="社区描述" width="100" />
+            
             <el-table-column prop="userName" label="创建者" width="120" />
 
             <el-table-column fixed="right" label="操作" min-width="180">
@@ -63,6 +64,9 @@
 
     </el-card>
 
+
+    
+
     <!-- 对话框:添加,修改功能 -->
     <el-dialog v-model="dialogFormVisible" :title="title" width="500">
 
@@ -82,6 +86,7 @@
 
             <el-form-item label="社区描述" :label-width="formLabelWidth">
                 <el-input v-model="form.communityDescription" autocomplete="off" />
+                
             </el-form-item>
 
             <el-form-item label="创建者" :label-width="formLabelWidth">
@@ -106,9 +111,6 @@
     <!-- 详情对话框 -->
     <el-dialog v-model="dialogDetailVisible" title="社区详细信息显示" width="500">
         <el-form :model="form">
-            <el-form-item label="社区类别" :label-width="formLabelWidth">
-                <el-form-item :label="form.categoryId"></el-form-item>
-            </el-form-item>
 
             <el-form-item label="社区名" :label-width="formLabelWidth">
                 <el-form-item :label="form.communityName"></el-form-item>
@@ -118,8 +120,8 @@
                 <el-form-item :label="form.communityDescription"></el-form-item>
             </el-form-item>
 
-            <el-form-item label="创建人" :label-width="formLabelWidth">
-                <el-form-item :label="form.createdBy"></el-form-item>
+            <el-form-item label="创建者" :label-width="formLabelWidth">
+                <el-form-item :label="form.userName"></el-form-item>
             </el-form-item>
         </el-form>
 
@@ -133,7 +135,6 @@
 
 
     <!-- 用户详细表 -->
-
     <el-dialog v-model="dialogUserInfoVisible" title="用户详细信息显示" width="600px">
 
         <el-table :data="users" style="width: 100%">
@@ -181,7 +182,11 @@ export default {
             btnName: "",                     //对话框按钮文字
             // claInfoData: [],                  //加载到下拉框的班级信息
             imageUrl: "",                     //图片URL
-            catInfoData: [],
+            catInfoData: [
+                { categoryId: 1, catName: '管理学' },
+                { categoryId: 8, catName: '经济学' },
+                { categoryId: 9, catName: '数学' },
+            ],
             selectedField: "",  // 选择的查询字段
             searchField: '',
             searchKeyword: '',
@@ -230,7 +235,7 @@ export default {
                     });
                 });
         },
-        
+
 
 
 
@@ -252,7 +257,7 @@ export default {
 
         openDetailDialog(cmnid) {
             var _this = this
-            this.$http.get("/cmns/v1/cmn/" + cmnid).then(function (response) {
+            this.$http.get("v1/cmns/cmn/" + cmnid).then(function (response) {
                 console.log(response.data);
                 _this.form = response.data
             })
@@ -282,7 +287,7 @@ export default {
             console.log(this.form);
             var _this = this;
             // this.form.stu_interest = this.form.stu_interest.join(',')              //将数据转为字符串
-            this.$http.put("/cmns/v1/cmn", this.form).then(function (response) {
+            this.$http.put("v1/cmns/cmn", this.form).then(function (response) {
                 console.log(response.data);
 
                 if (response.data == 1) {
@@ -304,7 +309,7 @@ export default {
         addCmn() {           //添加功能
             var _this = this;
             // this.form.stu_interest = this.form.stu_interest.join(',');
-            this.$http.post("/cmns/v1/cmn", this.form).then(function (response) {
+            this.$http.post("v1/cmns/cmn", this.form).then(function (response) {
                 console.log(response.data);
 
                 if (response.data == 1) {
@@ -353,7 +358,7 @@ export default {
             )
                 .then(() => {
                     var _this = this;
-                    this.$http.delete("cmns/v1/cmn/" + cmnid).then(function (response) {
+                    this.$http.delete("v1/cmns/cmn/" + cmnid).then(function (response) {
                         console.log(response.data);
                     })
                     if (response.data == 1) {
@@ -393,7 +398,7 @@ export default {
                     this.multipleSelection.forEach(item => {
                         var _this = this;
                         var cmnid = item.communityId
-                        this.$http.delete("/cmns/v1/cmn/" + cmnid).then(function (response) {
+                        this.$http.delete("v1/cmns/cmn/" + cmnid).then(function (response) {
                             console.log(response.data);
                             if (response.data == 1) {
                                 num = num + 1
@@ -443,7 +448,7 @@ export default {
                     field = '';
             }
 
-            
+
             // 调用getPageData并传入所有参数
             this.getPageData(num, size, field, keyword);
         },

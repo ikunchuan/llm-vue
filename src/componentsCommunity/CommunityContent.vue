@@ -1,101 +1,101 @@
 <template>
-    <el-card class="card">
-        <template #header>
-            <div slot="header" class="card-header">{{ 社区模块管理 }}</div><br>
-
-            <div class="header-actions">
-                <!-- 查询字段选择：让用户选择查询的字段 -->
-                <el-select v-model="selectedField" placeholder="选择查询字段" style="width: 180px;">
-                    <el-option label="社区类别" value="courseName"></el-option>
-                    <el-option label="社区名" value="courseDescription"></el-option>
-                    <el-option label="社区描述" value="courseDifficultyLevel"></el-option>
-                    <el-option label="帖子标题" value="courseRating"></el-option>
-                </el-select>&nbsp;
-
-                <!-- 输入框：输入查询内容 -->
-                <el-input v-model="queryStr" style="width: 220px" placeholder="请输入查询内容" />&nbsp;
-
-                <!-- <el-input v-model="queryStr" style="width: 220px" placeholder="请输入课程名称" />&nbsp; -->
-                <el-button type="primary" @click="queryInfo">查询</el-button>
-                <el-button class="button" type="success" @click="openAddDialog">添加</el-button>
-                <el-button class="button" type="warning" @click="multipleDelete">多选删除</el-button>
 
 
-            </div>
+    <el-tabs v-model="activeName" class="demo-tabs" @tab-click="handleClick">
+        <el-tab-pane label="帖子" name="first">
+            <el-card class="card">
+                <template #header>
+                    <div slot="header" class="card-header">{{ 社区模块管理 }}</div><br>
 
-        </template>
+                    <div class="header-actions">
+                        <!-- 查询字段选择：让用户选择查询的字段 -->
+                        <el-select v-model="selectedField" placeholder="选择查询字段" style="width: 180px;">
+                            <el-option label="社区名" value="communityName"></el-option>
+                            <el-option label="用户名" value="userName"></el-option>
+                            <el-option label="帖子标题" value="postTitle"></el-option>
+                            <el-option label="帖子内容" value="postContent"></el-option>
+                        </el-select>&nbsp;
 
-        <el-table :data="tableData" style="width: 100%" @selection-change="handleSelectionChange">
-            <el-table-column type="selection" width="55" />
-            <el-table-column prop="communityName" label="社区名" width="120" />
-            <el-table-column prop="userId" label="发帖用户" width="120" />
-            <el-table-column prop="postTitle" label="帖子标题" width="200" />
-            <el-table-column prop="postContent" label="帖子内容" width="200">
-                <template v-slot:default="{ row }">
-                    <span class="ellipsis">{{ row.postContent }}</span>
-                </template>
-            </el-table-column>
-            <el-table-column prop="createdTime" label="发帖时间" width="120">
-                <template v-slot:default="{ row }">
-                    <span>{{ formatDate(row.createdTime) }}</span>
-                </template>
-            </el-table-column>
+                        <!-- 输入框：输入查询内容 -->
+                        <el-input v-model="queryStr" style="width: 220px" placeholder="请输入查询内容" />&nbsp;
 
-            <el-table-column fixed="right" label="操作" min-width="180">
+                        <!-- <el-input v-model="queryStr" style="width: 220px" placeholder="请输入课程名称" />&nbsp; -->
+                        <el-button type="primary" @click="queryInfo">查询</el-button>
+                        <el-button class="button" type="warning" @click="multipleDelete">多选删除</el-button>
 
-                <template #default="scope">
-                    <el-button link type="primary" size="small" @click="openDetailDialog(scope.row.communityId)">
-                        详情
-                    </el-button>
-                    <el-button link type="primary" size="small" @click="singleDelete(scope.row.communityId)">
-                        删除
-                    </el-button>
-                    <el-button link type="primary" size="small" @click="openUpdateDialog(scope.row)">
-                        编辑
-                    </el-button>
+
+                    </div>
 
                 </template>
 
-            </el-table-column>
-        </el-table>
+                <el-table :data="tableData" style="width: 100%" @selection-change="handleSelectionChange">
+                    <el-table-column type="selection" width="55" />
+                    <el-table-column prop="communityName" label="社区名" width="120" />
+                    <el-table-column prop="userName" label="发帖用户" width="120" />
+                    <el-table-column prop="postTitle" label="帖子标题" width="200" />
+                    <el-table-column prop="postContent" label="帖子内容" width="200">
+                        <template v-slot:default="{ row }">
+                            <span class="ellipsis">{{ row.postContent }}</span>
+                        </template>
+                    </el-table-column>
+                    <el-table-column prop="createdTime" label="发帖时间" width="120">
+                        <template v-slot:default="{ row }">
+                            <span>{{ formatDate(row.createdTime) }}</span>
+                        </template>
+                    </el-table-column>
 
-        <br />
+                    <el-table-column fixed="right" label="操作" min-width="180">
 
-        <!-- 分页 -->
-        <el-pagination v-model:current-page="currentPage" v-model:page-size="pageSize" :page-sizes="[3, 5, 10, 20]"
-            layout="total, sizes, prev, pager, next, jumper" :total="pageInfo.total" @size-change="handleSizeChange"
-            @current-change="handleCurrentChange" />
+                        <template #default="scope">
+                            <el-button link type="primary" size="small" @click="openDetailDialog(scope.row.postId)">
+                                详情
+                            </el-button>
+                            <el-button link type="primary" size="small" @click="singleDelete(scope.row.communityId)">
+                                删除
+                            </el-button>
+                            <el-button link type="primary" size="small" @click="openUpdateDialog(scope.row)">
+                                编辑
+                            </el-button>
 
-    </el-card>
+                        </template>
+
+                    </el-table-column>
+                </el-table>
+
+                <br />
+
+                <!-- 分页 -->
+                <el-pagination v-model:current-page="currentPage" v-model:page-size="pageSize"
+                    :page-sizes="[3, 5, 10, 20]" layout="total, sizes, prev, pager, next, jumper"
+                    :total="pageInfo.total" @size-change="handleSizeChange" @current-change="handleCurrentChange" />
+            </el-card>
+        </el-tab-pane>
+        <el-tab-pane label="帖子评论" name="second">PostContent</el-tab-pane>
+    </el-tabs>
+
 
     <!-- 对话框:添加,修改功能 -->
     <el-dialog v-model="dialogFormVisible" :title="title" width="500">
 
         <el-form :rules="myrules" ref="" frmRef :model="form">
 
-
-            <el-form-item label="类别" :label-width="formLabelWidth">
-                <el-select v-model="form.categoryId" placeholder="请选择类别">
-                    <el-option v-for="cat in catInfoData" :key="cat.categoryId" :label="cat.catName"
-                        :value="cat.categoryId" />
-                </el-select>
-            </el-form-item>
-
-            <el-form-item label="所属社区" :label-width="formLabelWidth">
+            <el-form-item label="社区名" :label-width="formLabelWidth">
                 <el-input v-model="form.communityName" autocomplete="off" />
             </el-form-item>
 
-            <el-form-item label="社区描述" :label-width="formLabelWidth">
-                <el-input v-model="form.communityDescription" autocomplete="off" />
+            <el-form-item label="发帖用户" :label-width="formLabelWidth">
+                <el-input v-model="form.userName" autocomplete="off" />
             </el-form-item>
 
-            <el-form-item label="创建者" :label-width="formLabelWidth">
-                <el-input v-model="form.createdBy" autocomplete="off" />
+            <el-form-item label="帖子标题" :label-width="formLabelWidth">
+                <el-input v-model="form.postTitle" autocomplete="off" />
             </el-form-item>
 
+            <el-form-item label="帖子内容" :label-width="formLabelWidth">
+                <el-input v-model="form.postContent" autocomplete="off" />
+            </el-form-item>
 
         </el-form>
-
 
         <template #footer>
             <div class="dialog-footer">
@@ -119,9 +119,6 @@
                 <el-form-item :label="form.postContent"></el-form-item>
             </el-form-item>
 
-          
-
-
         </el-form>
 
         <template #footer>
@@ -134,7 +131,6 @@
 
 
     <!-- 用户详细表 -->
-
     <el-dialog v-model="dialogUserInfoVisible" title="用户详细信息显示" width="600px">
 
         <el-table :data="users" style="width: 100%">
@@ -159,6 +155,7 @@
 import { ElMessage, ElMessageBox } from 'element-plus';
 import { handleCurrentChange } from 'element-plus/es/components/tree/src/model/util.mjs';
 import { Plus } from '@element-plus/icons-vue';
+import { color } from 'echarts';
 export default {
     data() {
         return {
@@ -216,36 +213,37 @@ export default {
             this.getPageData(this.currentPage, this.pageSize)
             console.log("size:", pageSize);
         },
+
         handleCurrentChange(pageNum) {      //切换页号时得到当时页号
             this.currentPage = pageNum;
-            this.getPageData(this.currentPage, this.pageSize)
+            this.getPageData(this.currentPage, this.pageSize,searchField, searchKeyword)
             console.log("num:", pageNum);
+            
         },
 
-        getPageData(num, size) {
-            this.$http.get("posts/v1/postall", { params: { pageNum: num, pageSize: size } })
+        getPageData(num, size, searchField, searchKeyword) {
+            // 构建查询条件对象，假设你希望根据 communityName 和 userName 搜索
+            let communitySearch = {
+                communityName: searchField === 'communityName' ? searchKeyword : '',
+                userName: searchField === 'userName' ? searchKeyword : '',
+                postTitle: searchField === 'postTitle' ? searchKeyword : '',
+                postContent: searchField === 'postContent' ? searchKeyword : ''
+            };
+
+            // 发送POST请求到后端
+            this.$http.post("/v1/posts/search?pageNum=" + num + "&pageSize=" + size, communitySearch)
                 .then(response => {
                     this.pageInfo = response.data;
-                    this.tableData = this.pageInfo.records;
-
-                    // 初始化或保护原始数据缓存
-                    if (!this.queryData || this.queryData.length === 0) {
-                        this.queryData = [...this.tableData];
-                    }
-
-                    console.log(this.tableData);
+                    this.tableData = this.pageInfo.list;
+                    console.log("查询结果:", this.tableData);
+                })
+                .catch(error => {
+                    console.error("查询出错:", error);
+                    ElMessage({
+                        type: 'error',
+                        message: '查询失败'
+                    });
                 });
-        },
-
-        openUserDialog(cmnid) {
-            var _this = this
-            this.$http.get("/ucmns/v1/ucmn/user/" + cmnid).then(function (response) {
-                console.log(response.data);
-                _this.users = response.data
-            })
-
-            this.dialogUserInfoVisible = true;
-            console.log("打开用户详细页面")
         },
 
         closeDialog() {
@@ -253,9 +251,9 @@ export default {
             console.log("closeDialog.....")
         },
 
-        openDetailDialog(cmnid) {
+        openDetailDialog(postid) {
             var _this = this
-            this.$http.get("/posts/v1/post/" + cmnid).then(function (response) {
+            this.$http.get("/v1/posts/post/" + postid).then(function (response) {
                 console.log(response.data);
                 _this.form = response.data
             })
@@ -274,10 +272,7 @@ export default {
             this.btnName = "修改"
             this.title = "修改社区信息"
             this.dialogFormVisible = true
-            //console.log(row)
             this.form = row         //得到要修改的数据,并回显到对话框的表单上
-            // this.form.stu_interest = this.form.stu_interest.split(',')
-            // this.form.stu_sex = this.form.stu_sex.toString()
             console.log("openUpdateDialog....");
         },
 
@@ -285,7 +280,7 @@ export default {
             console.log(this.form);
             var _this = this;
             // this.form.stu_interest = this.form.stu_interest.join(',')              //将数据转为字符串
-            this.$http.put("/posts/v1/post", this.form).then(function (response) {
+            this.$http.put("v1/posts/post", this.form).then(function (response) {
                 console.log(response.data);
 
                 if (response.data == 1) {
@@ -307,7 +302,7 @@ export default {
         addCmn() {           //添加功能
             var _this = this;
             // this.form.stu_interest = this.form.stu_interest.join(',');
-            this.$http.post("/posts/v1/post", this.form).then(function (response) {
+            this.$http.post("v1/posts/post", this.form).then(function (response) {
                 console.log(response.data);
 
                 if (response.data == 1) {
@@ -356,7 +351,7 @@ export default {
             )
                 .then(() => {
                     var _this = this;
-                    this.$http.delete("cmns/v1/cmn/" + cmnid).then(function (response) {
+                    this.$http.delete("v1/posts/post" + cmnid).then(function (response) {
                         console.log(response.data);
                     })
                     if (response.data == 1) {
@@ -396,7 +391,7 @@ export default {
                     this.multipleSelection.forEach(item => {
                         var _this = this;
                         var cmnid = item.communityId
-                        this.$http.delete("/posts/v1/post/" + cmnid).then(function (response) {
+                        this.$http.delete("v1/posts/post/" + cmnid).then(function (response) {
                             console.log(response.data);
                             if (response.data == 1) {
                                 num = num + 1
@@ -418,16 +413,37 @@ export default {
         },
 
         queryInfo() {
+            console.log("查询内容:", this.queryStr);
+            // 检查当前页码,如果未定义则使用默认值1
+            let num = this.currentPage || 1;
+            // 检查每页大小,如果未定义则使用默认值3 
+            let size = this.pageSize || 3;
 
-            if (this.queryStr.trim().length > 0) {
-                this.tableData = this.queryData.filter(item =>
-                    item.communityName.includes(this.queryStr.trim())
-                );
-            } else {
-                this.tableData = [...this.queryData];
+            // 构建查询参数
+            let field = '';
+            let keyword = this.queryStr || '';
+
+            // 根据选择的查询字段设置field
+            switch (this.selectedField) {
+                case '1':
+                    field = 'communityName';
+                    break;
+                case '2':
+                    field = 'userName';
+                    break;
+                case '3':
+                    field = 'postTitle';
+                    break;
+                case '4':
+                    field = 'postContent';
+                    break;
+                default:
+                    field = '';
             }
 
-            console.log(this.tableData);
+
+            // 调用getPageData并传入所有参数
+            this.getPageData(num, size, field, keyword);
         },
 
         handleSelectionChange(val) {            //多行选择
@@ -442,20 +458,6 @@ export default {
 
     mounted() {
         this.getPageData(1, 5)
-
-
-
-        // this.$http.get("/cmns/v1/cmn").then((response) => {
-        //     this.cmnsInfoData = response.data;
-        //     console.log('cmnsInfoData:', this.cmnsInfoData);
-        //     console.log("huhuhu")
-        // });
-
-        this.$http.get("/posts/v1/postall").then((response) => {
-            this.postData = response.data;
-            console.log('postData:', this.postData);
-        });
-
     }
 
 }
