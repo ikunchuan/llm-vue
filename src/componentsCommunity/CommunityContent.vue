@@ -119,9 +119,6 @@
                 <el-form-item :label="form.postContent"></el-form-item>
             </el-form-item>
 
-
-
-
         </el-form>
 
         <template #footer>
@@ -216,10 +213,12 @@ export default {
             this.getPageData(this.currentPage, this.pageSize)
             console.log("size:", pageSize);
         },
+
         handleCurrentChange(pageNum) {      //切换页号时得到当时页号
             this.currentPage = pageNum;
-            this.getPageData(this.currentPage, this.pageSize)
+            this.getPageData(this.currentPage, this.pageSize,searchField, searchKeyword)
             console.log("num:", pageNum);
+            
         },
 
         getPageData(num, size, searchField, searchKeyword) {
@@ -245,17 +244,6 @@ export default {
                         message: '查询失败'
                     });
                 });
-        },
-
-        openUserDialog(cmnid) {
-            var _this = this
-            this.$http.get("/ucmns/v1/ucmn/user/" + cmnid).then(function (response) {
-                console.log(response.data);
-                _this.users = response.data
-            })
-
-            this.dialogUserInfoVisible = true;
-            console.log("打开用户详细页面")
         },
 
         closeDialog() {
@@ -292,7 +280,7 @@ export default {
             console.log(this.form);
             var _this = this;
             // this.form.stu_interest = this.form.stu_interest.join(',')              //将数据转为字符串
-            this.$http.put("/posts/v1/post", this.form).then(function (response) {
+            this.$http.put("v1/posts/post", this.form).then(function (response) {
                 console.log(response.data);
 
                 if (response.data == 1) {
@@ -314,7 +302,7 @@ export default {
         addCmn() {           //添加功能
             var _this = this;
             // this.form.stu_interest = this.form.stu_interest.join(',');
-            this.$http.post("/posts/v1/post", this.form).then(function (response) {
+            this.$http.post("v1/posts/post", this.form).then(function (response) {
                 console.log(response.data);
 
                 if (response.data == 1) {
@@ -363,7 +351,7 @@ export default {
             )
                 .then(() => {
                     var _this = this;
-                    this.$http.delete("cmns/v1/cmn/" + cmnid).then(function (response) {
+                    this.$http.delete("v1/posts/post" + cmnid).then(function (response) {
                         console.log(response.data);
                     })
                     if (response.data == 1) {
@@ -403,7 +391,7 @@ export default {
                     this.multipleSelection.forEach(item => {
                         var _this = this;
                         var cmnid = item.communityId
-                        this.$http.delete("/posts/v1/post/" + cmnid).then(function (response) {
+                        this.$http.delete("v1/posts/post/" + cmnid).then(function (response) {
                             console.log(response.data);
                             if (response.data == 1) {
                                 num = num + 1
