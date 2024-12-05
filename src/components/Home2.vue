@@ -11,16 +11,16 @@
               <el-icon>
                 <location />
               </el-icon>
-              <span class="menu-title">用户管理</span>
+              <span class="menu-title">用户分析</span>
             </template>
             <el-menu-item index="1-1">
-              <RouterLink to="/home/userList">用户基本信息管理</RouterLink>
+              <RouterLink to="/home2/userProfile" :style="{ color: '#98c6f6' }">用户画像分析</RouterLink>
             </el-menu-item>
             <el-menu-item index="1-2">
-              <RouterLink to="/home/userMonitor">用户行为监控管理</RouterLink>
+              <RouterLink to="/home2/userActivity" :style="{ color: '#98c6f6' }">赛学行为活动分析</RouterLink>
             </el-menu-item>
             <el-menu-item index="1-3">
-              <RouterLink to="/home/userViolation">违规用户处理</RouterLink>
+              <RouterLink to="/home2/communityActivity" :style="{ color: '#98c6f6' }">社区活动详情分析</RouterLink>
             </el-menu-item>
           </el-sub-menu>
 
@@ -29,60 +29,20 @@
               <el-icon>
                 <location />
               </el-icon>
-              <span class="menu-title">竞赛中心管理</span>
+              <span class="menu-title">网站运营情况</span>
             </template>
             <el-menu-item index="2-1">
-              <RouterLink to="/home/competitionInfo">竞赛信息管理</RouterLink>
+              <RouterLink to="/home2/trafficanalysis" :style="{ color: '#98c6f6' }">流量分析</RouterLink>
             </el-menu-item>
             <el-menu-item index="2-2">
-              <RouterLink to="/home/competitionDetail">竞赛详情管理</RouterLink>
+              <RouterLink to="/home2/performanceMonitor" :style="{ color: '#98c6f6' }">技术性能监控</RouterLink>
             </el-menu-item>
             <el-menu-item index="2-3">
-              <RouterLink to="/home/category">类别管理</RouterLink>
+              <RouterLink to="/home2/cashFlowStatement" :style="{ color: '#98c6f6' }">现金流量分析</RouterLink>
             </el-menu-item>
           </el-sub-menu>
 
-          <el-sub-menu index="3">
-            <template #title>
-              <el-icon>
-                <location />
-              </el-icon>
-              <span class="menu-title">资源中心</span>
-            </template>
-            <el-menu-item index="3-1">
-              <RouterLink to="/home/courseInfo">课程信息管理</RouterLink>
-            </el-menu-item>
-            <el-menu-item index="3-2">
-              <RouterLink to="/home/courseDetail">课程详细内容管理</RouterLink>
-            </el-menu-item>
-            <el-menu-item index="3-3">
-              <RouterLink to="/home/questionInfo">题目信息管理</RouterLink>
-            </el-menu-item>
-            <!-- <el-menu-item index="3-4">
-                <RouterLink to="/home/questionDifficulty">题目难度管理</RouterLink>
-              </el-menu-item> -->
-          </el-sub-menu>
-
-          <el-sub-menu index="4">
-            <template #title>
-              <el-icon>
-                <location />
-              </el-icon>
-              <span class="menu-title">社区管理</span>
-            </template>
-            <el-menu-item index="4-1">
-              <RouterLink to="/home/communityUser">社区用户管理</RouterLink>
-            </el-menu-item>
-            <el-menu-item index="4-2">
-              <RouterLink to="/home/communityBoard">社区板块管理</RouterLink>
-            </el-menu-item>
-            <el-menu-item index="4-3">
-              <RouterLink to="/home/communityContent">社区内容管理</RouterLink>
-            </el-menu-item>
-            <el-menu-item index="4-4">
-              <RouterLink to="/home/communityAudit">社区审核管理</RouterLink>
-            </el-menu-item>
-          </el-sub-menu>
+       
         </el-menu>
       </el-aside>
 
@@ -100,8 +60,14 @@
             </el-breadcrumb>
           </div>
 
-
           <div class="header-right">
+    <el-badge :value="5" class="icon">
+      <el-icon class="el-icon-bell" @click="handleNotification" />
+    </el-badge>
+    <el-icon class="el-icon-setting icon" @click="handleSettings" />
+    <el-icon class="el-icon-user icon" @click="handleProfile" />
+  </div>
+          <!-- <div class="header-right">
             <el-dropdown class="icon-dropdown">
               <el-button class="icon-button" icon="el-icon-bell" @click="handleNotification">
                 <span class="badge">5</span>
@@ -111,10 +77,34 @@
                 <el-dropdown-item>Notification 2</el-dropdown-item>
                 <el-dropdown-item>Notification 3</el-dropdown-item>
               </el-dropdown-menu>
+            </el-dropdown> -->
+            <!-- <el-button class="icon-button" icon="el-icon-setting" @click="handleSettings"></el-button>
+            <el-button class="icon-button" icon="el-icon-user" @click="handleProfile"></el-button> -->
+          
+            <!-- <el-dropdown class="icon-dropdown">
+              <el-button class="icon-button" icon="el-icon-setting" @click="handleSettings">
+                <span class="badge">2</span>
+              </el-button>
+              <el-dropdown-menu slot="dropdown">
+                <el-dropdown-item>Settings Option 1</el-dropdown-item>
+                <el-dropdown-item>Settings Option 2</el-dropdown-item>
+              </el-dropdown-menu>
+            </el-dropdown> -->
+
+            <!-- Profile button with dropdown -->
+            <!-- <el-dropdown class="icon-dropdown">
+              <el-button class="icon-button" icon="el-icon-user" @click="handleProfile">
+                <span class="badge">1</span>
+              </el-button>
+              <el-dropdown-menu slot="dropdown">
+                <el-dropdown-item>Profile Option 1</el-dropdown-item>
+                <el-dropdown-item>Profile Option 2</el-dropdown-item>
+              </el-dropdown-menu>
             </el-dropdown>
-            <el-button class="icon-button" icon="el-icon-setting" @click="handleSettings"></el-button>
-            <el-button class="icon-button" icon="el-icon-user" @click="handleProfile"></el-button>
-          </div>
+          
+          
+          
+          </div> -->
         </el-header>
 
 
@@ -123,7 +113,7 @@
         <el-main>
           <router-view></router-view>
         </el-main>
-        <el-footer class="footer">Footer</el-footer>
+       
       </el-container>
     </el-container>
   </div>
@@ -169,20 +159,12 @@ export default {
     getBreadcrumbName(path) {
       // 根据路由的路径来返回对应的面包屑名称
       const names = {
-        'userList': '用户基本信息管理',
-        'userMonitor': '用户行为监控管理',
-        'userViolation': '违规用户处理',
-        'competitionInfo': '竞赛信息管理',
-        'category1': '类别一级分类管理',
-        'category2': '类别二级分类管理',
-        'courseInfo': '课程信息管理',
-        'courseDetail': '课程详细内容管理',
-        'questionInfo': '题目信息管理',
-        // 'questionDifficulty': '题目难度管理',
-        'communityUser': '社区用户管理',
-        'communityBoard': '社区板块管理',
-        'communityContent': '社区内容管理',
-        'communityAudit': '社区审核管理'
+        'userProfile': '用户画像分析',
+        'userActivity': '赛学行为活动分析',
+        'communityActivity': '社区活动分析',
+        'performanceMonitor': '性能监控',
+        'trafficanalysis': '流量分析',
+        'cashFlowStatement': '流量分析',
       };
       return names[path] || path;
     }, // 如果没有找到对应的名称，返回路径本身
@@ -200,11 +182,11 @@ export default {
 </script>
 
 <style scoped>
-/* Global Styles */
 body {
   font-family: 'Roboto', sans-serif;
   font-size: 14px;
   background-color: #f4f6fc;
+  /* 背景色 */
   margin: 0;
   padding: 0;
 }
@@ -214,16 +196,21 @@ body {
   min-height: 100vh;
   display: flex;
   flex-direction: row;
+  background-color: #f4f6fc;
+  /* 统一背景色 */
 }
 
 /* Sidebar */
 .sidebar {
   background: linear-gradient(180deg, #0a1f44 0%, #2e3c56 100%);
   box-shadow: 2px 0 10px rgba(0, 0, 0, 0.2);
-  border-radius: 0 10px 10px 0;
+  border-radius: 0px 0 0 0px;
+  /*左右角统一的圆角*/
   padding-top: 20px;
   position: relative;
 }
+
+
 
 .el-menu-vertical-demo {
   border: none;
@@ -250,7 +237,7 @@ body {
 }
 
 .el-menu-item.is-active {
-  background-color: #ffd04b;
+  background-color: #ffffff;
   color: #fff;
 }
 
@@ -260,43 +247,63 @@ body {
   border-radius: 10px;
   padding: 0px;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
-  margin-top: 20px;
+  margin-top: 0px;
 }
 
 /* Header */
 .header {
-
   display: flex;
   justify-content: space-between;
   align-items: center;
   background-color: #f9f9f9;
-  /* 更深的背景颜色 */
-  padding: 10 px 24px;
+  padding: 10px 24px;
+  /* 修复了padding语法 */
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-
+  margin-top: 0px;
+  /* border-radius: 10px 10px 0 0;  /* 圆角，防止顶部圆角突兀 */
 }
 
 .header-right {
   display: flex;
+  gap: 16px;
   align-items: center;
 
+}
+.icon {
+  font-size: 24px; /* 调整图标大小 */
+  color: #5c2727; /* 默认颜色 */
+  border-radius: 0; /* 设置直角 */
+  padding: 8px;
+  cursor: pointer;
+  transition: color 0.3s ease, background-color 0.3s ease; /* 添加动画 */
+}
+
+.icon:hover {
+  color: #31511e; /* 鼠标悬停时的颜色 */
+  background-color: #f0f0f0; /* 鼠标悬停时的背景色 */
+}
+
+.icon:active {
+  color: #ffffff; /* 按下时的颜色 */
+  background-color: #31511e; /* 按下时的背景色 */
 }
 
 .icon-button {
 
-  background: #007bff;
+  background: #e1e1e1;
   border-radius: 50%;
   border: none;
-  color: white;
+  color: #888;
   font-size: 20px;
   margin-left: 15px;
   padding: 8px;
+  transition: background 0.3s ease;
 }
 
 .icon-button:hover {
   /* color: #0066cc; */
-  background: #0056b3;
-  color: white;
+  background: #afb3b8;
+  color: #555;
 }
 
 .badge {
@@ -310,31 +317,41 @@ body {
   font-size: 10px;
 }
 
-/* Footer */
+/* Dropdown Menu */
+.el-dropdown-menu {
+  background-color: #fff;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.el-dropdown-item {
+  color: #333;
+}
+
+.el-dropdown-item:hover {
+  background-color: #f5f5f5;
+}
+
+/* Footer
 .footer {
   background: linear-gradient(180deg, #0a1f44 0%, #2e3c56 100%);
   text-align: center;
   padding: 15px 0;
   font-size: 14px;
   color: #ddd;
-  box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.1);
-}
-
-.footer a {
   color: #f5f5f5;
   text-decoration: none;
 }
 
 .footer a:hover {
   color: #ffd04b;
-}
+} */
 
 /* Breadcrumb Positioning */
 .breadcrumb-container {
   /* position: absolute;
-    top: 20px;
-    right: 960px;
-    z-index: 10; */
+  top: 20px;
+  right: 960px;
+  z-index: 10; */
   flex-grow: 1;
 }
 

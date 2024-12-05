@@ -17,41 +17,20 @@ import CourseInfo from "../componentsCourse/CourseInfo.vue"; // 课程信息管�
 import CourseDetail from "../componentsCourse/CourseDetail.vue"; // 课程详细内容管理
 import QuestionInfo from "../componentsQuestion/QuestionInfo.vue"; // 题目信息管理
 
+
+import UserProfile from "../componentsUser/UserProfile.vue"; // 用户画像分析
+import UserActivity from "../componentsUser/UserActivity.vue"; // 用户画像分析
+
+import Trafficanalysis from "../componentsAnalyse/Trafficanalysis.vue"; // 社区活动分析
+import PerformanceMonitor from "../componentsAnalyse/PerformanceMonitor.vue"; // 性能监控
+import CashFlowStatement from "../componentsAnalyse/CashFlowStatement.vue"; // 现金流量分析
+import CommunityActivity from "../componentsCommunity/CommunityActivity.vue"; // 社区活动分析
+
+
 import CommunityBoard from "../componentsCommunity/CommunityBoard.vue"; // 社区板块管理
 import CommunityContent from "../componentsCommunity/CommunityContent.vue"; // 社区内容管理
 import CommunityAudit from "../componentsCommunity/CommunityAudit.vue"; // 社区审核管理
 
-// const routes = [
-//   { path: "/", component: Login }, // 默认路径为登录页
-//   {
-//     path: "/login",
-//     component: Login,
-//   },
-//   {
-//     path: "/register",
-//     component: Register, // 注册页面
-//   },
-//   {
-//     path: "/home",
-//     component: Home,
-//     children: [
-//       { path: "userList", component: UserList },
-//       { path: "userMonitor", component: UserMonitor },
-//       { path: "userViolation", component: UserViolation },
-//       { path: "competitionInfo", component: CompetitionInfo },
-//       { path: "competitionDetail", component: CompetitionDetail },
-//       { path: "category1", component: Category1 },
-//       { path: "category2", component: Category2 },
-//       { path: "courseInfo", component: CourseInfo },
-//       { path: "courseDetail", component: CourseDetail },
-//       { path: "questionInfo", component: QuestionInfo },
-
-//       { path: "communityBoard", component: CommunityBoard },
-//       { path: "communityContent", component: CommunityContent },
-//       { path: "communityAudit", component: CommunityAudit },
-//     ],
-//   },
-// ];
 
 const routes = [
   { path: "/", redirect: "/main" }, // 默认重定向到主页面
@@ -105,19 +84,14 @@ const routes = [
     name: "home2",
     component: Home2, // 主页面2
     children: [
-      { path: "userList", component: UserList },
-      { path: "userMonitor", component: UserMonitor },
-      { path: "userViolation", component: UserViolation },
-      { path: "competitionInfo", component: CompetitionInfo },
-      { path: "competitionDetail", component: CompetitionDetail },
-      { path: "category", component: Category },
-      { path: "courseInfo", component: CourseInfo },
-      { path: "courseDetail", component: CourseDetail },
-      { path: "questionInfo", component: QuestionInfo },
-
-      { path: "communityBoard", component: CommunityBoard },
-      { path: "communityContent", component: CommunityContent },
-      { path: "communityAudit", component: CommunityAudit },
+      { path: "userProfile", component: UserProfile },
+      { path: "userActivity", component: UserActivity },
+      { path: "communityActivity", component: CommunityActivity },
+    
+      { path: "trafficanalysis", component: Trafficanalysis },
+      { path: "performanceMonitor", component: PerformanceMonitor },
+      { path: "cashFlowStatement", component: CashFlowStatement },
+      
     ],
   },
   {

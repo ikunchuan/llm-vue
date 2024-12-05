@@ -28,8 +28,11 @@
               class="editable-input" style="padding: 10px 20px; font-size: 16px; width: 100%; outline: none; 
             text-align: left;">
             </div>
-          </el-form-item>
 
+          
+
+          </el-form-item>
+          
           <!-- 记住我 -->
           <el-form-item style="text-align: left;">
             <el-checkbox v-model="loginForm.rememberMe">记住我</el-checkbox>

@@ -2,12 +2,25 @@
     <div class="main-container">
       <el-row justify="center" class="content-row">
         <el-col :span="8" class="panel" @click="goToLogin('login')">
+
+         
+          
+          <img src="../assets/img/2.png" alt="业务数据处理" class="logo" />
+        
+
           <div class="panel-title">业务数据处理</div>
         </el-col>
+
         <el-col :span="8" class="panel" @click="goToLogin('login2')">
+          <!-- <div class="panel-icon">
+          <img src="@/assets/icons/statistics.svg" alt="统计分析" />
+        </div> -->
+        <img src="../assets/img/3.png" alt="业务数据处理" class="logo" />
           <div class="panel-title">统计分析</div>
         </el-col>
+
         <el-col :span="8" class="panel" @click="goToLogin('login3')">
+          <img src="../assets/img/4.png" alt="业务数据处理" class="logo" />
           <div class="panel-title">系统设置与维护</div>
         </el-col>
       </el-row>
@@ -25,6 +38,12 @@
   </script>
   
   <style scoped>
+  .logo {
+  width: 150px;
+  height: auto;
+  margin-bottom: 30px;
+  border-radius: 50%;
+}
   .main-container {
     padding: 50px;
     background: #f4f6f8;
