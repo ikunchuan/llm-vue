@@ -173,7 +173,7 @@ export default {
         },
 
         getPageData(num, size) {
-            this.$http.get('/uis/v1/ui', { params: { pageNum: num, pageSize: size } })
+            this.$http.get('/uis/v1/ui/search', { params: { pageNum: num, pageSize: size } })
                 .then((response) => {
                     console.log(response.data);
                     this.pageInfo = response.data;
