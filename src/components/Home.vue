@@ -14,13 +14,13 @@
               <span class="menu-title">用户管理</span>
             </template>
             <el-menu-item index="1-1">
-              <RouterLink to="/home/userList">用户基本信息管理</RouterLink>
+              <RouterLink to="/home/userList" :style="{ color: '#98c6f6' }">用户基本信息管理</RouterLink>
             </el-menu-item>
             <el-menu-item index="1-2">
-              <RouterLink to="/home/userMonitor">用户行为监控管理</RouterLink>
+              <RouterLink to="/home/userMonitor" :style="{ color: '#98c6f6' }">用户行为监控管理</RouterLink>
             </el-menu-item>
             <el-menu-item index="1-3">
-              <RouterLink to="/home/userViolation">违规用户处理</RouterLink>
+              <RouterLink to="/home/userViolation" :style="{ color: '#98c6f6' }">违规用户处理</RouterLink>
             </el-menu-item>
           </el-sub-menu>
 
@@ -32,13 +32,13 @@
               <span class="menu-title">竞赛中心管理</span>
             </template>
             <el-menu-item index="2-1">
-              <RouterLink to="/home/competitionInfo">竞赛信息管理</RouterLink>
+              <RouterLink to="/home/competitionInfo" :style="{ color: '#98c6f6' }">竞赛信息管理</RouterLink>
             </el-menu-item>
             <el-menu-item index="2-2">
-              <RouterLink to="/home/competitionDetail">竞赛详情管理</RouterLink>
+              <RouterLink to="/home/competitionDetail" :style="{ color: '#98c6f6' }">竞赛详情管理</RouterLink>
             </el-menu-item>
             <el-menu-item index="2-3">
-              <RouterLink to="/home/category2">类别二级分类管理</RouterLink>
+              <RouterLink to="/home/category2" :style="{ color: '#98c6f6' }">类别二级分类管理</RouterLink>
             </el-menu-item>
           </el-sub-menu>
 
@@ -50,13 +50,13 @@
               <span class="menu-title">资源中心</span>
             </template>
             <el-menu-item index="3-1">
-              <RouterLink to="/home/courseInfo">课程信息管理</RouterLink>
+              <RouterLink to="/home/courseInfo" :style="{ color: '#98c6f6' }">课程信息管理</RouterLink>
             </el-menu-item>
             <el-menu-item index="3-2">
-              <RouterLink to="/home/courseDetail">课程详细内容管理</RouterLink>
+              <RouterLink to="/home/courseDetail" :style="{ color: '#98c6f6' }">课程详细内容管理</RouterLink>
             </el-menu-item>
             <el-menu-item index="3-3">
-              <RouterLink to="/home/questionInfo">题目信息管理</RouterLink>
+              <RouterLink to="/home/questionInfo" :style="{ color: '#98c6f6' }">题目信息管理</RouterLink>
             </el-menu-item>
             <!-- <el-menu-item index="3-4">
               <RouterLink to="/home/questionDifficulty">题目难度管理</RouterLink>
@@ -74,13 +74,13 @@
               <RouterLink to="/home/communityUser">社区用户管理</RouterLink>
             </el-menu-item> -->
             <el-menu-item index="4-2">
-              <RouterLink to="/home/communityBoard">社区板块管理</RouterLink>
+              <RouterLink to="/home/communityBoard" :style="{ color: '#98c6f6' }">社区板块管理</RouterLink>
             </el-menu-item>
             <el-menu-item index="4-3">
-              <RouterLink to="/home/communityContent">社区内容管理</RouterLink>
+              <RouterLink to="/home/communityContent" :style="{ color: '#98c6f6' }">社区内容管理</RouterLink>
             </el-menu-item>
             <el-menu-item index="4-4">
-              <RouterLink to="/home/communityAudit">社区审核管理</RouterLink>
+              <RouterLink to="/home/communityAudit" :style="{ color: '#98c6f6' }">社区审核管理</RouterLink>
             </el-menu-item>
           </el-sub-menu>
         </el-menu>
@@ -220,10 +220,12 @@ body {
 .sidebar {
   background: linear-gradient(180deg, #0a1f44 0%, #2e3c56 100%);
   box-shadow: 2px 0 10px rgba(0, 0, 0, 0.2);
-  border-radius: 10px 0 0 10px;  /* 左右角统一的圆角 */
+  border-radius: 10px 0 0 10px;  /*左右角统一的圆角*/
   padding-top: 20px;
   position: relative;
 }
+
+
 
 .el-menu-vertical-demo {
   border: none;
@@ -250,7 +252,7 @@ body {
 }
 
 .el-menu-item.is-active {
-  background-color: #ffd04b;
+  background-color: #ffffff;
   color: #fff;
 }
 
@@ -283,7 +285,7 @@ body {
 
 .icon-button {
 
-  background: #007bff;
+  background: #e1e1e1;
   border-radius: 50%;
   border: none;
   color: white;
