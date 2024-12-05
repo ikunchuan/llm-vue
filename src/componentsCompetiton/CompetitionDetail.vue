@@ -46,7 +46,7 @@
             <el-table-column fixed="right" label="操作" min-width="180">
                 <template #default="scope">
                     <el-button link size="small" @click="openDetailDialog(scope.row.competitionId)">详情</el-button>
-                    <el-button link size="small" @click="singleDelete(scope.row.competitionIdId)">删除</el-button>
+                    <el-button link size="small" @click="singleDelete(scope.row.competitionId)">删除</el-button>
                     <el-button link size="small" @click="openUpdateDialog(scope.row)">编辑</el-button>
                 </template>
             </el-table-column>
@@ -159,6 +159,12 @@
         <el-descriptions-item label="竞赛官方网站链接">{{ form.competitionUrl }}</el-descriptions-item>
         <el-descriptions-item label="竞赛日程安排">{{ form.competitionSchedule }}</el-descriptions-item>
         <el-descriptions-item label="报名截止日期">{{ form.registrationDeadline }}</el-descriptions-item>
+
+        </el-descriptions>
+
+        <el-descriptions direction="vertical"
+        :column="4":size="size" :direction="vertical" :style="blockMargin">
+        
         <el-descriptions-item label="作品提交指南">{{ form.registrationGuide }}</el-descriptions-item>
         <el-descriptions-item label="优秀案例展示">{{ form.outstandingCases }}</el-descriptions-item>
         <el-descriptions-item label="竞赛参赛资格要求">{{ form.eligibilityCriteria }}</el-descriptions-item>
@@ -167,6 +173,8 @@
         <el-descriptions-item label="更新时间">{{ form.updatedTime }}</el-descriptions-item>
         <el-descriptions-item label="创建时间">{{ form.createdTime }}</el-descriptions-item>
         </el-descriptions>
+
+
         </el-form>
     
         <template #footer>
@@ -179,7 +187,7 @@
 
 
 <script >
-    
+import { ElMessage, ElMessageBox } from 'element-plus';
 
 export default {
     data() {
@@ -334,21 +342,22 @@ export default {
             });
         },
         // 删除单个题目
+       // 删除单个竞赛信息
         singleDelete(competitionId) {
-            ElMessageBox.confirm('确定删除这条记录吗?', '删除提示', {
+            ElMessageBox.confirm('是否删除该竞赛信息?', '删除提示', {
                 confirmButtonText: '确定',
                 cancelButtonText: '取消',
                 type: "warning",
             }).then(() => {
                 this.$http.delete(`http://localhost:10086/comdetail/v1/detail/${competitionId}`).then((response) => {
-                    if (response.data === 1) {
+                    if (response.data == 1) {
                         ElMessage({ message: '删除成功', type: "success" });
                         this.getPageData(this.currentPage, this.pageSize); // 刷新数据
                     } else {
-                        ElMessage({ message: '删除失败', type: "warning" });
+                        ElMessage({ message: '删除失败', type: "error" });
                     }
                 }).catch(() => {
-                    ElMessage({ message: '请求失败，请重试', type: 'error' });
+                    ElMessage({ message: '请求失败，请重试', type: "error" });
                 });
             }).catch(() => { });
         },
@@ -386,7 +395,7 @@ export default {
             }
             if (this.queryStr.trim().length > 0) {
                 this.tableData = this.pageInfo.records.filter(item =>
-                    item.competitionId && item.competitionId.toString().includes(this.queryStr.trim())
+                    item.competitionName && item.competitionName.toString().includes(this.queryStr.trim())
                 );
             } else {
                 this.tableData = this.pageInfo.records;

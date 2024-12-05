@@ -14,8 +14,8 @@
             <el-table-column fixed type="selection" width="55" />
             
             <el-table-column prop="competitionName" label="竞赛名称" width="120" />
-            <el-table-column prop="categoryId"  label="竞赛类别ID" width="120" />
-            <el-table-column prop="levelId" label="竞赛等级ID" width="120" />
+            <el-table-column prop="categoryId"  label="竞赛类别" width="120" />
+            <el-table-column prop="levelId" label="竞赛等级" width="120" />
             <el-table-column prop="competitionImgUrl" label="竞赛图片链接" width="150" />
             <el-table-column prop="competitionStatus" label="竞赛状态" width="120" />
             <el-table-column prop="isActive" label="是否激活" width="100">
@@ -36,7 +36,7 @@
             <el-table-column fixed="right" label="操作" min-width="180">
                 <template #default="scope">
                     <el-button link size="small" @click="openDetailDialog(scope.row.competitionId)">详情</el-button>
-                    <el-button link size="small" @click="singleDelete(scope.row.competitionIdId)">删除</el-button>
+                    <el-button link size="small" @click="singleDelete(scope.row.competitionId)">删除</el-button>
                     <el-button link size="small" @click="openUpdateDialog(scope.row)">编辑</el-button>
                 </template>
             </el-table-column>
@@ -292,12 +292,12 @@ export default {
         },
          // 删除单条数据
             singleDelete(competitionId) {
-            ElMessageBox.confirm('是否删除此条数据?', '删除提示', {
+            ElMessageBox.confirm('是否删除该竞赛信息?', '删除提示', {
                 confirmButtonText: '确定',
                 cancelButtonText: '取消',
                 type: "warning",
             }).then(() => {
-                this.$http.delete(`comp/v1/compe/${competitionId}`).then((response) => {
+                this.$http.delete(`http://localhost:10086/comp/v1/compe/${competitionId}`).then((response) => {
                     if (response.data == 1) {
                         ElMessage({ message: '删除成功', type: "success" });
                         this.getPageData(this.currentPage, this.pageSize); // 刷新数据
@@ -309,7 +309,7 @@ export default {
                 });
             }).catch(() => { });
         },
-        
+
         // 批量删除
         multipleDelete() {
             if (this.multipleSelection.length > 0) {
