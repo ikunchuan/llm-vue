@@ -24,7 +24,7 @@
         </template>
 
         <!-- 表格 -->
-        <el-table :data="tableData" style="width: 100%" @selection-change="handleSelectionChange">
+        <el-table :data="tableData" style="width: 100%" @selection-change="handleSelectionChange" v-loading="loading">
             <el-table-column fixed type="selection" width="55" />
             <el-table-column fixed type="index" label="序号" width="55" />
 
@@ -145,6 +145,7 @@
             <template #extra>
                 <el-button type="primary" @click="openUpdateDialog(form)">编辑</el-button>
             </template>
+
             <el-descriptions-item>
                 <template #label>
                     <div class="cell-item">题目难度</div>
@@ -200,7 +201,7 @@
 
         <template #footer>
             <div style="flex: auto">
-                <el-button @click="closeDrawer">取消</el-button>
+                <el-button @click="closeDrawer">关闭</el-button>
             </div>
         </template>
     </el-drawer>
@@ -221,7 +222,7 @@ export default {
             pageSize: 5,    //每页显示的条数
             pageInfo: {},   //分页信息。单条数据用map（就是python中的字典），用`{}`表示空字典
 
-            tableData: [],  //表格数据。多条数据用数组（就是python中的序列），用`[]`表示空字典、
+            tableData: [],  //表格数据。多条数据用数组（就是python中的序列），用`[]`表示空数组
             catInfoData: [], //表格的类别信息
             catIdAndName: [], //全部类别id和名称
             queryData: [],      //查询数据
@@ -229,6 +230,7 @@ export default {
             form: {},           //对话框表单数据
             formLabelWidth: '150px',  //添加修改对话框label宽度
 
+            loading: true,  //加载框
             dialogFormVisible: false, //添加修改对话框可见性
             dialogDetailVisible: false,     //详细对话框可见性
             title: '',  //添加修改对话框标题
@@ -306,10 +308,14 @@ export default {
                         categoryId: item.categoryId,
                         categoryName: item.categoryName,
                     }));
+                    if (response) {
+                        this.loading = false;
+                    }
                     console.log(this.catInfoData);
                 }).catch(() => {
                     ElMessage({ message: '请求失败，请重试', type: "error" });
                 });
+
         },
 
         // 添加或编辑按钮点击事件
@@ -397,6 +403,7 @@ export default {
             this.dialogDetailVisible = false;
             this.dialogFormVisible = false;
         },
+
         //删除单个题目
         singleDelete(questionId) {
             ElMessageBox.confirm('确定删除这条记录吗?', '删除提示', {
@@ -472,8 +479,6 @@ export default {
                 }
             } else if (this.selectedField === '3') {
                 field = 'questionTitle';
-                console.log(keyword);
-                console.log(field);
             } else if (this.selectedField === '4') {
                 field = 'questionText';
             } else {
@@ -543,7 +548,7 @@ export default {
 </script>
 
 <style scoped>
-/* 为课程名称和简介添加滚动条 */
+/* 为详情添加滚动条 */
 .question-detail-text {
     max-height: 150px;
     /* 设置最大高度，超出部分滚动 */
@@ -552,7 +557,7 @@ export default {
     white-space: normal;
     /* 允许换行 */
     padding: 5px;
-    /* 可选：为文本加一些内边距，使内容看起来更舒适 */
+    /* 为文本加一些内边距，使内容看起来更舒适 */
 }
 
 .truncate-text {
