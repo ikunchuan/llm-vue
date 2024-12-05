@@ -4,28 +4,20 @@
             <span>用户行为监控管理</span>
         </div>
 
-        <!-- <div class="echart" ref="mychart" id="mychart"
-            :style="{ float: 'left', width: '100%', height: '200px' }"
-        ></div>
-        <div class="echart" ref="mybing" id="mybing"
-            :style="{ float: 'left', width: '100%', height: '200px' }"
-        ></div> -->
-        <!-- 这里可以放置用户行为监控内容 -->
-        <!-- <p>显示用户行为监控内容</p> -->
-        <!-- 查询字段选择：让用户选择查询的字段 -->
+        <!-- 查询字段选择 -->
         <el-select v-model="selectedField" placeholder="选择查询字段" style="width: 180px;">
-                    <el-option label="用户名" value="userName"></el-option>
-                    
-            
+            <el-option label="用户名" value="userName"></el-option>
         </el-select>&nbsp;
 
         <!-- 输入框：输入查询内容 -->
-        <el-input v-model="queryStr" style="width: 220px" placeholder="请输入查询内容" />&nbsp;                
-        <el-button type="primary"  @click="queryInfo">查询</el-button>
-                
+        <el-input v-model="queryStr" style="width: 220px" placeholder="请输入查询内容" />&nbsp;
+        <el-button type="primary" @click="queryInfo">查询</el-button>
 
+        <!-- 用户总数显示 -->
+        <div>用户总数: {{ userTotalCount }}</div>
 
-    <el-table :data="tableData" style="width: 100%" @selection-change="handleSelectionChange">
+        <!-- 用户数据表格 -->
+        <el-table :data="tableData" style="width: 100%" @selection-change="handleSelectionChange">
             <el-table-column type="selection" width="55" />
 
             <el-table-column prop="userName" label="用户名" width="120" />
@@ -63,28 +55,16 @@
             </el-table-column>
         </el-table>
 
-        <br />
-
+        <!-- 分页组件 -->
         <el-pagination v-model:current-page="currentPage" v-model:page-size="pageSize" :page-sizes="[2, 3, 4, 5]"
             :background="true" layout="total, sizes, prev, pager, next, jumper" :total="pageInfo.total"
             @size-change="handleSizeChange" @current-change="handleCurrentChange" />
-            <!-- 用户观看课程分布 -->
-            <div class="echart" ref="mybing" id="mybing"
-            :style="{ float: 'left', width: '100%', height: '400px' }"
-        ></div>
-        <!-- 各社区评论每天参与人数 -->
-        <div class="echart" ref="myxian" id="myxian"
-            :style="{ float: 'right', width: '100%', height: '400px' }"
-        ></div>
-        <!-- 收藏竞赛人数 -->
-        <div class="echart" ref="myzhu" id="myzhu"
-            :style="{ float: 'right', width: '100%', height: '400px' }"
-        ></div>
+
+        <!-- 用户性别分布饼图 -->
+        <div class="echart" ref="myPieChart" :style="{ width: '100%', height: '400px' }"></div>
+        <!-- 用户完成视频个数图表 -->
+        <div class="echart" ref="myVideoChart" :style="{ width: '100%', height: '400px' }"></div>
     </el-card>
-
-    
-   
-
 </template>
 
 <script>
@@ -95,25 +75,24 @@ export default {
     data() {
         return {
             dialogDetailVisible: false,
-            queryStr: "", 
-            selectedField: "", 
+            queryStr: "",
+            selectedField: "",
             currentPage: 1,
             pageSize: 5,
             pageInfo: {},
             tableData: [],
-            form: {},
-            formLabelWidth: "140px", 
-            queryData: [],
-            title: "",
-            btnName: "",
-            imageUrl: ""
+            sexDistributionData: [], // 用于存储性别分布数据
+            userTotalCount: 0, // 存储用户总数
+            videoCompletionData: [] // 存储用户完成视频个数数
         };
     },
     mounted() {
-        this.mybing();
-        this.myxian();
-        this.myzhu();
         this.getPageData(this.currentPage, this.pageSize);
+        this.getUserData();
+        this.getUserTotalCount(); // 获取用户总数
+        this.initPieChart();
+        this.getVideoCompletionData(); // 获取用户完成视频个数数据
+        this.initVideoChart();
     },
     methods: {
         handleSizeChange(pageSize) {
@@ -128,7 +107,7 @@ export default {
             this.$http.get('/uis/v1/ui', { params: { pageNum: num, pageSize: size } })
                 .then((response) => {
                     this.pageInfo = response.data;
-                    this.tableData = this.pageInfo.records;
+                    this.tableData = response.data.records;
                 })
                 .catch((error) => {
                     ElMessage.error('数据加载失败，请稍后重试');
@@ -160,141 +139,113 @@ export default {
             }
             this.tableData = this.pageInfo.records.filter(item => item[this.selectedField]?.toString().includes(queryValue));
         },
-        mybing() {
-            const option = {
-                title: { text: 'Customized Pie', left: 'center' },
-                tooltip: { trigger: 'item' },
-                series: [
-                    {
-                        name: 'Access From',
-                        type: 'pie',
-                        radius: '55%',
-                        center: ['50%', '50%'],
-                        data: [
-                            { value: 335, name: 'Direct' },
-                            { value: 310, name: 'Email' },
-                            { value: 274, name: 'Union Ads' },
-                            { value: 235, name: 'Video Ads' },
-                            { value: 400, name: 'Search Engine' }
-                        ],
-                        roseType: 'radius',
-                    }
-                ]
-            };
-            const mybing = echarts.init(this.$refs.mybing);
-            mybing.setOption(option);
-            window.addEventListener("resize", () => mybing.resize());
+        getUserTotalCount() {
+            this.$http.get('/uis/v1/ui/user-total-count').then(response => {
+                this.userTotalCount = response.data; // 存储用户总数
+            }).catch(error => {
+                ElMessage.error('获取用户总数失败，请稍后重试');
+            });
         },
-        myxian() {
+        getUserData() {
+            this.$http.get('/uis/v1/ui/sex-distribution').then(response => {
+                this.sexDistributionData = response.data; // 存储性别分布数据
+                this.updatePieChart(); // 更新性别分布图表
+            }).catch(error => {
+                ElMessage.error('数据加载失败，请稍后重试');
+            });
+        },
+        initPieChart() {
+            this.myPieChart = echarts.init(this.$refs.myPieChart);
+            const pieOption = {
+                title: {
+                    text: '用户分布',
+                    subtext: '',
+                    left: 'center'
+                },
+                tooltip: {
+                    trigger: 'item'
+                },
+                legend: {
+                    orient: 'vertical',
+                    left: 'left'
+                },
+                series: [{
+                    name: '用户性别',
+                    type: 'pie',
+                    radius: '50%',
+                    data: [] // 初始数据为空
+                }]
+            };
+            this.myPieChart.setOption(pieOption);
+        },
+        updatePieChart() {
+            // 由于user_sex是整型，我们需要确保map函数中的比较是基于整数的
+            const pieData = this.sexDistributionData.map(item => ({
+                value: item.count,
+                name: item.user_sex === 1 ? '男' : '女' // 直接使用整型比较
+            }));
+            const pieOption = {
+                series: [{
+                    data: pieData
+                }]
+            };
+            this.myPieChart.setOption(pieOption);
+        },
+        getVideoCompletionData() {
+            this.$http.get('/uis/v1/ui/countCourseAll').then(response => {
+                this.videoCompletionData = response.data;
+                this.updateVideoChart(); // 更新图表
+            }).catch(error => {
+                ElMessage.error('获取用户完成视频个数数据失败，请稍后重试');
+            });
+        },
+        initVideoChart() {
+            this.myVideoChart = echarts.init(this.$refs.myVideoChart);
             const option = {
                 title: {
-                    text: 'Stacked Line'
+                    text: '用户完成视频个数',
+                    left: 'center'
                 },
                 tooltip: {
                     trigger: 'axis'
                 },
-                legend: {
-                    data: ['Email', 'Union Ads', 'Video Ads', 'Direct', 'Search Engine']
-                },
-                grid: {
-                    left: '3%',
-                    right: '4%',
-                    bottom: '3%',
-                    containLabel: true
-                },
-                toolbox: {
-                    feature: {
-                    saveAsImage: {}
-                    }
-                },
                 xAxis: {
                     type: 'category',
-                    boundaryGap: false,
-                    data: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
+                    data: [] // 用户名
                 },
                 yAxis: {
                     type: 'value'
                 },
-                series: [
-                    {
-                    name: 'Email',
-                    type: 'line',
-                    stack: 'Total',
-                    data: [120, 132, 101, 134, 90, 230, 210]
-                    },
-                    {
-                    name: 'Union Ads',
-                    type: 'line',
-                    stack: 'Total',
-                    data: [220, 182, 191, 234, 290, 330, 310]
-                    },
-                    {
-                    name: 'Video Ads',
-                    type: 'line',
-                    stack: 'Total',
-                    data: [150, 232, 201, 154, 190, 330, 410]
-                    },
-                    {
-                    name: 'Direct',
-                    type: 'line',
-                    stack: 'Total',
-                    data: [320, 332, 301, 334, 390, 330, 320]
-                    },
-                    {
-                    name: 'Search Engine',
-                    type: 'line',
-                    stack: 'Total',
-                    data: [820, 932, 901, 934, 1290, 1330, 1320]
-                    }
-                ]
-                };
-                const myxian = echarts.init(this.$refs.myxian);
-                myxian.setOption(option);
-                window.addEventListener("resize", () => myxian.resize());
-        },
-        myzhu(){
-            const option = {
-                tooltip: {
-                    trigger: 'axis',
-                    axisPointer: {
-                    type: 'shadow'
-                    }
-                },
-                grid: {
-                    left: '3%',
-                    right: '4%',
-                    bottom: '3%',
-                    containLabel: true
-                },
-                xAxis: [
-                    {
-                    type: 'category',
-                    data: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
-                    axisTick: {
-                        alignWithLabel: true
-                    }
-                    }
-                ],
-                yAxis: [
-                    {
-                    type: 'value'
-                    }
-                ],
-                series: [
-                    {
-                    name: 'Direct',
+                series: [{
+                    name: '完成视频个数',
                     type: 'bar',
-                    barWidth: '60%',
-                    data: [10, 52, 200, 334, 390, 330, 220]
-                    }
-                ]
-                };
-                const myzhu = echarts.init(this.$refs.myzhu);
-                myzhu.setOption(option);
-                window.addEventListener("resize", () => myzhu.resize());
+                    data: [] // 完成视频个数
+                }]
+            };
+            this.myVideoChart.setOption(option);
+        },
+        updateVideoChart() {
+            if (!this.myVideoChart) return;
+            const userNames = this.videoCompletionData.map(item => item.user_name);
+            const completionCounts = this.videoCompletionData.map(item => item.completed_count);
+            const option = {
+                xAxis: {
+                    data: userNames
+                },
+                series: [{
+                    data: completionCounts
+                }]
+            };
+            this.myVideoChart.setOption(option);
         }
-        
+    },
+    beforeDestroy() {
+        this.myPieChart.dispose();
+        if (this.myVideoChart) {
+            this.myVideoChart.dispose();
+        }
     }
+    
 }
 </script>
 

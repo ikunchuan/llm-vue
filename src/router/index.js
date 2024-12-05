@@ -12,12 +12,10 @@ import UserMonitor from "../componentsUser/UserMonitor.vue"; // 用户行为监�
 import UserViolation from "../componentsUser/UserViolation.vue"; // 违规用户处理
 import CompetitionInfo from "../componentsCompetiton/CompetitionInfo.vue"; // 竞赛信息管理
 import CompetitionDetail from "../componentsCompetiton/CompetitionDetail.vue"; // 竞赛详情信息管理
-import Category1 from "../componentsCategory/Category1.vue"; // 类别一级分类管理
-import Category2 from "../componentsCategory/Category2.vue"; // 类别二级分类管理
+import Category from "../componentsCategory/Category.vue"; // 类别管理
 import CourseInfo from "../componentsCourse/CourseInfo.vue"; // 课程信息管理
 import CourseDetail from "../componentsCourse/CourseDetail.vue"; // 课程详细内容管理
 import QuestionInfo from "../componentsQuestion/QuestionInfo.vue"; // 题目信息管理
-
 
 import CommunityBoard from "../componentsCommunity/CommunityBoard.vue"; // 社区板块管理
 import CommunityContent from "../componentsCommunity/CommunityContent.vue"; // 社区内容管理
@@ -47,8 +45,7 @@ import CommunityAudit from "../componentsCommunity/CommunityAudit.vue"; // 社�
 //       { path: "courseInfo", component: CourseInfo },
 //       { path: "courseDetail", component: CourseDetail },
 //       { path: "questionInfo", component: QuestionInfo },
-   
-     
+
 //       { path: "communityBoard", component: CommunityBoard },
 //       { path: "communityContent", component: CommunityContent },
 //       { path: "communityAudit", component: CommunityAudit },
@@ -93,12 +90,11 @@ const routes = [
       { path: "userViolation", component: UserViolation },
       { path: "competitionInfo", component: CompetitionInfo },
       { path: "competitionDetail", component: CompetitionDetail },
-      { path: "category1", component: Category1 },
-      { path: "category2", component: Category2 },
+      { path: "category", component: Category },
       { path: "courseInfo", component: CourseInfo },
       { path: "courseDetail", component: CourseDetail },
       { path: "questionInfo", component: QuestionInfo },
-     
+
       { path: "communityBoard", component: CommunityBoard },
       { path: "communityContent", component: CommunityContent },
       { path: "communityAudit", component: CommunityAudit },
@@ -114,12 +110,11 @@ const routes = [
       { path: "userViolation", component: UserViolation },
       { path: "competitionInfo", component: CompetitionInfo },
       { path: "competitionDetail", component: CompetitionDetail },
-      { path: "category1", component: Category1 },
-      { path: "category2", component: Category2 },
+      { path: "category", component: Category },
       { path: "courseInfo", component: CourseInfo },
       { path: "courseDetail", component: CourseDetail },
       { path: "questionInfo", component: QuestionInfo },
-      
+
       { path: "communityBoard", component: CommunityBoard },
       { path: "communityContent", component: CommunityContent },
       { path: "communityAudit", component: CommunityAudit },
@@ -135,21 +130,17 @@ const routes = [
       { path: "userViolation", component: UserViolation },
       { path: "competitionInfo", component: CompetitionInfo },
       { path: "competitionDetail", component: CompetitionDetail },
-      { path: "category1", component: Category1 },
-      { path: "category2", component: Category2 },
+      { path: "category", component: Category },
       { path: "courseInfo", component: CourseInfo },
       { path: "courseDetail", component: CourseDetail },
       { path: "questionInfo", component: QuestionInfo },
-      
+
       { path: "communityBoard", component: CommunityBoard },
       { path: "communityContent", component: CommunityContent },
       { path: "communityAudit", component: CommunityAudit },
     ],
   },
 ];
-
-
-
 
 const router = createRouter({
   history: createWebHashHistory(),

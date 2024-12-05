@@ -38,7 +38,7 @@
               <RouterLink to="/home/competitionDetail" :style="{ color: '#98c6f6' }">竞赛详情管理</RouterLink>
             </el-menu-item>
             <el-menu-item index="2-3">
-              <RouterLink to="/home/category2" :style="{ color: '#98c6f6' }">类别二级分类管理</RouterLink>
+              <RouterLink to="/home/category" :style="{ color: '#98c6f6' }">类别管理</RouterLink>
             </el-menu-item>
           </el-sub-menu>
 
@@ -93,7 +93,7 @@
           <div class="breadcrumb-container">
             <el-breadcrumb class="breadcrumb" separator=">">
               <Icon type="ios-home-outline"></Icon>
-   
+
               <el-breadcrumb-item v-for="(crumb, index) in breadcrumbs" :key="index" :to="crumb.path">
                 {{ crumb.name }}
               </el-breadcrumb-item>
@@ -129,7 +129,7 @@
   </div>
 </template>
 
-<script >
+<script>
 export default {
   data() {
     return {};
@@ -144,7 +144,7 @@ export default {
 
       // 遍历路径，生成每一层的面包屑项
       pathArray.forEach((part, index) => {
-        fullPath += '${part}/'; 
+        fullPath += '${part}/';
         breadcrumbList.push({
           name: this.getBreadcrumbName(part), // 这里的 getBreadcrumbName 是自定义的
           path: fullPath
@@ -203,7 +203,8 @@ export default {
 body {
   font-family: 'Roboto', sans-serif;
   font-size: 14px;
-  background-color: #f4f6fc;  /* 背景色 */
+  background-color: #f4f6fc;
+  /* 背景色 */
   margin: 0;
   padding: 0;
 }
@@ -213,14 +214,16 @@ body {
   min-height: 100vh;
   display: flex;
   flex-direction: row;
-  background-color: #f4f6fc;  /* 统一背景色 */
+  background-color: #f4f6fc;
+  /* 统一背景色 */
 }
 
 /* Sidebar */
 .sidebar {
   background: linear-gradient(180deg, #0a1f44 0%, #2e3c56 100%);
   box-shadow: 2px 0 10px rgba(0, 0, 0, 0.2);
-  border-radius: 10px 0 0 10px;  /*左右角统一的圆角*/
+  border-radius: 10px 0 0 10px;
+  /*左右角统一的圆角*/
   padding-top: 20px;
   position: relative;
 }
@@ -262,7 +265,7 @@ body {
   border-radius: 10px;
   padding: 0px;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
-  margin-top: 20px;
+  margin-top: 0px;
 }
 
 /* Header */
@@ -271,9 +274,11 @@ body {
   justify-content: space-between;
   align-items: center;
   background-color: #f9f9f9;
-  padding: 10px 24px;  /* 修复了padding语法 */
+  padding: 10px 24px;
+  /* 修复了padding语法 */
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-  /* border-radius: 10px 10px 0 0;  /* 圆角，防止顶部圆角突兀 */  
+  margin-top: 0px;
+  /* border-radius: 10px 10px 0 0;  /* 圆角，防止顶部圆角突兀 */
 }
 
 .header-right {
@@ -340,10 +345,14 @@ body {
   display: flex;
   align-items: center;
   padding: 5px 0;
-  background-color: transparent;  /* 去掉背景色 */
-  border: none;  /* 去掉边框 */
-  box-shadow: none;  /* 去掉阴影 */
-  margin: 0;  /* 去掉默认的外边距 */
+  background-color: transparent;
+  /* 去掉背景色 */
+  border: none;
+  /* 去掉边框 */
+  box-shadow: none;
+  /* 去掉阴影 */
+  margin: 0;
+  /* 去掉默认的外边距 */
 }
 
 /* 面包屑项 */
@@ -357,7 +366,8 @@ body {
 .breadcrumb-icon {
   margin-right: 8px;
   font-size: 16px;
-  color: #007bff;  /* 设置图标颜色 */
+  color: #007bff;
+  /* 设置图标颜色 */
 }
 
 /* 分隔符 */
