@@ -4,9 +4,9 @@
             <div slot="header" class="card-header">{{ name }}</div><br>
             <div class="header-actions">
                 <el-input v-model="queryStr" style="width: 220px" placeholder="请输入题目标题" />&nbsp;
-                <el-button type="primary" round @click="queryInfo">查询</el-button>
-                <el-button class="button" type="success" round @click="openAddDialog">添加</el-button>
-                <el-button class="button" type="warning" round @click="multipleDelete">多选删除</el-button>
+                <el-button type="primary" @click="queryInfo">查询</el-button>
+                <el-button class="button" type="success" @click="openAddDialog">添加</el-button>
+                <el-button class="button" type="warning" @click="multipleDelete">多选删除</el-button>
             </div>
         </template>
 
@@ -14,15 +14,12 @@
             <el-table-column fixed type="selection" width="55" />
             
             <el-table-column prop="competitionName" label="竞赛名称" width="120" />
-            <el-table-column prop="categoryId"  label="竞赛类别" width="120" />
-            <el-table-column prop="levelId" label="竞赛等级" width="120" />
+            <el-table-column prop="categoryName"  label="竞赛类别" width="120" />
+            <el-table-column prop="levelName" label="竞赛等级" width="120" />
+            
             <el-table-column prop="competitionImgUrl" label="竞赛图片链接" width="150" />
             <el-table-column prop="competitionStatus" label="竞赛状态" width="120" />
-            <el-table-column prop="isActive" label="是否激活" width="100">
-                <template #default="scope">
-                    {{ scope.row.isActive == 0 ? '激活' : '停用' }}
-                </template>
-            </el-table-column>
+            <el-table-column prop="isActive" label="是否激活" width="100"/>
             <el-table-column prop="updatedTime" label="更新时间" width="200">
                 <template #default="{ row }">
                     <span>{{ formatDate(row.updatedTime) }}</span>
@@ -49,98 +46,102 @@
     </el-card>
 
     <!-- 编辑、添加对话框 -->
-    <el-dialog v-model="dialogFormVisible" :title="title" width="500">
-        <el-form :model="form">
-            <el-form-item label="类别" :label-width="formLabelWidth">
-                <el-select v-model="form.categoryId" placeholder="-- 请选择类别 --">
-                    <el-option v-for="cat in catInfoData" :key="cat.categoryId" :label="cat.catName"
-                        :value="cat.categoryId" />
-                </el-select>
-            </el-form-item>
-            <el-form-item label="竞赛ID" :label-width="formLabelWidth">
-                <el-input v-model="form.competitionID" type="textarea" autocomplete="off" />
-            </el-form-item>
-            
 
-            <el-form-item label="竞赛名称" :label-width="formLabelWidth">
-                <el-input v-model="form.competitionName" type="textarea" autocomplete="off" />
-            </el-form-item>
+<el-drawer v-model="dialogFormVisible" :title="title" size="50%">
+    <el-form :model="form">
+        <el-form-item label="竞赛类别" :label-width="formLabelWidth">
+            <el-select v-model="form.categoryName" >
+                <el-option v-for="cat in catInfoData" :key="cat.categoryId" :label="cat.catName" :value="cat.categoryName" />
+            </el-select>
+        </el-form-item>
+        
+        <el-form-item label="竞赛名称" :label-width="formLabelWidth">
+            <el-input v-model="form.competitionName" autocomplete="off" />
+        </el-form-item>
 
-            <el-form-item label="竞赛类别ID" :label-width="formLabelWidth">
-                <el-input v-model="form.categoryId" type="textarea" autocomplete="off" />
-            </el-form-item>
+        <el-form-item label="竞赛等级" :label-width="formLabelWidth">
+            <el-select v-model="form.levelName">
+                <el-option label="国际级" value="国际级" />
+                <el-option label="国家级A类" value="国家级A类" />
+                <el-option label="国家级B类" value="国家级B类" />
+                <el-option label="省级A类" value="省级A类" />
+            </el-select>
+        </el-form-item>
 
-            <el-form-item label="竞赛等级ID" :label-width="formLabelWidth">
-                <el-input v-model="form.levelId" type="textarea" autocomplete="off" />
-            </el-form-item>
+        <el-form-item label="竞赛图片链接" :label-width="formLabelWidth">
+            <el-input v-model="form.competitionImgUrl" autocomplete="off" />
+        </el-form-item>
 
-            <el-form-item label="竞赛图片链接" :label-width="formLabelWidth">
-                <el-input v-model="form.competitionImgUrl" type="textarea" autocomplete="off" />
-            </el-form-item>
+        <el-form-item label="竞赛状态" :label-width="formLabelWidth">
+            <el-select v-model="form.competitionStatus">
+                <el-option label="未开始" value="未开始" />
+                <el-option label="进行中" value="进行中" />
+                <el-option label="已结束" value="已结束" />
+            </el-select>
+        </el-form-item>
 
-            <el-form-item label="竞赛状态" :label-width="formLabelWidth">
-                <el-input v-model="form.competitionStatus" type="textarea" autocomplete="off" />
-            </el-form-item>
+        <el-form-item label="是否激活" :label-width="formLabelWidth">
+            <el-select v-model="form.isActive">
+                <el-option label="停用" value="停用" />
+                <el-option label="激活" value="激活" />
+            </el-select>
+        </el-form-item>
+    </el-form>
 
-            <el-form-item label="是否激活" :label-width="formLabelWidth">
-                <el-input v-model="form.isActive" type="textarea" autocomplete="off"/>             
-            </el-form-item>
-        </el-form>
-
-        <template #footer>
-            <div class="dialog-footer">
-                <el-button @click="dialogFormVisible = false">取消</el-button>
-                <el-button type="primary" @click="btnAddUpdate">{{ btnName }}</el-button>
-            </div>
-        </template>
-    </el-dialog>
+    <template #footer>
+        <div style="flex: auto; text-align: right;">
+            <el-button @click="dialogFormVisible = false">取消</el-button>
+            <el-button type="primary" @click="btnAddUpdate">{{ btnName }}</el-button>
+        </div>
+    </template>
+</el-drawer>
 
     <!-- 详情对话框 -->
-    <el-dialog v-model="dialogDetailVisible" title="竞赛信息详情" width="800">
-        <el-form :model="form">
-            <el-form-item label="竞赛ID" :label-width="formLabelWidth">
-                <el-form-item :label="form.competitionId"  />
-            </el-form-item>
+    <el-drawer v-model="dialogDetailVisible" title="竞赛信息详情" size="50%">
+    <el-descriptions :column="2" border>
+        <el-descriptions-item label="竞赛ID">
+            {{ form.competitionId }}
+        </el-descriptions-item>
 
-            <el-form-item label="竞赛名称" :label-width="formLabelWidth">
-                <el-form-item :label="form.competitionName" />
-            </el-form-item>
+        <el-descriptions-item label="竞赛名称">
+            {{ form.competitionName }}
+        </el-descriptions-item>
 
-            <el-form-item label="竞赛类别ID" :label-width="formLabelWidth">
-                <el-form-item :label="form.categoryId"  />
-            </el-form-item>
+        <el-descriptions-item label="竞赛类别">
+            {{ form.categoryName }}
+        </el-descriptions-item>
 
-            <el-form-item label="竞赛等级ID" :label-width="formLabelWidth">
-                <el-form-item :label="form.levelId"  />
-            </el-form-item>
-            
-            <el-form-item label="竞赛图片链接" :label-width="formLabelWidth">
-                <el-form-item :label="form.competitionImgUrl"  />
-            </el-form-item>
-            
-            <el-form-item label="竞赛状态" :label-width="formLabelWidth">
-                <el-form-item :label="form.competitionStatus" />
-            </el-form-item>
-            
-            <el-form-item label="是否激活" :label-width="formLabelWidth">
-                <el-form-item :label="form.isActive"  />
-            </el-form-item>
+        <el-descriptions-item label="竞赛等级">
+            {{ form.levelName }}
+        </el-descriptions-item>
 
-            <el-form-item label="更新时间：" :label-width="formLabelWidth">
-                <el-form-item :label="form.updatedTime" />
-            </el-form-item>
+        <el-descriptions-item label="竞赛图片链接">
+            <a :href="form.competitionImgUrl" target="_blank">{{ form.competitionImgUrl }}</a>
+        </el-descriptions-item>
 
-            <el-form-item label="创建时间：" :label-width="formLabelWidth">
-                <el-form-item :label="form.createdTime" />
-            </el-form-item>
-        </el-form>
+        <el-descriptions-item label="竞赛状态">
+            {{ form.competitionStatus }}
+        </el-descriptions-item>
 
-        <template #footer>
-            <div class="dialog-footer">
-                <el-button @click="dialogDetailVisible = false">关闭</el-button>
-            </div>
-        </template>
-    </el-dialog>
+        <el-descriptions-item label="是否激活">
+        <el-tag :type="form.isActive === '激活' ? 'success' : 'info'">{{ form.isActive }}</el-tag>
+        </el-descriptions-item>
+
+        <el-descriptions-item label="更新时间">
+            {{ formatDate(form.updatedTime) }}
+        </el-descriptions-item>
+
+        <el-descriptions-item label="创建时间">
+            {{ formatDate(form.createdTime) }}
+        </el-descriptions-item>
+    </el-descriptions>
+
+    <template #footer>
+        <div style="text-align: right; margin-top: 20px">
+            <el-button @click="dialogDetailVisible = false">关闭</el-button>
+        </div>
+    </template>
+</el-drawer>
 </template>
 
 <script>
@@ -255,7 +256,7 @@ export default {
         },
          // 编辑修改信息
             updateQuestion() {
-            if (!this.form.competitionName || !this.form.competitionImgUrl || !this.form.competitionStatus || !this.form.competitionId || !this.form.categoryId || !this.form.levelId ) {
+            if (!this.form.competitionName || !this.form.competitionImgUrl || !this.form.competitionStatus || !this.form.categoryName || !this.form.levelName ) {
                 ElMessage({ message: '请填写完整的竞赛信息！', type: "warning" });
                 return;
             }
@@ -310,7 +311,7 @@ export default {
             }).catch(() => { });
         },
 
-        // 批量删除
+        //批量删除
         multipleDelete() {
             if (this.multipleSelection.length > 0) {
                 ElMessageBox.confirm('是否删除选中的所有数据?', '批量删除提示', {
@@ -319,8 +320,8 @@ export default {
                     type: "warning",
                 }).then(() => {
                     const ids = this.multipleSelection.map(item => item.competitionId);
-                    this.$http.delete(`comp/v1/compe/${ids}`,).then((response) => {
-                        if (response.data == 1) {
+                    this.$http.delete(`/comp/v1/compe`, { data: ids }).then((response) => {
+                        if (response.data > 0) {
                             ElMessage({ message: '批量删除成功', type: "success" });
                             this.getPageData(this.currentPage, this.pageSize); // 刷新数据
                         } else {
@@ -334,7 +335,6 @@ export default {
                 ElMessage({ message: '请选择要删除的记录', type: "warning" });
             }
         },
-
         // 查询功能
         queryInfo() {
             // 清空之前的选择
@@ -371,14 +371,54 @@ export default {
                     ElMessage({ message: '请求失败，请重试', type: "error" });
                 });
         },
-        
+        // 获取分页数据
+        getPageData(num, size, searchField, searchKeyword) {
+            // 构建查询条件对象，假设你希望根据 questionTitle 和 categoryName 搜索
+            let questionSearch = {
+                categoryName: searchField === 'categoryName' ? searchKeyword : '',
+                questionLevel: searchField === 'categoryId' ? searchKeyword : '',
+                questionTitle: searchField === 'competitionName' ? searchKeyword : '',
+                questionText: searchField === 'isActive' ? searchKeyword : ''
+            };
+
+            console.log("请求分页参数: ", num, size, searchField, searchKeyword);
+
+            //questionSearch是查询对象， { params: { pageNum: num, pageSize: size } }是页面对象。
+            //注意：如果Controller的方法的参数前面是查询对象，后面是分页对象，顺序一定要对应，否则会报错。我这里后端是查询对象在前，分页对象在后。
+            /*  另外一种形式 
+                this.$http.post('/qst/v1/search?pageNum=' + num + '&pageSize=' + size, questionSearch)，
+                这样默认就是页面在前，查询在后。
+            */
+            this.$http.post('/comp/v1/search', questionSearch, { params: { pageNum: num, pageSize: size } })
+                .then((response) => {
+                    console.log(response.data);  // 检查后端返回的数据
+                    this.pageInfo = response.data;
+                    this.tableData = this.pageInfo.list;
+                    this.catInfoData = this.pageInfo.list.map(item => ({
+                        categoryId: item.categoryId,
+                        categoryName: item.categoryName,
+                    }));
+                    console.log(this.catInfoData);
+                }).catch(() => {
+                    ElMessage({ message: '请求失败，请重试', type: "error" });
+                });
+        },
 
         handleSelectionChange(val) {
             this.multipleSelection = val;
         },
     },
     mounted() {
+        
+
         this.getPageData(this.currentPage, this.pageSize);
+         //在页面加载时获取所有分类，给到添加和编辑题目的分类下拉框
+            this.$http.get('/cat/v1/all').then((response) => {
+            this.catIdAndName = response.data;
+            console.log(this.catIdAndName);
+
+        });
+        
     },
 };
 </script>
