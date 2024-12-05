@@ -262,7 +262,7 @@ body {
   border-radius: 10px;
   padding: 0px;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
-  margin-top: 20px;
+  margin-top: 0px;
 }
 
 /* Header */
@@ -273,6 +273,7 @@ body {
   background-color: #f9f9f9;
   padding: 10px 24px;  /* 修复了padding语法 */
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  margin-top: 0px;
   /* border-radius: 10px 10px 0 0;  /* 圆角，防止顶部圆角突兀 */  
 }
 
