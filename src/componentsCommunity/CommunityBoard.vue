@@ -32,6 +32,7 @@
             <el-table-column prop="categoryName" label="社区类别" width="120" />
             <el-table-column prop="communityName" label="社区名" width="120" />
             <el-table-column prop="communityDescription" label="社区描述" width="100" />
+            
             <el-table-column prop="userName" label="创建者" width="120" />
 
             <el-table-column fixed="right" label="操作" min-width="180">
@@ -85,6 +86,7 @@
 
             <el-form-item label="社区描述" :label-width="formLabelWidth">
                 <el-input v-model="form.communityDescription" autocomplete="off" />
+                
             </el-form-item>
 
             <el-form-item label="创建者" :label-width="formLabelWidth">

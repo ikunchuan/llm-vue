@@ -13,12 +13,7 @@
 
                 <!-- 输入框：输入查询内容 -->
                 <el-input v-model="queryStr" style="width: 220px" placeholder="请输入查询内容" />&nbsp;
-
-                <!-- <el-input v-model="queryStr" style="width: 220px" placeholder="请输入课程名称" />&nbsp; -->
-                
                 <el-button type="primary"  @click="queryInfo">查询</el-button>
-                
-
             </div>
 
         </template>
