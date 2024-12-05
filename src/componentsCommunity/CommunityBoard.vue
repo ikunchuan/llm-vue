@@ -29,11 +29,22 @@
         <el-table :data="tableData" style="width: 100%" @selection-change="handleSelectionChange">
             <el-table-column type="selection" width="55" />
 
-            <el-table-column prop="categoryName" label="社区类别" width="120" />
-            <el-table-column prop="communityName" label="社区名" width="120" />
+            <el-table-column prop="categoryName" label="社区类别" width="90" />
+            <el-table-column prop="communityName" label="社区名" width="100" />
             <el-table-column prop="communityDescription" label="社区描述" width="100" />
-            
-            <el-table-column prop="userName" label="创建者" width="120" />
+            <el-table-column prop="userName" label="创建者" width="100" />
+
+            <el-table-column prop="updatedTime" label="更新时间" width="200">
+                <template v-slot:default="{ row }">
+                    <span>{{ formatDate(row.updatedTime) }}</span>
+                </template>
+            </el-table-column>
+
+            <el-table-column prop="createdTime" label="创建时间" width="200">
+                <template v-slot:default="{ row }">
+                    <span>{{ formatDate(row.createdTime) }}</span>
+                </template>
+            </el-table-column>
 
             <el-table-column fixed="right" label="操作" min-width="180">
 
@@ -65,17 +76,13 @@
     </el-card>
 
 
-    
-
     <!-- 对话框:添加,修改功能 -->
     <el-dialog v-model="dialogFormVisible" :title="title" width="500">
 
-        <el-form :rules="myrules" ref="" frmRef :model="form">
-
 
             <el-form-item label="类别" :label-width="formLabelWidth">
-                <el-select v-model="form.categoryId" placeholder="请选择类别">
-                    <el-option v-for="cat in catInfoData" :key="cat.categoryId" :label="cat.catName"
+                <el-select v-model="form.categoryId" placeholder="--请选择类别--">
+                    <el-option v-for="cat in catIdAndName" :key="cat.categoryId" :label="cat.categoryName"
                         :value="cat.categoryId" />
                 </el-select>
             </el-form-item>
@@ -85,24 +92,16 @@
             </el-form-item>
 
             <el-form-item label="社区描述" :label-width="formLabelWidth">
-                <el-input v-model="form.communityDescription" autocomplete="off" />
-                
-            </el-form-item>
-
-            <el-form-item label="创建者" :label-width="formLabelWidth">
-                <el-input v-model="form.createdBy" autocomplete="off" />
+                <el-input v-model="form.communityDescription" type="textarea" autocomplete="off" />
             </el-form-item>
 
 
-        </el-form>
 
 
         <template #footer>
             <div class="dialog-footer">
                 <el-button @click="dialogFormVisible = false">取消</el-button>
-                <el-button type="primary" @click="btnAddUpdate">
-                    {{ btnName }}
-                </el-button>
+                <el-button type="primary" @click="btnAddUpdate">{{ btnName }}</el-button>
             </div>
         </template>
     </el-dialog>
@@ -119,37 +118,14 @@
             <el-form-item label="社区描述" :label-width="formLabelWidth">
                 <el-form-item :label="form.communityDescription"></el-form-item>
             </el-form-item>
-
-            <el-form-item label="创建者" :label-width="formLabelWidth">
-                <el-form-item :label="form.userName"></el-form-item>
-            </el-form-item>
         </el-form>
 
         <template #footer>
             <div class="dialog-footer">
                 <el-button @click="dialogDetailVisible = false">取消</el-button>
-
             </div>
         </template>
     </el-dialog>
-
-
-    <!-- 用户详细表 -->
-    <el-dialog v-model="dialogUserInfoVisible" title="用户详细信息显示" width="600px">
-
-        <el-table :data="users" style="width: 100%">
-            <el-table-column prop="createTime" label="Date" width="180" />
-            <el-table-column prop="createBy" label="Name" width="180" />
-        </el-table>
-
-        <template #footer>
-            <div class="dialog-footer">
-                <el-button @click="dialogUserInfoVisible = false">取消</el-button>
-            </div>
-        </template>
-    </el-dialog>
-
-
 
 
 </template>
@@ -162,7 +138,6 @@ import { Plus } from '@element-plus/icons-vue';
 export default {
     data() {
         return {
-            // cmnsInfoData:[],
             dialogUserInfoVisible: false,
             dialogDetailVisible: false,   //详细对话框
             dialogFormVisible: false,  //对话框是否展示,默认为不展示
@@ -173,21 +148,15 @@ export default {
             userData: [],        //用户信息数据
             queryData: [],
             pageInfo: {},       //分页信息对象
-            pageSize: 3,        //当前页条数
-            pageNum: 1,     //当前页号
+
             users: {},
             form: {},                       //对话框表单数据
             formLabelWidth: "150px",    //对话框label宽度
             title: "",                           //对话框标题
             btnName: "",                     //对话框按钮文字
-            // claInfoData: [],                  //加载到下拉框的班级信息
             imageUrl: "",                     //图片URL
-            catInfoData: [
-                { categoryId: 1, catName: '管理学' },
-                { categoryId: 8, catName: '经济学' },
-                { categoryId: 9, catName: '数学' },
-            ],
-            selectedField: "",  // 选择的查询字段
+            catIdAndName: [],        //全部类别id和名称
+            selectedField: "",          // 选择的查询字段
             searchField: '',
             searchKeyword: '',
         };
@@ -200,6 +169,18 @@ export default {
         //     // this.imageUrl = response
         //     this.form.stu_image_url = response
         // },
+
+        // 处理时间格式化
+        formatDate(value) {
+            if (!value) return '-';
+            const date = new Date(value);
+            return `${date.getFullYear()}-
+                    ${String(date.getMonth() + 1).padStart(2, '0')}-
+                    ${String(date.getDate()).padStart(2, '0')} 
+                    ${String(date.getHours()).padStart(2, '0')}:
+                    ${String(date.getMinutes()).padStart(2, '0')}:
+                    ${String(date.getSeconds()).padStart(2, '0')}`;
+        },
 
         handleSizeChange(pageSize) {
             this.pageSize = pageSize;
@@ -276,10 +257,7 @@ export default {
             this.btnName = "修改"
             this.title = "修改社区信息"
             this.dialogFormVisible = true
-            //console.log(row)
             this.form = row         //得到要修改的数据,并回显到对话框的表单上
-            // this.form.stu_interest = this.form.stu_interest.split(',')
-            // this.form.stu_sex = this.form.stu_sex.toString()
             console.log("openUpdateDialog....");
         },
 
@@ -287,7 +265,7 @@ export default {
             console.log(this.form);
             var _this = this;
             // this.form.stu_interest = this.form.stu_interest.join(',')              //将数据转为字符串
-            this.$http.put("v1/cmns/cmn", this.form).then(function (response) {
+            this.$http.put("v1/cmns/cmn", this.form).then((response) => {
                 console.log(response.data);
 
                 if (response.data == 1) {
@@ -308,10 +286,10 @@ export default {
 
         addCmn() {           //添加功能
             var _this = this;
-            // this.form.stu_interest = this.form.stu_interest.join(',');
+            this.form.communityUnderview = 1;
+            this.form.createdBy = 1;
             this.$http.post("v1/cmns/cmn", this.form).then(function (response) {
                 console.log(response.data);
-
                 if (response.data == 1) {
                     ElMessage({
                         message: '社区添加成功',
@@ -468,23 +446,15 @@ export default {
     mounted() {
         // 初始化页面时调用getPageData,使用默认参数
         this.currentPage = 1;  // 设置默认页码为1
-        this.pageSize = 3;     // 设置默认每页显示3条
+        this.pageSize = 5;     // 设置默认每页显示3条
         this.getPageData(this.currentPage, this.pageSize, '', '');  // field和keyword传空字符串
-        this.getPageData(1, 3, '', '')
 
-        // this.$http.get("/cmns/v1/cmn").then((response) => {
-        //     this.cmnsInfoData = response.data
-        //     console.log(this.cmnsInfoData)
-        // })
+        this.$http.get("cat/v1/all").then((response) => {
+            console.log(response.data);
+            this.catIdAndName = response.data;
+            console.log(this.catIdAndName)
+        })
 
-        // this.$http.get("/cmns/v1/cmn").then((response) => {
-        //     this.cmnsInfoData = response.data;
-        //     console.log('cmnsInfoData:', this.cmnsInfoData);
-        //     console.log("huhuhu")
-        //     // 确保这里的 tableData 被正确赋值
-        //     // this.tableData = this.cmnsInfoData;
-        //     // console.log('tableData:', this.tableData);
-        // });
 
     }
 
