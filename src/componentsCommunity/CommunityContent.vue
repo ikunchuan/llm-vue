@@ -1,11 +1,7 @@
 <template>
-
-
-    <el-tabs v-model="activeName" class="demo-tabs" @tab-click="handleClick">
-        <el-tab-pane label="帖子" name="first">
             <el-card class="card">
-                <template #header>
-                    <div slot="header" class="card-header">{{ 社区模块管理 }}</div><br>
+                <el-tabs title="社区模块管理" v-model="activeName" class="demo-tabs" @tab-click="handleClick">
+                    <el-tab-pane label="帖子" name="first">
 
                     <div class="header-actions">
                         <!-- 查询字段选择：让用户选择查询的字段 -->
@@ -22,11 +18,7 @@
                         <!-- <el-input v-model="queryStr" style="width: 220px" placeholder="请输入课程名称" />&nbsp; -->
                         <el-button type="primary" @click="queryInfo">查询</el-button>
                         <el-button class="button" type="warning" @click="multipleDelete">多选删除</el-button>
-
-
                     </div>
-
-                </template>
 
                 <el-table :data="tableData" style="width: 100%" @selection-change="handleSelectionChange">
                     <el-table-column type="selection" width="55" />
@@ -45,7 +37,6 @@
                     </el-table-column>
 
                     <el-table-column fixed="right" label="操作" min-width="180">
-
                         <template #default="scope">
                             <el-button link type="primary" size="small" @click="openDetailDialog(scope.row.postId)">
                                 详情
@@ -56,78 +47,61 @@
                             <el-button link type="primary" size="small" @click="openUpdateDialog(scope.row)">
                                 编辑
                             </el-button>
-
                         </template>
 
                     </el-table-column>
                 </el-table>
-
+            </el-tab-pane>
+            <el-tab-pane label="帖子评论" name="second"></el-tab-pane>
+                        </el-tabs>
                 <br />
-
                 <!-- 分页 -->
                 <el-pagination v-model:current-page="currentPage" v-model:page-size="pageSize"
                     :page-sizes="[3, 5, 10, 20]" layout="total, sizes, prev, pager, next, jumper"
                     :total="pageInfo.total" @size-change="handleSizeChange" @current-change="handleCurrentChange" />
-            </el-card>
-        </el-tab-pane>
-        <el-tab-pane label="帖子评论" name="second">PostContent</el-tab-pane>
-    </el-tabs>
+ </el-card>
 
 
     <!-- 对话框:添加,修改功能 -->
-    <el-dialog v-model="dialogFormVisible" :title="title" width="500">
-
-        <el-form :rules="myrules" ref="" frmRef :model="form">
-
-            <el-form-item label="社区名" :label-width="formLabelWidth">
-                <el-input v-model="form.communityName" autocomplete="off" />
-            </el-form-item>
-
-            <el-form-item label="发帖用户" :label-width="formLabelWidth">
-                <el-input v-model="form.userName" autocomplete="off" />
-            </el-form-item>
-
-            <el-form-item label="帖子标题" :label-width="formLabelWidth">
-                <el-input v-model="form.postTitle" autocomplete="off" />
-            </el-form-item>
-
-            <el-form-item label="帖子内容" :label-width="formLabelWidth">
-                <el-input v-model="form.postContent" autocomplete="off" />
-            </el-form-item>
-
-        </el-form>
-
-        <template #footer>
-            <div class="dialog-footer">
-                <el-button @click="dialogFormVisible = false">取消</el-button>
-                <el-button type="primary" @click="btnAddUpdate">
-                    {{ btnName }}
-                </el-button>
-            </div>
-        </template>
-    </el-dialog>
+    <el-drawer v-model="dialogFormVisible" :title="title" size="40%" direction="rtl">
+    <el-form :model="form" label-width="150px">
+        <el-form-item label="社区名">
+            <el-input v-model="form.communityName" autocomplete="off" />
+        </el-form-item>
+        <el-form-item label="发帖用户">
+            <el-input v-model="form.userName" autocomplete="off" />
+        </el-form-item>
+        <el-form-item label="帖子标题">
+            <el-input v-model="form.postTitle" autocomplete="off" />
+        </el-form-item>
+        <el-form-item label="帖子内容">
+            <el-input v-model="form.postContent" type="textarea" autocomplete="off" />
+        </el-form-item>
+    </el-form>
+    <template #footer>
+        <el-button @click="closeDrawer">取消</el-button>
+        <el-button type="primary" @click="btnAddUpdate">{{ btnName }}</el-button>
+    </template>
+</el-drawer>
 
 
-    <!-- 详情对话框 -->
-    <el-dialog v-model="dialogDetailVisible" title="社区详细信息显示" width="500">
-        <el-form :model="form">
-            <el-form-item label="帖子标题" :label-width="formLabelWidth">
-                <el-form-item :label="form.postTitle"></el-form-item>
-            </el-form-item>
+    <!-- 详情抽屉 -->
+<el-drawer v-model="dialogDetailVisible" :title="'帖子详情'" size="35%" direction="rtl">
+    <el-descriptions title="帖子详情信息" :column="1" border>
+        <el-descriptions-item label="帖子标题">
+            <span>{{ form.postTitle }}</span>
+        </el-descriptions-item>
+        <el-descriptions-item label="帖子内容">
+            <span>{{ form.postContent }}</span>
+        </el-descriptions-item>
+    </el-descriptions>
 
-            <el-form-item label="帖子内容" :label-width="formLabelWidth">
-                <el-form-item :label="form.postContent"></el-form-item>
-            </el-form-item>
-
-        </el-form>
-
-        <template #footer>
-            <div class="dialog-footer">
-                <el-button @click="dialogDetailVisible = false">取消</el-button>
-
-            </div>
-        </template>
-    </el-dialog>
+    <template #footer>
+        <div class="drawer-footer">
+            <el-button @click="dialogDetailVisible = false">关闭</el-button>
+        </div>
+    </template>
+</el-drawer>
 
 
     <!-- 用户详细表 -->
@@ -155,10 +129,13 @@
 import { ElMessage, ElMessageBox } from 'element-plus';
 import { handleCurrentChange } from 'element-plus/es/components/tree/src/model/util.mjs';
 import { Plus } from '@element-plus/icons-vue';
-import { color } from 'echarts';
 export default {
     data() {
         return {
+
+            isPostSelected: false, // 控制表格显示
+            activeName: 'first', // 当前 Tab
+
             postData: [],
             dialogUserInfoVisible: false,
             dialogDetailVisible: false,   //详细对话框
@@ -202,6 +179,23 @@ export default {
 
 
     methods: {
+
+        handleClick(tab) {
+        if (tab.name === 'second') {
+            this.fetchComments();
+        }
+    },
+    // fetchComments() { 第二层处理
+    //     if (!this.selectedPostId) {
+    //         ElMessage.warning("请先选择一个帖子！");
+    //         return;
+    //     }
+    //     this.$http.get(`/v1/posts/${this.selectedPostId}/comments`).then((response) => {
+    //         this.commentsData = response.data;
+    //     }).catch(() => {
+    //         ElMessage.error("加载评论失败");
+    //     });
+    // },
         // handleSuccess(response) {            //图片上传成功后的回调函数
         //     console.log(response);
         //     // this.imageUrl = response
