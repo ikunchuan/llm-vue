@@ -1,12 +1,23 @@
 <template>
     <el-card class="card">
         <template #header>
+            <!-- 标题 -->
             <div slot="header" class="card-header">{{ name }}</div><br>
+            <!-- 搜索框 -->
             <div class="header-actions">
-                <el-input v-model="queryStr" style="width: 220px" placeholder="请输入类别名称" />&nbsp;
-                <el-button type="primary" round @click="queryInfo">查询</el-button>
-                <el-button class="button" type="success" round @click="openAddDialog">添加</el-button>
-                <el-button class="button" type="warning" round @click="multipleDelete">多选删除</el-button>
+                <!-- 选择查询字段 -->
+                <el-select v-model="selectedField" placeholder="选择查询字段" style="width: 180px;">
+                    <el-option label="类别名称" value="1" />
+                    <el-option label="题目难度" value="2" />
+                    <el-option label="题目标题" value="3" />
+                    <el-option label="题目内容" value="4" />
+                </el-select>&nbsp;
+                <!-- 输入框 -->
+                <el-input v-model="queryStr" style="width: 220px" placeholder="请输入查询内容" />&nbsp;
+                <!-- 功能按钮 -->
+                <el-button type="primary" @click="queryInfo">查询</el-button>
+                <el-button class="button" type="success" @click="openAddDialog">添加</el-button>
+                <el-button class="button" type="warning" @click="multipleDelete">多选删除</el-button>
             </div>
         </template>
 

@@ -1,28 +1,32 @@
 <template>
+
     <el-card class="card">
+
         <template #header>
             <!-- 标题 -->
             <div slot="header" class="card-header">{{ name }}</div><br>
             <!-- 搜索框 -->
             <div class="header-actions">
                 <!-- 选择查询字段 -->
-                <el-select v-model="selectedField" placeholder="选择查询字段" style="width: 180px;">
+                <el-select v-model="selectedField" placeholder="选择查询字段" style="width: 180px;" clearable>
                     <el-option label="题目类别" value="1" />
                     <el-option label="题目难度" value="2" />
                     <el-option label="题目标题" value="3" />
                     <el-option label="题目内容" value="4" />
                 </el-select>&nbsp;
                 <!-- 输入框 -->
-                <el-input v-model="queryStr" style="width: 220px" placeholder="请输入查询内容" />&nbsp;
+                <el-input v-model="queryStr" style="width: 220px" placeholder="请输入查询内容" clearable />&nbsp;
                 <!-- 功能按钮 -->
                 <el-button type="primary" @click="queryInfo">查询</el-button>
                 <el-button class="button" type="success" @click="openAddDialog">添加</el-button>
                 <el-button class="button" type="warning" @click="multipleDelete">多选删除</el-button>
             </div>
         </template>
+
         <!-- 表格 -->
         <el-table :data="tableData" style="width: 100%" @selection-change="handleSelectionChange">
             <el-table-column fixed type="selection" width="55" />
+            <el-table-column fixed type="index" label="序号" width="55" />
 
             <el-table-column prop="categoryName" label="类别" width="120" />
 
@@ -83,6 +87,7 @@
         <el-pagination v-model:current-page="currentPage" v-model:page-size="pageSize" :page-sizes="[5, 10, 15, 20]"
             layout="total, sizes, prev, pager, next, jumper" :total="pageInfo.total" @size-change="handleSizeChange"
             @current-change="handleCurrentChange" />
+
     </el-card>
 
     <!-- 抽屉：添加修改 -->
@@ -92,11 +97,10 @@
         </template>
 
         <el-form :model="form">
-
             <el-form-item label="类别" :label-width="formLabelWidth">
                 <el-select v-model="form.categoryId" placeholder="-- 请选择类别 --">
-                    <el-option v-for="cat in catInfoData" :key="cat.categoryId" :label="cat.categoryName"
-                        :value="cat.categoryName" />
+                    <el-option v-for="cat in catIdAndName" :key="cat.categoryId" :label="cat.categoryName"
+                        :value="cat.categoryId" />
                 </el-select>
             </el-form-item>
 
@@ -217,8 +221,9 @@ export default {
             pageSize: 5,    //每页显示的条数
             pageInfo: {},   //分页信息。单条数据用map（就是python中的字典），用`{}`表示空字典
 
-            tableData: [],  //表格数据。单条数据用数组（就是python中的序列），用`[]`表示空字典
-            catInfoData: [], //类别信息
+            tableData: [],  //表格数据。多条数据用数组（就是python中的序列），用`[]`表示空字典、
+            catInfoData: [], //表格的类别信息
+            catIdAndName: [], //全部类别id和名称
             queryData: [],      //查询数据
 
             form: {},           //对话框表单数据
@@ -260,17 +265,17 @@ export default {
                     ${String(date.getSeconds()).padStart(2, '0')}`;
         },
 
-        // 分页大小变化
+        // 数据量变化
         handleSizeChange(pageSize) {
-            console.log("当前页大小: ", pageSize);
             this.pageSize = pageSize;
+            console.log("当前页大小: ", this.pageSize);
             this.getPageData(this.currentPage, this.pageSize, this.searchField, this.queryStr);
         },
 
         // 页码变化
         handleCurrentChange(pageNum) {
-            console.log("当前页码: ", pageNum);
             this.currentPage = pageNum;
+            console.log("当前页码: ", this.currentPage);
             this.getPageData(this.currentPage, this.pageSize, this.searchField, this.queryStr);
         },
 
@@ -284,17 +289,24 @@ export default {
                 questionText: searchField === 'questionText' ? searchKeyword : ''
             };
 
-            // this.$http.post('/qst/v1/search?pageNum=' + num + '&pageSize=' + size, questionSearch)
-            this.$http.post('/qst/v1/search', {
-                pageNum: num,
-                pageSize: size,
-                ...questionSearch
-            })
+            console.log("请求分页参数: ", num, size, searchField, searchKeyword);
+
+            //questionSearch是查询对象， { params: { pageNum: num, pageSize: size } }是页面对象。
+            //注意：如果Controller的方法的参数前面是查询对象，后面是分页对象，顺序一定要对应，否则会报错。我这里后端是查询对象在前，分页对象在后。
+            /*  另外一种形式 
+                this.$http.post('/qst/v1/search?pageNum=' + num + '&pageSize=' + size, questionSearch)，
+                这样默认就是页面在前，查询在后。
+            */
+            this.$http.post('/qst/v1/search', questionSearch, { params: { pageNum: num, pageSize: size } })
                 .then((response) => {
                     console.log(response.data);  // 检查后端返回的数据
                     this.pageInfo = response.data;
                     this.tableData = this.pageInfo.list;
-                    this.catInfoData = this.pageInfo.categoryName;
+                    this.catInfoData = this.pageInfo.list.map(item => ({
+                        categoryId: item.categoryId,
+                        categoryName: item.categoryName,
+                    }));
+                    console.log(this.catInfoData);
                 }).catch(() => {
                     ElMessage({ message: '请求失败，请重试', type: "error" });
                 });
@@ -326,7 +338,7 @@ export default {
             this.$http.post('/qst/v1', this.form).then((response) => {
                 if (response.data == 1) {
                     ElMessage({ message: '题目信息添加成功！', type: "success" });
-                    this.getPageData(this.currentPage, this.pageSize); // 刷新数据
+                    this.getPageData(this.currentPage, this.pageSize, '', ''); // 刷新数据
                     this.dialogFormVisible = false; // 关闭对话框
                 } else {
                     ElMessage({ message: '题目信息添加失败！', type: "error" });
@@ -355,7 +367,7 @@ export default {
             this.$http.put(`/qst/v1`, this.form).then((response) => {
                 if (response.data == 1) {
                     ElMessage({ message: '更新成功', type: "success" });
-                    this.getPageData(this.currentPage, this.pageSize); // 刷新数据
+                    this.getPageData(this.currentPage, this.pageSize, '', ''); // 刷新数据
                     this.dialogFormVisible = false; // 关闭对话框
                 } else {
                     ElMessage({ message: '更新失败', type: "error" });
@@ -395,7 +407,7 @@ export default {
                 this.$http.delete(`/qst/v1/${questionId}`).then((response) => {
                     if (response.data === 1) {
                         ElMessage({ message: '删除成功', type: "success" });
-                        this.getPageData(this.currentPage, this.pageSize); // 刷新数据
+                        this.getPageData(this.currentPage, this.pageSize, '', ''); // 刷新数据
                     } else {
                         ElMessage({ message: '删除失败', type: "warning" });
                     }
@@ -417,7 +429,7 @@ export default {
                     this.$http.delete(`/qst/v1`, { data: ids }).then((response) => {
                         if (response.data > 0) {
                             ElMessage({ message: '批量删除成功', type: "success" });
-                            this.getPageData(this.currentPage, this.pageSize); // 刷新数据
+                            this.getPageData(this.currentPage, this.pageSize, '', ''); // 刷新数据
                         } else {
                             ElMessage({ message: '批量删除失败', type: "warning" });
                         }
@@ -436,40 +448,70 @@ export default {
             // 检查当前页码,如果未定义则使用默认值1
             let num = this.currentPage || 1;
             // 检查每页大小,如果未定义则使用默认值3 
-            let size = this.pageSize || 3;
+            let size = this.pageSize || 5;
 
             // 构建查询参数
             let field = '';
             let keyword = this.queryStr || '';
 
-            // 根据选择的查询字段设置field
-            switch (this.selectedField) {
-                case '1':
-                    field = 'categoryName';
-                    break;
-                case '2':
-                    field = 'questionLevel';
-                    break;
-                case '3':
-                    field = 'questionTitle';
-                    break;
-                case '4':
-                    field = 'questionText';
-                    break;
-                default:
-                    field = '';
+
+            if (this.selectedField === '1') {
+                field = 'categoryName';
+            } else if (this.selectedField === '2') {
+                field = 'questionLevel';
+                if (keyword === '入门') {
+                    keyword = 1;
+                } else if (keyword === '简单') {
+                    keyword = 2;
+                } else if (keyword === '中等') {
+                    keyword = 3;
+                } else if (keyword === '困难') {
+                    keyword = 4;
+                } else if (keyword === '极难') {
+                    keyword = 5;
+                }
+            } else if (this.selectedField === '3') {
+                field = 'questionTitle';
+                console.log(keyword);
+                console.log(field);
+            } else if (this.selectedField === '4') {
+                field = 'questionText';
+            } else {
+                field = '';
             }
+
+            // // 根据选择的查询字段设置field
+            // switch (this.selectedField) {
+            //     case '1':
+            //         field = 'categoryName';
+            //         break;
+            //     case '2':
+            //         field = 'questionLevel';
+            //         if (keyword === '入门') {
+            //             keyword = 1;
+            //         } else if (keyword === '简单') {
+            //             keyword = 2;
+            //         } else if (keyword === '中等') {
+            //             keyword = 3;
+            //         } else if (keyword === '困难') {
+            //             keyword = 4;
+            //         } else if (keyword === '极难') {
+            //             keyword = 5;
+            //         }
+            //         break;
+            //     case '3':
+            //         field = 'questionTitle';
+            //         console.log(this.keyword);
+            //         break;
+            //     case '4':
+            //         field = 'questionText';
+            //         break;
+            //     default:
+            //         field = '';
+            // }
 
             // 调用getPageData并传入所有参数
             this.getPageData(num, size, field, keyword);
-
-            // 根据选择的字段和查询内容过滤数据
-            this.tableData = this.pageInfo.list.filter(item => {
-                if (item[this.selectedField] && item[this.selectedField].includes(this.queryStr.trim())) {
-                    return true;
-                }
-                return false;
-            });
 
             // 使用 $nextTick 确保 DOM 已经更新
             this.$nextTick(() => {
@@ -477,8 +519,6 @@ export default {
                     this.$refs.pagination.setTotal(this.pageInfo.total);
                 }
             });
-
-
         },
 
         //处理多选框
@@ -489,9 +529,15 @@ export default {
     },
 
     mounted() {
+        //默认查全部数据
         this.getPageData(this.currentPage, this.pageSize, '', '');
-        // this.$http.get('/api/question/getAllQuestionType')
 
+        //在页面加载时获取所有分类，给到添加和编辑题目的分类下拉框
+        this.$http.get('/cat/v1/all').then((response) => {
+            this.catIdAndName = response.data;
+            console.log(this.catIdAndName);
+
+        });
     },
 };
 </script>
