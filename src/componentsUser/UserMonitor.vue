@@ -17,7 +17,7 @@
         <div>用户总数: {{ userTotalCount }}</div>
 
         <!-- 用户数据表格 -->
-        <el-table :data="tableData" style="width: 100%" @selection-change="handleSelectionChange">
+        <el-table :data="tableData" style="width: 100%" @selection-change="handleSelectionChange" v-loading="loading">
             <el-table-column type="selection" width="55" />
 
             <el-table-column prop="userName" label="用户名" width="120" />
@@ -76,6 +76,7 @@ import { ElMessage } from 'element-plus';
 export default {
     data() {
         return {
+            loading:true,
             dialogDetailVisible: false,
             queryStr: "",
             selectedField: "",
@@ -110,6 +111,9 @@ export default {
                 .then((response) => {
                     this.pageInfo = response.data;
                     this.tableData = response.data.records;
+                    if (response) {
+                        this.loading = false;
+                    }
                 })
                 .catch((error) => {
                     ElMessage.error('数据加载失败，请稍后重试');
