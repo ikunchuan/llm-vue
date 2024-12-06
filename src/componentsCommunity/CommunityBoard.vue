@@ -58,7 +58,7 @@
                     <el-button link type="primary" size="small" @click="openUpdateDialog(scope.row)">
                         编辑
                     </el-button>
-                    <el-button link type="primary" size="small" @click="openUserDialog(scope.row.communityId)">
+                    <el-button link type="primary" size="small" @click="fetchCommunityUsers(scope.row.communityId)">
                         所有用户
                     </el-button>
                 </template>
@@ -112,23 +112,18 @@
             </el-descriptions>
         </div>
         <template #footer>
-            <el-button @click="closeDialog">关闭</el-button>
+            <el-button @click="closeDialog(form)">关闭</el-button>
         </template>
     </el-drawer>
 
     <!-- 用户信息抽屉 -->
     <el-drawer v-model="dialogUserInfoVisible" title="用户详情" size="35%" direction="rtl">
-        <el-descriptions :column="1" border>
-                <el-descriptions-item label="用户名">{{  }}</el-descriptions-item>
-                <el-descriptions-item label="用户详情">{{  }}</el-descriptions-item>
-                <el-descriptions-item label="">{{  }}</el-descriptions-item>
-                <el-descriptions-item label="">{{  }}</el-descriptions-item>
-            </el-descriptions>
+        <el-table :data="communityUsers" style="width: 100%">
+            <el-table-column prop="userName" label="用户名" />
+            <el-table-column prop="postCount" label="发帖数量" />
+        </el-table>
     </el-drawer>
-
-
 </template>
-
 
 <script>
 import { ElMessage, ElMessageBox } from 'element-plus';
@@ -145,6 +140,9 @@ export default {
             multipleSelection: [],       //多选删除
             tableData: [],    //社区信息数据
             userData: [],        //用户信息数据
+            communityUsers: [], // 存储用户列表
+
+
             queryData: [],
             pageInfo: {},       //分页信息对象
 
@@ -168,6 +166,22 @@ export default {
         //     // this.imageUrl = response
         //     this.form.stu_image_url = response
         // },
+
+        fetchCommunityUsers(communityId) {
+            this.$http.get(`/v1/cmns/cmnpostuser/${communityId}`)
+                .then((response) => {
+                    if (response.data && response.data.length) {
+                        this.communityUsers = response.data;
+                        this.dialogUserInfoVisible = true;
+                    } else {
+                        ElMessage.warning('该社区暂无用户数据');
+                    }
+                })
+                .catch((error) => {
+                    console.error("获取用户列表失败:", error);
+                    ElMessage.error('获取用户数据失败，请稍后重试');
+                });
+        },
 
         // 处理时间格式化
         formatDate(value) {
@@ -216,7 +230,6 @@ export default {
                 });
         },
 
-
         openUserDialog(cmnid) {
             var _this = this
             this.$http.get("/ucmns/v1/ucmn/user/" + cmnid).then(function (response) {
@@ -230,16 +243,20 @@ export default {
 
         resetForm() {
             this.form = {
-                categoryId: null,
-                communityName: '',
-                communityDescription: '',
+                categoryId: null,            // 类别
+                communityName: '',           // 社区名
+                communityDescription: '',    // 社区描述
+                communityUnderview: null,    // 社区概览字段
+                createdBy: null,             // 创建者
             };
         },
 
-
-        closeDialog() {
-            this.form = []
-            console.log("closeDialog.....")
+        closeDialog(dialogType) {
+            if (dialogType === 'form') this.dialogFormVisible = false;
+            if (dialogType === 'detail') this.dialogDetailVisible = false;
+            if (dialogType === 'user') this.dialogUserInfoVisible = false;
+            this.resetForm();
+            console.log(`${dialogType} 抽屉已关闭`);
         },
 
         openDetailDialog(cmnid) {
@@ -252,75 +269,68 @@ export default {
             this.dialogDetailVisible = true;
         },
 
+        // openAddDialog() {
+        //     this.btnName = "添加";
+        //     this.title = "添加社区信息";
+        //     this.resetForm(); // 清空表单
+        //     this.dialogFormVisible = true;
+        //     console.log("openAddDialog....");
+        // }
         openAddDialog() {
             this.btnName = "添加";
             this.title = "添加社区信息";
             this.resetForm(); // 清空表单
-            this.dialogFormVisible = true;
+            this.dialogFormVisible = true; // 打开对话框
             console.log("openAddDialog....");
         },
-
-
-
-        openUpdateDialog(row) {                 //打开修改对话框,修改数据回显
-            this.btnName = "修改"
-            this.title = "修改社区信息"
-            this.dialogFormVisible = true
-            this.form = row         //得到要修改的数据,并回显到对话框的表单上
-            console.log("openUpdateDialog....");
+        
+        //打开修改对话框,修改数据回显
+        openUpdateDialog(row) {
+            this.btnName = "修改";
+            this.title = "修改社区信息";
+            this.form = { ...row }; // 深拷贝数据，防止直接修改表格数据
+            this.dialogFormVisible = true;
+        },
+        updateCmn() {
+            this.$http.put("/v1/cmns/cmn", this.form)
+                .then(response => {
+                    if (response.data === 1) {
+                        ElMessage.success("社区信息修改成功");
+                        this.dialogFormVisible = false; // 关闭对话框
+                        this.getPageData(this.currentPage, this.pageSize, '', ''); // 刷新表格数据
+                    } else {
+                        ElMessage.warning("社区信息修改失败");
+                    }
+                })
+                .catch(error => {
+                    console.error("修改失败:", error);
+                    ElMessage.error("修改社区信息失败，请稍后重试");
+                });
         },
 
-        closeDialog() {
-            this.dialogFormVisible = false;
-            this.dialogDetailVisible = false;
-            this.resetForm(); // 确保表单重置
-            this.multipleSelection = []; // 清空多选状态
-            console.log("抽屉已关闭");
-        },
-
-        updateCmn() {        //修改功能
-            console.log(this.form);
-            var _this = this;
-            // this.form.stu_interest = this.form.stu_interest.join(',')              //将数据转为字符串
-            this.$http.put("v1/cmns/cmn", this.form).then((response) => {
-                console.log(response.data);
-
-                if (response.data == 1) {
-                    ElMessage({
-                        message: '学生信息修改成功',
-                        type: 'success',
-                    })
-                } else {
-                    ElMessage({
-                        message: '学生信息修改失败',
-                        type: 'warning',
-                    })
-                }
-            })
-            this.form = []
-        },
-
-        addCmn() {           //添加功能
-            var _this = this;
+        addCmn() {           // 添加功能
             this.form.communityUnderview = 1;
             this.form.createdBy = 1;
-            this.$http.post("v1/cmns/cmn", this.form).then(function (response) {
+            this.$http.post("v1/cmns/cmn", this.form).then((response) => {
                 console.log(response.data);
                 if (response.data == 1) {
-                    ElMessage({
-                        message: '社区添加成功',
-                        type: 'success',
-                    })
-                } else {
-                    ElMessage({
-                        message: '社区添加失败',
-                        type: 'warning',
-                    })
-                }
+                    ElMessage.success('社区添加成功');
+                    // 关闭对话框
+                    this.dialogFormVisible = false;
 
-            })
-            this.form = []
+                    // 重新获取当前页数据
+                    this.getPageData(this.currentPage, this.pageSize, '', '');
+                } else {
+                    ElMessage.warning('社区添加失败');
+                }
+            }).catch((error) => {
+                console.error("添加失败:", error);
+                ElMessage.error('添加数据失败，请稍后重试');
+            });
+            // 重置表单
+            this.resetForm();
         },
+
 
 
         //--------------------------------------------------------
@@ -340,7 +350,6 @@ export default {
             this.getPageData(this.currentPage, this.pageSize, '', ''); // 刷新数据
 
         },
-
 
         singleDelete(cmnid) {
             console.log("singleDelete().....")
@@ -459,13 +468,13 @@ export default {
         this.currentPage = 1;  // 设置默认页码为1
         this.pageSize = 5;     // 设置默认每页显示3条
         this.getPageData(this.currentPage, this.pageSize, '', '');  // field和keyword传空字符串
+        
 
         this.$http.get("cat/v1/all").then((response) => {
             console.log(response.data);
             this.catIdAndName = response.data;
             console.log(this.catIdAndName)
         })
-
 
     }
 
