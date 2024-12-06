@@ -27,6 +27,8 @@
                     {{ scope.row.userSex==1?'男':'女' }}
                 </template>
             </el-table-column>
+            <el-table-column prop="userLocal" label="地区" width="120" />
+            <el-table-column prop="userAge" label="年龄" width="120" />
             <el-table-column prop="userPassword" label="密码" width="120" />
             <el-table-column prop="userPhone" label="联系方式" width="120" />
             <el-table-column prop="userEmail" label="邮箱" width="120" />
@@ -76,6 +78,14 @@
 
             <el-form-item label="性别" :label-width="formLabelWidth">
                 {{ form.userSex==1?'男':'女' }}
+            </el-form-item>
+
+            <el-form-item label="地区" :label-width="formLabelWidth">
+                <el-form-item :label="form.userLocal"></el-form-item>
+            </el-form-item>
+
+            <el-form-item label="年龄" :label-width="formLabelWidth">
+                <el-form-item :label="form.userAge"></el-form-item>
             </el-form-item>
 
             <el-form-item label="密码" :label-width="formLabelWidth">
