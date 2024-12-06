@@ -32,7 +32,7 @@
 
 
                 <!-- 表格 -->
-                <el-table :data="tableData" style="width: 100%" @selection-change="handleSelectionChange">
+                <el-table :data="tableData" style="width: 100%" @selection-change="handleSelectionChange" v-loading="loading">
                     <el-table-column fixed type="selection" width="55" />
                     <el-table-column prop="categoryId" label="类别" width="70" />
                 
@@ -137,6 +137,7 @@ import { ElMessageBox , ElMessage } from 'element-plus';
 export default {
     data() {
         return {
+            loading :true,
             activeTab: '课程信息',  // 当前选中的标签页
             queryStr: "",  // 查询字段
             courseImage: 'https://cube.elemecdn.com/0/88/03b0d39583f48206768a7534e55bcpng.png',  // 默认课程封面
@@ -240,6 +241,9 @@ export default {
                     .then(response => {
                         const data = response.data;
                         console.log(data);  // 打印返回的数据
+                        if (response) {
+                        this.loading = false;
+                    }
 
                         if (data && data.length > 0) {
                             if (data.length === 1) {

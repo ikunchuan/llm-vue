@@ -22,7 +22,7 @@
             </div>
         </template>
 
-        <el-table :data="tableData" style="width: 100%" @selection-change="handleSelectionChange">
+        <el-table :data="tableData" style="width: 100%" @selection-change="handleSelectionChange"  v-loading="loading">
             <el-table-column fixed type="selection" width="55" />
             <el-table-column prop="categoryId" label="类别" width="70" />
 
@@ -79,52 +79,7 @@
             @current-change="handleCurrentChange" />
     </el-card>
 
-    <!-- 编辑、添加对话框
-    <el-dialog v-model="dialogFormVisible" :title="title" width="500">
-        <el-form :model="form">
-            <el-form-item label="类别" :label-width="formLabelWidth">
-                <el-select v-model="form.categoryId" placeholder="请选择类别">
-                    <el-option v-for="cat in catInfoData" :key="cat.categoryId" :label="cat.catName"
-                        :value="cat.categoryId" />
-                </el-select>
-            </el-form-item>
-
-            <el-form-item label="课程名称" :label-width="formLabelWidth">
-                <el-input v-model="form.courseName" type="textarea" autocomplete="off" />
-            </el-form-item>
-
-            <el-form-item label="课程简介" :label-width="formLabelWidth">
-                <el-input v-model="form.courseDescription" type="textarea" autocomplete="off" />
-            </el-form-item>
-
-            <el-form-item label="课程难度" :label-width="formLabelWidth">
-                <el-select v-model="form.courseDifficultyLevel" placeholder="请选择难度级别">
-                    <el-option label="初级" value="初级" />
-                    <el-option label="中级" value="中级" />
-                    <el-option label="高级" value="高级" />
-                </el-select>
-            </el-form-item>
-
-            <el-form-item label="课程评分" :label-width="formLabelWidth">
-                <el-input 
-                    v-model="form.courseRating" 
-                    type="number" 
-                    :min="1" 
-                    :max="5" 
-                    step="1" 
-                    autocomplete="off" 
-                    @input="validateRating" 
-                />
-            </el-form-item>
-        </el-form>
-
-        <template #footer>
-            <div class="dialog-footer">
-                <el-button type="primary" @click="btnAddUpdate">{{ btnName }}</el-button>
-                <el-button @click="dialogFormVisible = false">取消</el-button>
-            </div>
-        </template>
-    </el-dialog> -->
+ 
     <el-drawer v-model="dialogFormVisible" :title="title" size="40%" direction="rtl">
         <el-form :model="form" label-width="150px">
             <!-- <el-form-item label="类别">
@@ -216,6 +171,7 @@ import { ElMessage, ElMessageBox } from 'element-plus';
 export default {
     data() {
         return {
+            loading:true,
             name: '课程信息',
             queryStr: "",
             selectedField: "",  // 选择的查询字段
@@ -242,52 +198,7 @@ export default {
         };
     },
     methods: {
-        // handleSizeChange(pageSize) {
-        //     console.log("当前页大小: ", pageSize);
-        //     this.pageSize = pageSize;
-        //     this.getPageData(this.currentPage, this.pageSize);
-        // },
-
-        // handleCurrentChange(pageNum) {
-        //     console.log("当前页码: ", pageNum);
-        //     this.currentPage = pageNum;
-        //     this.getPageData(this.currentPage, this.pageSize);
-        // },
-
-        // getPageData(num, size) {
-        //     this.$http.get('/crs/v1/page', { params: { pageNum: num, pageSize: size } })
-        //         .then((response) => {
-        //             console.log(response.data);
-        //             this.pageInfo = response.data;
-        //             this.tableData = this.pageInfo.records;
-        //         });
-        // },
-        // queryInfo() {
-        //     if (this.queryStr.trim().length > 0) {
-        //         this.tableData = this.pageInfo.records.filter(item =>
-        //             item.courseName && item.courseName.match(this.queryStr.trim())
-        //         );
-        //     } else {
-        //         this.tableData = this.pageInfo.records;// 恢复原数据
-        //     }
-        // },
-        //         // 查询方法，根据选择的字段和输入的查询内容进行查询
-        //         queryInfo() {
-        //     // 如果选择了查询字段和输入了查询条件
-        //     if (this.queryStr.trim().length > 0 && this.selectedField) {
-        //         this.tableData = this.pageInfo.records.filter(item => {
-        //             // 根据选择的字段进行匹配
-        //             if (item[this.selectedField] && item[this.selectedField].includes(this.queryStr.trim())) {
-        //                 return true;  // 匹配成功
-        //             }
-        //             return false;  // 不匹配
-        //         });
-        //     } else {
-        //         // 如果没有选择字段或者没有输入查询内容，恢复原数据
-        //         this.tableData = this.pageInfo.records;
-        //     }
-        // },
-
+  
         handleSizeChange(pageSize) {
             this.pageSize = pageSize;
             this.getPageData(this.currentPage, this.pageSize);
@@ -303,6 +214,10 @@ export default {
                 .then((response) => {
                     this.pageInfo = response.data;
                     this.tableData = this.pageInfo.records;
+                    if (response) {
+                        this.loading = false;
+                    }
+
                 });
         },
 

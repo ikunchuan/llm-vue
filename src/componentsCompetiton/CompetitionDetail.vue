@@ -54,9 +54,9 @@
             
             <el-table-column fixed="right" label="操作" min-width="180">
                 <template #default="scope">
-                    <el-button link size="small" type="primary"@click="openDetailDialog(scope.row.competitionId)">详情</el-button>
-                    <el-button link size="small" type="primary"@click="singleDelete(scope.row.competitionId)">删除</el-button>
-                    <el-button link size="small" type="primary"@click="openUpdateDialog(scope.row)">编辑</el-button>
+                    <el-button link size="small" type="primary" @click="openDetailDialog(scope.row.competitionId)">详情</el-button>
+                    <el-button link size="small" type="primary" @click="singleDelete(scope.row.competitionId)">删除</el-button>
+                    <el-button link size="small" type="primary" @click="openUpdateDialog(scope.row)">编辑</el-button>
                 </template>
             </el-table-column>
         </el-table>

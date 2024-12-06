@@ -16,7 +16,7 @@
             </div>
         </template>
 
-        <el-table :data="tableData" style="width: 100%" @selection-change="handleSelectionChange">
+        <el-table :data="tableData" style="width: 100%" @selection-change="handleSelectionChange"  v-loading="loading">
             <el-table-column fixed type="selection" width="55" />
             
             <el-table-column prop="competitionName" label="竞赛名称" width="120" />
@@ -41,9 +41,9 @@
             </el-table-column>
             <el-table-column  fixed="right" label="操作" min-width="180">
                 <template #default="scope">
-                    <el-button link size="small" type="primary"@click="openDetailDialog(scope.row.competitionId)">详情</el-button>
-                    <el-button link size="small" type="primary"@click="singleDelete(scope.row.competitionId)">删除</el-button>
-                    <el-button link size="small" type="primary"@click="openUpdateDialog(scope.row)">编辑</el-button>
+                    <el-button link size="small" type="primary" @click="openDetailDialog(scope.row.competitionId)">详情</el-button>
+                    <el-button link size="small" type="primary" @click="singleDelete(scope.row.competitionId)">删除</el-button>
+                    <el-button link size="small" type="primary" @click="openUpdateDialog(scope.row)">编辑</el-button>
                 </template>
             </el-table-column>
         </el-table>
@@ -159,6 +159,7 @@ import { ElMessage, ElMessageBox } from 'element-plus';
 export default {
     data() {
         return {
+            // loading :true,
             name: '竞赛信息',
             queryStr: "",
 
@@ -241,12 +242,17 @@ export default {
                     ElMessage({ message: '竞赛信息添加成功！', type: "success" });
                     this.getPageData(this.currentPage, this.pageSize); // 刷新数据
                     this.dialogFormVisible = false; // 关闭对话框
+                   
+
                 } else {
                     ElMessage({ message: '信息添加失败！', type: "error" });
                 }
-            }).catch((err) => {
+            }
+            
+            ).catch((err) => {
                 ElMessage({ message: '请求失败，请重试', type: "error" });
             });
+           
         },
 
         // 打开编辑对话框
