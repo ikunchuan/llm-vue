@@ -81,7 +81,7 @@
     <el-drawer v-model="dialogFormVisible" :title="title" size="35%" direction="rtl">
         <el-form :model="form" label-width="120px">
             <el-form-item label="类别">
-                <el-select v-model="form.categoryName" placeholder="--请选择类别--">
+                <el-select v-model="form.categoryId" placeholder="--请选择类别--">
                     <el-option v-for="cat in catIdAndName" :key="cat.categoryId" :label="cat.categoryName" :value="cat.categoryId" />
                 </el-select>
             </el-form-item>
