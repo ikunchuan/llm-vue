@@ -164,6 +164,13 @@
         <el-descriptions :column="1" :size="size" border>
             <el-descriptions-item>
                 <template #label>
+                    <div class="cell-item">题目类别</div>
+                </template>
+                <div class="question-detail-text">{{ isCorrectId() }}</div>
+            </el-descriptions-item>
+
+            <el-descriptions-item>
+                <template #label>
                     <div class="cell-item">题目内容</div>
                 </template>
                 <div class="question-detail-text">{{ form.questionText }}</div>
@@ -241,6 +248,10 @@ export default {
     },
 
     methods: {
+        isCorrectId() {
+            return this.catIdAndName.filter(item => item.categoryId === this.form.categoryId)[0].categoryName
+        },
+
         //处理难度分级
         formatLevel(questionLevel) {
             if (questionLevel == 1) {
@@ -485,36 +496,6 @@ export default {
                 field = '';
             }
 
-            // // 根据选择的查询字段设置field
-            // switch (this.selectedField) {
-            //     case '1':
-            //         field = 'categoryName';
-            //         break;
-            //     case '2':
-            //         field = 'questionLevel';
-            //         if (keyword === '入门') {
-            //             keyword = 1;
-            //         } else if (keyword === '简单') {
-            //             keyword = 2;
-            //         } else if (keyword === '中等') {
-            //             keyword = 3;
-            //         } else if (keyword === '困难') {
-            //             keyword = 4;
-            //         } else if (keyword === '极难') {
-            //             keyword = 5;
-            //         }
-            //         break;
-            //     case '3':
-            //         field = 'questionTitle';
-            //         console.log(this.keyword);
-            //         break;
-            //     case '4':
-            //         field = 'questionText';
-            //         break;
-            //     default:
-            //         field = '';
-            // }
-
             // 调用getPageData并传入所有参数
             this.getPageData(num, size, field, keyword);
 
@@ -541,7 +522,6 @@ export default {
         this.$http.get('/cat/v1/all').then((response) => {
             this.catIdAndName = response.data;
             console.log(this.catIdAndName);
-
         });
     },
 };
