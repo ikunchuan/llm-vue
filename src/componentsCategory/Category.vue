@@ -76,65 +76,78 @@
             @current-change="handleCurrentChange" />
     </el-card>
 
-    <!-- <transition name="el-fade-in-linear"> -->
-    <!-- 子类别卡片 -->
-    <el-drawer v-model="childCardVisible" :direction="direction" size="35%">
-        <template default>
-            <!-- 标题 -->
-            <div slot="header" class="card-header">{{ childName }}</div><br>
-            <!-- 功能按钮 -->
-            <el-button type="primary" @click="queryInfo">查询</el-button>
-            <el-button class="button" type="success" @click="openAddDialog">添加</el-button>
-            <el-button class="button" type="warning" @click="multipleDelete">多选删除</el-button>
-        </template>
+    <transition name="el-fade-in-linear">
+        <!-- 子类别卡片 -->
+        <el-card class="card" v-if="childCardVisible">
+            <template #header>
+                <!-- 标题 -->
+                <div slot="header" class="card-header">{{ childName }}</div>
+                <el-button type="text" @click="closeChildCard">关闭</el-button>
+                <!-- 搜索框 -->
+                <div class="header-actions">
+                    <!-- 选择查询字段 -->
+                    <el-select v-model="selectedField" placeholder="选择查询字段" style="width: 180px;" clearable>
+                        <el-option label="类别名称" value="1" />
+                        <el-option label="类别描述" value="2" />
+                    </el-select>&nbsp;
 
-        <el-table :data="childInfoData" style="width: 100%" @selection-change="handleSelectionChange"
-            v-loading="loading">
-            <el-table-column fixed type="selection" width="55" />
-            <el-table-column fixed type="index" label="序号" width="55" />
+                    <!-- 输入框 -->
+                    <el-input v-model="queryStr" style="width: 220px" placeholder="请输入查询内容" clearable />&nbsp;
 
-            <el-table-column prop="sortOrder" label="类别排序" width="100">
-                <template #default="scope">
-                    <span class="truncate-text">{{ scope.row.sortOrder }}</span>
-                </template>
-            </el-table-column>
+                    <!-- 功能按钮 -->
+                    <el-button type="primary" @click="queryInfo">查询</el-button>
+                    <el-button class="button" type="success" @click="openAddDialog">添加</el-button>
+                    <el-button class="button" type="warning" @click="multipleDelete">多选删除</el-button>
+                </div>
+            </template>
 
-            <el-table-column prop="categoryName" label="类别名称" width="120">
-                <template #default="scope">
-                    <span class="truncate-text">{{ scope.row.categoryName }}</span>
-                </template>
-            </el-table-column>
+            <template>
+                <!-- 标题 -->
+                <div slot="header" class="card-header">{{ childName }}</div><br>
+                <!-- 功能按钮 -->
+                <el-button type="primary" @click="queryInfo">查询</el-button>
+                <el-button class="button" type="success" @click="openAddDialog">添加</el-button>
+                <el-button class="button" type="warning" @click="multipleDelete">多选删除</el-button>
+            </template>
 
-            <el-table-column prop="description" label="类别描述" width="200">
-                <template #default="scope">
-                    <span class="truncate-text">{{ scope.row.description }}</span>
-                </template>
-            </el-table-column>
+            <el-table :data="childInfoData" style="width: 100%" @selection-change="handleSelectionChange"
+                v-loading="c_loading">
+                <el-table-column fixed type="selection" width="55" />
+                <el-table-column fixed type="index" label="序号" width="55" />
 
-            <el-table-column prop="updatedTime" label="更新时间" width="200">
-                <template v-slot:default="{ row }">
-                    <span>{{ formatDate(row.updatedTime) }}</span>
-                </template>
-            </el-table-column>
+                <el-table-column prop="sortOrder" label="类别排序" width="100">
+                    <template #default="scope">
+                        <span class="truncate-text">{{ scope.row.sortOrder }}</span>
+                    </template>
+                </el-table-column>
 
-            <el-table-column prop="createdTime" label="创建时间" width="200">
-                <template v-slot:default="{ row }">
-                    <span>{{ formatDate(row.createdTime) }}</span>
-                </template>
-            </el-table-column>
+                <el-table-column prop="categoryName" label="类别名称" width="120">
+                    <template #default="scope">
+                        <span class="truncate-text">{{ scope.row.categoryName }}</span>
+                    </template>
+                </el-table-column>
 
-            <el-table-column fixed="right" label="操作" min-width="500">
-                <template #default="scope">
-                    <el-button link size="small" type="primary"
-                        @click="openDetailDialog(scope.row.categoryId)">详情</el-button>
-                    <el-button link size="small" type="primary"
-                        @click="singleDelete(scope.row.categoryId)">删除</el-button>
-                    <el-button link size="small" type="primary" @click="openUpdateDialog(scope.row)">编辑</el-button>
-                </template>
-            </el-table-column>
-        </el-table>
-    </el-drawer>
-    <!-- </transition> -->
+                <el-table-column prop="description" label="类别描述" width="200">
+                    <template #default="scope">
+                        <span class="truncate-text">{{ scope.row.description }}</span>
+                    </template>
+                </el-table-column>
+
+                <el-table-column prop="updatedTime" label="更新时间" width="200">
+                    <template v-slot:default="{ row }">
+                        <span>{{ formatDate(row.updatedTime) }}</span>
+                    </template>
+                </el-table-column>
+
+                <el-table-column prop="createdTime" label="创建时间" width="200">
+                    <template v-slot:default="{ row }">
+                        <span>{{ formatDate(row.createdTime) }}</span>
+                    </template>
+                </el-table-column>
+            </el-table>
+
+        </el-card>
+    </transition>
 
     <!-- 抽屉：添加修改 -->
     <el-drawer v-model="dialogFormVisible" :direction="direction" size="35%">
@@ -164,7 +177,6 @@
         </template>
     </el-drawer>
 
-
     <!-- 抽屉：详情-->
     <el-drawer v-model="dialogDetailVisible" :direction="direction" size="35%">
         <el-descriptions class="margin-top" title="类别详情信息" :column="1" :size="size" border>
@@ -192,9 +204,7 @@
                 </template>
                 <div class="question-detail-text">{{ form.description }}</div>
             </el-descriptions-item>
-        </el-descriptions><br>
 
-        <el-descriptions class="margin-top" :column="2" :size="size" border>
             <el-descriptions-item>
                 <template #label>
                     <div class="cell-item">更新时间</div>
@@ -226,7 +236,7 @@ export default {
     data() {
         return {
             name: '类别管理', //主体标题
-            childName: '二级类别信息', //子标题
+            childName: '', //子标题
             queryStr: "",  //查询条件
             selectedField: "",  //选择字段
 
@@ -244,6 +254,7 @@ export default {
             formLabelWidth: '150px',
 
             loading: true,
+            c_loading: true,
             childCardVisible: false,
             dialogFormVisible: false,
             dialogDetailVisible: false,
@@ -254,7 +265,17 @@ export default {
         };
     },
 
+    watch: {
+        currentPage: 'fetchData',
+        pageSize: 'fetchData',
+        queryStr: 'fetchData',
+        selectedField: 'fetchData'
+    },
+
     methods: {
+        fetchData() {
+            this.getPageData(this.currentPage, this.pageSize, this.selectedField, this.queryStr);
+        },
         // 处理时间格式化
         formatDate(value) {
             if (!value) return '-';
@@ -292,16 +313,16 @@ export default {
 
             console.log("请求分页参数: ", num, size, searchField, searchKeyword);
 
+            this.loading = true;
             this.$http.post('/cat/v1/search', categorySearch, { params: { pageNum: num, pageSize: size } })
                 .then((response) => {
                     console.log(response.data);  // 检查后端返回的数据
                     this.pageInfo = response.data;
                     this.tableData = this.pageInfo.list;
-                    if (response) {
-                        this.loading = false;
-                    }
                 }).catch(() => {
                     ElMessage({ message: '请求失败，请重试', type: "error" });
+                }).finally(() => {
+                    this.loading = false;
                 });
         },
 
@@ -384,19 +405,24 @@ export default {
         },
 
         openChildCard(categoryId) {
-            this.$http.get(`/cat/v1/all`).then((response) => {
-                this.childCardData = response.data;
-                this.childCardData.forEach(element => {
-                    if (element.id == categoryId) {
-                        this.childCardTitle = element.name;
-                    }
-                });
+            this.childCardVisible = true; // 显示子类别卡片
+            this.c_loading = true;
+            this.$http.get(`/cat/v1/subcategories/${categoryId}`).then((response) => {
+                console.log(response.data);
+                this.childInfoData = response.data.slice(1);
+
+                this.childName = "子类别 - " + categoryName; // 设置子类别名称
+                this.c_loading = false;
             }).catch(() => {
-                ElMessage({ message: '请求失败，请重试', type: "error" });
+                ElMessage({ message: '没有子类别，请选择其他类别', type: "warning" });
+                this.c_loading = false;
             });
-            this.childCardVisible = !this.childCardVisible; // 切换布尔值
         },
 
+        //关闭子类别
+        closeChildCard() {
+            this.childCardVisible = false;
+        },
         //关闭抽屉
         closeDrawer() {
             this.dialogDetailVisible = false;
