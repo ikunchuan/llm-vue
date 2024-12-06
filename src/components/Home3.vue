@@ -11,17 +11,15 @@
               <el-icon>
                 <location />
               </el-icon>
-              <span class="menu-title">用户管理</span>
+              <span class="menu-title">系统设置</span>
             </template>
             <el-menu-item index="1-1">
-              <RouterLink to="/home/userList">用户基本信息管理</RouterLink>
+              <RouterLink to="/home3/permissions" :style="{ color: '#98c6f6' }">管理员权限设置</RouterLink>
             </el-menu-item>
             <el-menu-item index="1-2">
-              <RouterLink to="/home/userMonitor">用户行为监控管理</RouterLink>
+              <RouterLink to="/home3/parameterSetting" :style="{ color: '#98c6f6' }">系统参数设置</RouterLink>
             </el-menu-item>
-            <el-menu-item index="1-3">
-              <RouterLink to="/home/userViolation">违规用户处理</RouterLink>
-            </el-menu-item>
+
           </el-sub-menu>
 
           <el-sub-menu index="2">
@@ -29,60 +27,18 @@
               <el-icon>
                 <location />
               </el-icon>
-              <span class="menu-title">竞赛中心管理</span>
+              <span class="menu-title">日志管理</span>
             </template>
             <el-menu-item index="2-1">
-              <RouterLink to="/home/competitionInfo">竞赛信息管理</RouterLink>
+              <RouterLink to="/home3/loginJournal" :style="{ color: '#98c6f6' }">登录日志管理</RouterLink>
             </el-menu-item>
             <el-menu-item index="2-2">
-              <RouterLink to="/home/competitionDetail">竞赛详情管理</RouterLink>
+              <RouterLink to="/home3/operateJournal" :style="{ color: '#98c6f6' }">操作日志管理</RouterLink>
             </el-menu-item>
-            <el-menu-item index="2-3">
-              <RouterLink to="/home/category">类别管理</RouterLink>
-            </el-menu-item>
+    
           </el-sub-menu>
 
-          <el-sub-menu index="3">
-            <template #title>
-              <el-icon>
-                <location />
-              </el-icon>
-              <span class="menu-title">资源中心</span>
-            </template>
-            <el-menu-item index="3-1">
-              <RouterLink to="/home/courseInfo">课程信息管理</RouterLink>
-            </el-menu-item>
-            <el-menu-item index="3-2">
-              <RouterLink to="/home/courseDetail">课程详细内容管理</RouterLink>
-            </el-menu-item>
-            <el-menu-item index="3-3">
-              <RouterLink to="/home/questionInfo">题目信息管理</RouterLink>
-            </el-menu-item>
-            <!-- <el-menu-item index="3-4">
-                <RouterLink to="/home/questionDifficulty">题目难度管理</RouterLink>
-              </el-menu-item> -->
-          </el-sub-menu>
 
-          <el-sub-menu index="4">
-            <template #title>
-              <el-icon>
-                <location />
-              </el-icon>
-              <span class="menu-title">社区管理</span>
-            </template>
-            <el-menu-item index="4-1">
-              <RouterLink to="/home/communityUser">社区用户管理</RouterLink>
-            </el-menu-item>
-            <el-menu-item index="4-2">
-              <RouterLink to="/home/communityBoard">社区板块管理</RouterLink>
-            </el-menu-item>
-            <el-menu-item index="4-3">
-              <RouterLink to="/home/communityContent">社区内容管理</RouterLink>
-            </el-menu-item>
-            <el-menu-item index="4-4">
-              <RouterLink to="/home/communityAudit">社区审核管理</RouterLink>
-            </el-menu-item>
-          </el-sub-menu>
         </el-menu>
       </el-aside>
 
@@ -99,9 +55,15 @@
               </el-breadcrumb-item>
             </el-breadcrumb>
           </div>
-
-
           <div class="header-right">
+    <el-badge :value="5" class="icon">
+      <el-icon class="el-icon-bell" @click="handleNotification" />
+    </el-badge>
+    <el-icon class="el-icon-setting icon" @click="handleSettings" />
+    <el-icon class="el-icon-user icon" @click="handleProfile" />
+  </div>
+
+          <!-- <div class="header-right">
             <el-dropdown class="icon-dropdown">
               <el-button class="icon-button" icon="el-icon-bell" @click="handleNotification">
                 <span class="badge">5</span>
@@ -114,7 +76,7 @@
             </el-dropdown>
             <el-button class="icon-button" icon="el-icon-setting" @click="handleSettings"></el-button>
             <el-button class="icon-button" icon="el-icon-user" @click="handleProfile"></el-button>
-          </div>
+          </div> -->
         </el-header>
 
 
@@ -169,20 +131,11 @@ export default {
     getBreadcrumbName(path) {
       // 根据路由的路径来返回对应的面包屑名称
       const names = {
-        'userList': '用户基本信息管理',
-        'userMonitor': '用户行为监控管理',
-        'userViolation': '违规用户处理',
-        'competitionInfo': '竞赛信息管理',
-        'category1': '类别一级分类管理',
-        'category2': '类别二级分类管理',
-        'courseInfo': '课程信息管理',
-        'courseDetail': '课程详细内容管理',
-        'questionInfo': '题目信息管理',
-        // 'questionDifficulty': '题目难度管理',
-        'communityUser': '社区用户管理',
-        'communityBoard': '社区板块管理',
-        'communityContent': '社区内容管理',
-        'communityAudit': '社区审核管理'
+        'parameterSetting': '管理员权限设置',
+        'Permissions': '系统参数设置',
+        'loginJournal': '登录日志管理',
+        'OperateJournal': '操作日志管理',
+  
       };
       return names[path] || path;
     }, // 如果没有找到对应的名称，返回路径本身
@@ -220,7 +173,7 @@ body {
 .sidebar {
   background: linear-gradient(180deg, #0a1f44 0%, #2e3c56 100%);
   box-shadow: 2px 0 10px rgba(0, 0, 0, 0.2);
-  border-radius: 0 10px 10px 0;
+  border-radius: 0 0px 0px 0;
   padding-top: 20px;
   position: relative;
 }
@@ -250,17 +203,17 @@ body {
 }
 
 .el-menu-item.is-active {
-  background-color: #ffd04b;
+  background-color: #ffffff;
   color: #fff;
 }
 
 /* Content Container */
 .content-container {
   background-color: #ffffff;
-  border-radius: 10px;
+  border-radius: 0px;
   padding: 0px;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
-  margin-top: 20px;
+  margin-top: 0px;
 }
 
 /* Header */
@@ -273,6 +226,7 @@ body {
   /* 更深的背景颜色 */
   padding: 10 px 24px;
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  margin-top: 0px;
 
 }
 
@@ -326,7 +280,7 @@ body {
 }
 
 .footer a:hover {
-  color: #ffd04b;
+  color: #fffcf4;
 }
 
 /* Breadcrumb Positioning */

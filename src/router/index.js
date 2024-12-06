@@ -32,6 +32,15 @@ import CommunityContent from "../componentsCommunity/CommunityContent.vue"; // �
 import CommunityAudit from "../componentsCommunity/CommunityAudit.vue"; // 社区审核管理
 
 
+import LoginJournal from "../componentsSetting/LoginJournal.vue"; 
+import OperateJournal from "../componentsSetting/OperateJournal.vue"; 
+import ParameterSetting from "../componentsSetting/ParameterSetting.vue"; 
+import Permissions from "../componentsSetting/Permissions.vue"; 
+
+
+
+
+
 const routes = [
   { path: "/", redirect: "/main" }, // 默认重定向到主页面
   {
@@ -99,19 +108,12 @@ const routes = [
     name: "home3",
     component: Home3, // 主页面3
     children: [
-      { path: "userList", component: UserList },
-      { path: "userMonitor", component: UserMonitor },
-      { path: "userViolation", component: UserViolation },
-      { path: "competitionInfo", component: CompetitionInfo },
-      { path: "competitionDetail", component: CompetitionDetail },
-      { path: "category", component: Category },
-      { path: "courseInfo", component: CourseInfo },
-      { path: "courseDetail", component: CourseDetail },
-      { path: "questionInfo", component: QuestionInfo },
-
-      { path: "communityBoard", component: CommunityBoard },
-      { path: "communityContent", component: CommunityContent },
-      { path: "communityAudit", component: CommunityAudit },
+      { path: "loginJournal", component: LoginJournal },
+      { path: "operateJournal", component: OperateJournal },
+      { path: "parameterSetting", component: ParameterSetting },
+      { path: "permissions", component: Permissions },
+     
+   
     ],
   },
 ];
