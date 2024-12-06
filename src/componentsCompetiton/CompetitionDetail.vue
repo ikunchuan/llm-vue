@@ -3,7 +3,7 @@
         <template #header>
             <div slot="header" class="card-header">{{ name }}</div><br>
             <div class="header-actions">
-                <el-input v-model="queryStr" style="width: 220px" placeholder="请输入题目标题" />&nbsp;
+                <el-input v-model="queryStr" style="width: 220px" placeholder="请输入竞赛名称" />&nbsp;
                 <el-button type="primary" @click="queryInfo">查询</el-button>
                 <el-button class="button" type="success" @click="openAddDialog">添加</el-button>
                 <el-button class="button" type="warning" @click="multipleDelete">多选删除</el-button>
@@ -25,8 +25,15 @@
                     <span>{{ formatDate(row.endDate) }}</span>
                 </template>
             </el-table-column>
-            <el-table-column prop="competitionUrl" label="竞赛官方网站链接" width="150" />
+
+            <el-table-column label="竞赛官方网站链接" width="150" >
+            <template #default="{ row }">
+                <a :href="row.competitionUrl" target="_blank" rel="noopener noreferrer">{{ row.competitionUrl }}</a>
+            </template>
+            </el-table-column>
+
             <el-table-column prop="competitionSchedule"  label="竞赛日程安排" width="120" />
+
             <el-table-column prop="registrationDeadline" label="报名截止日期" width="180" >
                 <template #default="{ row }">
                     <span>{{ formatDate(row.registrationDeadline) }}</span>
@@ -38,16 +45,18 @@
                     <span>{{ formatDate(row.updatedTime) }}</span>
                 </template>
             </el-table-column>
+
             <el-table-column prop="createdTime" label="创建时间" width="200">
                 <template #default="{ row }">
                     <span>{{ formatDate(row.createdTime) }}</span>
                 </template>
             </el-table-column>
+            
             <el-table-column fixed="right" label="操作" min-width="180">
                 <template #default="scope">
-                    <el-button link size="small" @click="openDetailDialog(scope.row.competitionId)">详情</el-button>
-                    <el-button link size="small" @click="singleDelete(scope.row.competitionId)">删除</el-button>
-                    <el-button link size="small" @click="openUpdateDialog(scope.row)">编辑</el-button>
+                    <el-button link size="small" type="primary"@click="openDetailDialog(scope.row.competitionId)">详情</el-button>
+                    <el-button link size="small" type="primary"@click="singleDelete(scope.row.competitionId)">删除</el-button>
+                    <el-button link size="small" type="primary"@click="openUpdateDialog(scope.row)">编辑</el-button>
                 </template>
             </el-table-column>
         </el-table>
@@ -138,7 +147,7 @@
             <el-descriptions-item label="竞赛主办方">{{ form.competitionOrganizer }}</el-descriptions-item>
             <el-descriptions-item label="竞赛开始日期">{{ form.startDate }}</el-descriptions-item>
             <el-descriptions-item label="竞赛结束日期">{{ form.endDate }}</el-descriptions-item>
-            <el-descriptions-item label="竞赛官方网站链接"> <a :href="form.competitionImgUrl" target="_blank">{{ form.competitionUrl }}</a></el-descriptions-item>
+            <el-descriptions-item label="竞赛官方网站链接"> <a :href="form.competitionUrl" target="_blank">{{ form.competitionUrl }}</a></el-descriptions-item>
             <el-descriptions-item label="竞赛日程安排">{{ form.competitionSchedule }}</el-descriptions-item>
             <el-descriptions-item label="报名截止日期">{{ form.registrationDeadline }}</el-descriptions-item>
         </el-descriptions>
@@ -392,5 +401,9 @@ export default {
     <style scoped>
     .el-descriptions {
     margin-top: 20px;
+    }
+    .drawer-footer {
+    text-align: right;
+    padding: 10px;
     }
     </style>
