@@ -13,7 +13,7 @@
         <el-form :model="loginForm" status-icon :rules="formRules" ref="loginForm">
           <!-- 用户名 -->
           <el-form-item prop="userName" style="margin-bottom: 20px;">
-          
+
             <div contenteditable="true" :text-content="loginForm.userName" @input="updateUserName" placeholder="请输入用户名"
               class="editable-input" style="padding: 10px 20px; font-size: 16px; width: 100%; outline: none; 
             text-align: left;">
@@ -24,15 +24,15 @@
 
           <!-- 密码 -->
           <el-form-item prop="password" style="margin-bottom: 30px;">
-              <div contenteditable="true" :text-content="loginForm.password" @input="updatePassword" placeholder="请输入密码"
+            <div contenteditable="true" :text-content="loginForm.password" @input="updatePassword" placeholder="请输入密码"
               class="editable-input" style="padding: 10px 20px; font-size: 16px; width: 100%; outline: none; 
             text-align: left;">
             </div>
 
-          
+
 
           </el-form-item>
-          
+
           <!-- 记住我 -->
           <el-form-item style="text-align: left;">
             <el-checkbox v-model="loginForm.rememberMe">记住我</el-checkbox>
@@ -86,6 +86,8 @@ export default {
         const response = await axios.post('http://localhost:10086/admin/user/login', this.loginForm);
         if (response.data.code === 200) {
           this.$message.success('登录成功');
+          // 将用户名存储在本地存储中
+          localStorage.setItem('userName', response.data.message);
           // 登录成功后跳转到首页或用户主页
           this.$router.push('/home');
         } else {

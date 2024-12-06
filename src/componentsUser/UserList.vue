@@ -18,7 +18,7 @@
 
         </template>
 
-        <el-table :data="tableData" style="width: 100%" @selection-change="handleSelectionChange">
+        <el-table :data="tableData" style="width: 100%" @selection-change="handleSelectionChange" v-loading="loading">
             <el-table-column type="selection" width="55" />
 
             <el-table-column prop="userName" label="用户名" width="120" />
@@ -135,6 +135,7 @@ export default {
     data() {
         return {
             // cmnsInfoData:[],
+            loading:true,
             dialogDetailVisible: false,   //详细对话框
 
             name: '用户信息',
@@ -188,7 +189,11 @@ export default {
                     console.log(response.data);
                     this.pageInfo = response.data;
                     this.tableData = this.pageInfo.records;
+                    if (response) {
+                        this.loading = false;
+                    }
                 });
+                
         },
 
 

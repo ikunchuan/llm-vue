@@ -147,7 +147,7 @@
           
           </div> -->
 
-
+          <span class="user-name">{{ userName }}</span>
 
 
         </el-header>
@@ -167,8 +167,9 @@
 <script>
 export default {
   data() {
-    return {};
-    userAdminInfoData: { };
+    return {
+      userName: localStorage.getItem('userName') || '',    // 从本地存储中获取用户名
+    };
   },
   computed: {
     breadcrumbs() {
@@ -232,7 +233,9 @@ export default {
     // 路由变化时更新面包屑
     '$route': 'updateBreadcrumbs'
   },
+  mounted(){
 
+  }
 };
 </script>
 
