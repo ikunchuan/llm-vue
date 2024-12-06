@@ -178,21 +178,47 @@ export default {
             //         });
             // },
             
+            // fetchChapters() {
+            // this.loading = true;
+            // const params = { courseName: this.courseInfo };
+            // this.$http.post('crs/search/chapter', params)
+            //     .then(response => {
+            //     this.chapters = response.data;
+            //     })
+            //     .catch(error => {
+            //     console.error('Error fetching chapters:', error);
+            //     ElMessage({ message: '章节加载失败，请重试', type: 'error' });
+            //     })
+            //     .finally(() => {
+            //     this.loading = false;
+            //     });
+            // },
             fetchChapters() {
-            this.loading = true;
-            const params = { courseName: this.courseInfo };
-            axios.post('http://localhost:8080/crs/search/chapter', params)
-                .then(response => {
-                this.chapters = response.data;
-                })
-                .catch(error => {
-                console.error('Error fetching chapters:', error);
-                ElMessage({ message: '章节加载失败，请重试', type: 'error' });
-                })
-                .finally(() => {
-                this.loading = false;
-                });
+                if (!this.courseInfo) {
+                    ElMessage({ message: '请输入课程名称进行查询', type: 'warning' });
+                    return;
+                }
+                this.loading = true;
+                const params = { courseName: this.courseInfo }; // 使用课程名称查询
+                this.$http.post('/crs/search/chapter', params)``
+                    .then(response => {
+                        if (response.data && response.data.length > 0) {
+                            this.chapters = response.data; // 绑定章节数据
+                            ElMessage({ message: '章节信息加载成功', type: 'success' });
+                        } else {
+                            this.chapters = [];
+                            ElMessage({ message: '未找到相关章节信息', type: 'warning' });
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error fetching chapters:', error);
+                        ElMessage({ message: '章节加载失败，请重试', type: 'error' });
+                    })
+                    .finally(() => {
+                        this.loading = false;
+                    });
             },
+
 
             //用于课程内容管理的类别匹配
             isCorrectId() {
