@@ -79,7 +79,7 @@
             @current-change="handleCurrentChange" />
     </el-card>
 
-    <!-- 编辑、添加对话框 -->
+    <!-- 编辑、添加对话框
     <el-dialog v-model="dialogFormVisible" :title="title" width="500">
         <el-form :model="form">
             <el-form-item label="类别" :label-width="formLabelWidth">
@@ -124,50 +124,90 @@
                 <el-button @click="dialogFormVisible = false">取消</el-button>
             </div>
         </template>
-    </el-dialog>
-
-    <!-- 详情对话框 -->
-    <el-dialog v-model="dialogDetailVisible" title="课程信息详情" width="500">
-        <el-form :model="form">
-            <!-- <el-form-item label="课程名称：" :label-width="formLabelWidth">
-                <el-form-item :label="form.courseName" />
-            </el-form-item>
-
-            <el-form-item label="课程简介：" :label-width="formLabelWidth">
-                <el-form-item :label="form.courseDescription" />
+    </el-dialog> -->
+    <el-drawer v-model="dialogFormVisible" :title="title" size="40%" direction="rtl">
+        <el-form :model="form" label-width="150px">
+            <!-- <el-form-item label="类别">
+                <el-select v-model="form.categoryId" placeholder="请选择类别">
+                    <el-option v-for="cat in catInfoData" :key="cat.categoryId" :label="cat.catName" :value="cat.categoryId" />
+                </el-select>
             </el-form-item> -->
 
-            <el-form-item label="课程名称：" :label-width="formLabelWidth">
-                <div class="course-detail-text">{{ form.courseName }}</div>
+            <el-form-item label="类别" :label-width="formLabelWidth">
+                <el-select v-model="form.categoryId" placeholder="-- 请选择类别 --">
+                    <el-option v-for="cat in catIdAndName" :key="cat.categoryId" :label="cat.categoryName"
+                        :value="cat.categoryId" />
+                </el-select>
             </el-form-item>
 
-            <el-form-item label="课程简介：" :label-width="formLabelWidth">
-                <div class="course-detail-text">{{ form.courseDescription }}</div>
+            <el-form-item label="课程名称">
+                <el-input v-model="form.courseName" type="textarea" autocomplete="off" />
             </el-form-item>
 
-            <el-form-item label="难度级别：" :label-width="formLabelWidth">
-                <el-form-item :label="form.courseDifficultyLevel" />
+            <el-form-item label="课程简介">
+                <el-input v-model="form.courseDescription" type="textarea" autocomplete="off" />
             </el-form-item>
 
-            <el-form-item label="课程评分：" :label-width="formLabelWidth">
-                <el-form-item :label="form.courseRating" />
+            <el-form-item label="课程难度">
+                <el-select v-model="form.courseDifficultyLevel" placeholder="请选择难度级别">
+                    <el-option label="初级" value="初级" />
+                    <el-option label="中级" value="中级" />
+                    <el-option label="高级" value="高级" />
+                </el-select>
             </el-form-item>
 
-            <el-form-item label="更新时间：" :label-width="formLabelWidth">
-                <el-form-item :label="form.updatedTime" />
-            </el-form-item>
-
-            <el-form-item label="创建时间：" :label-width="formLabelWidth">
-                <el-form-item :label="form.createdTime" />
+            <el-form-item label="课程评分">
+                <el-input 
+                    v-model="form.courseRating" 
+                    type="number" 
+                    :min="1" 
+                    :max="5" 
+                    step="1" 
+                    autocomplete="off" 
+                    @input="validateRating" 
+                />
             </el-form-item>
         </el-form>
 
         <template #footer>
-            <div class="dialog-footer">
+            <div class="drawer-footer">
+                <el-button @click="dialogFormVisible = false">取消</el-button>
+                <el-button type="primary" @click="btnAddUpdate">{{ btnName }}</el-button>
+            </div>
+        </template>
+    </el-drawer>
+
+
+    <!-- 详情对话框 -->
+    <el-drawer v-model="dialogDetailVisible" :title="'课程信息详情'" size="35%" direction="rtl">
+        <el-descriptions :column="1" border>
+            <el-descriptions-item label="课程名称">
+                <span>{{ form.courseName }}</span>
+            </el-descriptions-item>
+            <el-descriptions-item label="课程简介">
+                <span>{{ form.courseDescription }}</span>
+            </el-descriptions-item>
+            <el-descriptions-item label="难度级别">
+                <span>{{ form.courseDifficultyLevel }}</span>
+            </el-descriptions-item>
+            <el-descriptions-item label="课程评分">
+                <span>{{ form.courseRating }}</span>
+            </el-descriptions-item>
+            <el-descriptions-item label="更新时间">
+                <span>{{ formatDate(form.updatedTime) }}</span>
+            </el-descriptions-item>
+            <el-descriptions-item label="创建时间">
+                <span>{{ formatDate(form.createdTime) }}</span>
+            </el-descriptions-item>
+        </el-descriptions>
+
+        <template #footer>
+            <div class="drawer-footer">
                 <el-button @click="dialogDetailVisible = false">关闭</el-button>
             </div>
         </template>
-    </el-dialog>
+    </el-drawer>
+
 </template>
 
 <script>
@@ -449,6 +489,12 @@ export default {
 
     mounted() {
         this.getPageData(this.currentPage, this.pageSize);
+
+        //在页面加载时获取所有分类，给到添加和编辑题目的分类下拉框
+        this.$http.get('/cat/v1/all').then((response) => {
+            this.catIdAndName = response.data;
+            console.log(this.catIdAndName);
+        });
     },
 };
 </script>
