@@ -147,7 +147,7 @@
           
           </div> -->
 
-          <span class="user-name">{{ userName }}</span>
+          <span class="user-name">欢迎您,{{ userName }}管理员</span>
 
 
         </el-header>
