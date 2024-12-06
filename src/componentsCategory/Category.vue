@@ -65,7 +65,7 @@
                         @click="singleDelete(scope.row.categoryId)">删除</el-button>
                     <el-button link size="small" type="primary" @click="openUpdateDialog(scope.row)">编辑</el-button>
                     <el-button link size="small" type="primary"
-                        @click="openChildCard(scope.row.parentId)">子类别</el-button>
+                        @click="openChildCard(scope.row.categoryId)">子类别</el-button>
                 </template>
             </el-table-column>
         </el-table>
@@ -76,65 +76,65 @@
             @current-change="handleCurrentChange" />
     </el-card>
 
-    <transition name="el-fade-in-linear">
-        <!-- 子类别卡片 -->
-        <el-card class="card" v-if="childCardVisible">
-            <template #header>
-                <!-- 标题 -->
-                <div slot="header" class="card-header">{{ childName }}</div><br>
-                <!-- 功能按钮 -->
-                <el-button type="primary" @click="queryInfo">查询</el-button>
-                <el-button class="button" type="success" @click="openAddDialog">添加</el-button>
-                <el-button class="button" type="warning" @click="multipleDelete">多选删除</el-button>
-            </template>
+    <!-- <transition name="el-fade-in-linear"> -->
+    <!-- 子类别卡片 -->
+    <el-drawer v-model="childCardVisible" :direction="direction" size="35%">
+        <template default>
+            <!-- 标题 -->
+            <div slot="header" class="card-header">{{ childName }}</div><br>
+            <!-- 功能按钮 -->
+            <el-button type="primary" @click="queryInfo">查询</el-button>
+            <el-button class="button" type="success" @click="openAddDialog">添加</el-button>
+            <el-button class="button" type="warning" @click="multipleDelete">多选删除</el-button>
+        </template>
 
-            <el-table :data="childInfoData" style="width: 100%" @selection-change="handleSelectionChange"
-                v-loading="loading">
-                <el-table-column fixed type="selection" width="55" />
-                <el-table-column fixed type="index" label="序号" width="55" />
+        <el-table :data="childInfoData" style="width: 100%" @selection-change="handleSelectionChange"
+            v-loading="loading">
+            <el-table-column fixed type="selection" width="55" />
+            <el-table-column fixed type="index" label="序号" width="55" />
 
-                <el-table-column prop="sortOrder" label="类别排序" width="100">
-                    <template #default="scope">
-                        <span class="truncate-text">{{ scope.row.sortOrder }}</span>
-                    </template>
-                </el-table-column>
+            <el-table-column prop="sortOrder" label="类别排序" width="100">
+                <template #default="scope">
+                    <span class="truncate-text">{{ scope.row.sortOrder }}</span>
+                </template>
+            </el-table-column>
 
-                <el-table-column prop="categoryName" label="类别名称" width="120">
-                    <template #default="scope">
-                        <span class="truncate-text">{{ scope.row.categoryName }}</span>
-                    </template>
-                </el-table-column>
+            <el-table-column prop="categoryName" label="类别名称" width="120">
+                <template #default="scope">
+                    <span class="truncate-text">{{ scope.row.categoryName }}</span>
+                </template>
+            </el-table-column>
 
-                <el-table-column prop="description" label="类别描述" width="200">
-                    <template #default="scope">
-                        <span class="truncate-text">{{ scope.row.description }}</span>
-                    </template>
-                </el-table-column>
+            <el-table-column prop="description" label="类别描述" width="200">
+                <template #default="scope">
+                    <span class="truncate-text">{{ scope.row.description }}</span>
+                </template>
+            </el-table-column>
 
-                <el-table-column prop="updatedTime" label="更新时间" width="200">
-                    <template v-slot:default="{ row }">
-                        <span>{{ formatDate(row.updatedTime) }}</span>
-                    </template>
-                </el-table-column>
+            <el-table-column prop="updatedTime" label="更新时间" width="200">
+                <template v-slot:default="{ row }">
+                    <span>{{ formatDate(row.updatedTime) }}</span>
+                </template>
+            </el-table-column>
 
-                <el-table-column prop="createdTime" label="创建时间" width="200">
-                    <template v-slot:default="{ row }">
-                        <span>{{ formatDate(row.createdTime) }}</span>
-                    </template>
-                </el-table-column>
+            <el-table-column prop="createdTime" label="创建时间" width="200">
+                <template v-slot:default="{ row }">
+                    <span>{{ formatDate(row.createdTime) }}</span>
+                </template>
+            </el-table-column>
 
-                <el-table-column fixed="right" label="操作" min-width="500">
-                    <template #default="scope">
-                        <el-button link size="small" type="primary"
-                            @click="openDetailDialog(scope.row.categoryId)">详情</el-button>
-                        <el-button link size="small" type="primary"
-                            @click="singleDelete(scope.row.categoryId)">删除</el-button>
-                        <el-button link size="small" type="primary" @click="openUpdateDialog(scope.row)">编辑</el-button>
-                    </template>
-                </el-table-column>
-            </el-table>
-        </el-card>
-    </transition>
+            <el-table-column fixed="right" label="操作" min-width="500">
+                <template #default="scope">
+                    <el-button link size="small" type="primary"
+                        @click="openDetailDialog(scope.row.categoryId)">详情</el-button>
+                    <el-button link size="small" type="primary"
+                        @click="singleDelete(scope.row.categoryId)">删除</el-button>
+                    <el-button link size="small" type="primary" @click="openUpdateDialog(scope.row)">编辑</el-button>
+                </template>
+            </el-table-column>
+        </el-table>
+    </el-drawer>
+    <!-- </transition> -->
 
     <!-- 抽屉：添加修改 -->
     <el-drawer v-model="dialogFormVisible" :direction="direction" size="35%">
@@ -383,9 +383,14 @@ export default {
             });
         },
 
-        openChildCard(parentId) {
+        openChildCard(categoryId) {
             this.$http.get(`/cat/v1/all`).then((response) => {
                 this.childCardData = response.data;
+                this.childCardData.forEach(element => {
+                    if (element.id == categoryId) {
+                        this.childCardTitle = element.name;
+                    }
+                });
             }).catch(() => {
                 ElMessage({ message: '请求失败，请重试', type: "error" });
             });
