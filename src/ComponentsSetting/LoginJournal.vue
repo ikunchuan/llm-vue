@@ -10,13 +10,13 @@
                 </el-select>&nbsp;
 
                 <!-- 输入框：输入查询内容 -->
-                <el-input v-model="queryStr" style="width: 220px" placeholder="请输入查询内容" />&nbsp; 
-                
+                <el-input v-model="queryStr" style="width: 220px" placeholder="请输入查询内容" />&nbsp;
+
                 <el-button type="primary" @click="queryInfo">查询</el-button>
             </div>
         </template>
 
-        <el-table :data="tableData" style="width: 100%" v-loading="loading">
+        <el-table :data="tableData" style="width: 100%" >
             <el-table-column prop="userName" label="管理员姓名" width="120" />
             <el-table-column prop="loginboard" label="登录板块" width="120" />
             <el-table-column prop="loginTime" label="登录时间" width="180">
@@ -27,15 +27,9 @@
         </el-table>
 
         <!-- 分页 -->
-        <el-pagination 
-            ref="pagination" 
-            v-model:current-page="currentPage" 
-            v-model:page-size="pageSize" 
-            :page-sizes="[5, 10, 20, 50]"
-            layout="total, sizes, prev, pager, next, jumper" 
-            :total="pageInfo.total" 
-            @size-change="handleSizeChange"
-            @current-change="handleCurrentChange" />
+        <el-pagination ref="pagination" v-model:current-page="currentPage" v-model:page-size="pageSize"
+            :page-sizes="[5, 10, 20, 50]" layout="total, sizes, prev, pager, next, jumper" :total="pageInfo.total"
+            @size-change="handleSizeChange" @current-change="handleCurrentChange" />
     </el-card>
 </template>
 
@@ -54,39 +48,69 @@ export default {
             pageSize: 5,
             pageInfo: {},
             tableData: [],
+            searchField: '',
+            searchKeyword: '',
         };
     },
     methods: {
         handleSizeChange(pageSize) {
             this.pageSize = pageSize;
-            this.getPageData(this.currentPage, this.pageSize);
+            this.getPageData(this.currentPage, this.pageSize, this.selectedField, this.queryStr);
         },
 
         handleCurrentChange(pageNum) {
             this.currentPage = pageNum;
-            this.getPageData(this.currentPage, this.pageSize);
+            this.getPageData(this.currentPage, this.pageSize, this.selectedField, this.queryStr);
         },
 
-        getPageData(num, size) {
-            const params = { pageNum: num, pageSize: size };
-            if (this.queryStr && this.selectedField) {
-                params[this.selectedField] = this.queryStr;
+        getPageData(num, size, searchField, searchKeyword) {
+
+            if (this.selectedField === 'userSex') {
+                if (searchKeyword == '男') {
+                    searchKeyword = 1
+                } else if (searchKeyword == '女') {
+                    searchKeyword = 2
+                }
             }
-            this.$http.get('/admin/user/login/logs', { params })
-                .then((response) => {
-                    this.pageInfo = response.data.data;
-                    this.tableData = this.pageInfo.records;
-                    this.loading = false;
+
+            // 构建查询条件对象
+            let userInfoSearch = {
+                userName: searchField === 'userName' ? searchKeyword : '',
+                userSex: searchField === 'userSex' ? searchKeyword : ''
+            };
+
+            // 发送POST请求到后端
+            this.$http.post("/uis/v1/ui/search?pageNum=" + num + "&pageSize=" + size, userInfoSearch)
+                .then(response => {
+                    this.pageInfo = response.data;
+                    this.tableData = this.pageInfo.list;
+                    console.log("查询结果:", this.tableData);
                 })
-                .catch(() => {
-                    this.loading = false;
-                    ElMessage.error('获取登录日志失败');
+                .catch(error => {
+                    console.error("查询出错:", error);
+                    ElMessage({
+                        type: 'error',
+                        message: '查询失败'
+                    });
                 });
+
         },
 
         queryInfo() {
-            this.getPageData(this.currentPage, this.pageSize);
+            console.log("查询内容:", this.queryStr);
+            // 检查当前页码,如果未定义则使用默认值1
+            let num = this.currentPage || 1;
+            // 检查每页大小,如果未定义则使用默认值5
+            let size = this.pageSize || 5;
+
+            // 构建查询参数
+            let field = this.selectedField || '';
+            let keyword = this.queryStr || '';
+
+            // 调用getPageData并传入所有参数
+            this.getPageData(num, size, field, keyword);
         },
+
 
         formatDate(value) {
             if (!value) return '-';
@@ -102,5 +126,5 @@ export default {
 </script>
 
 <style scoped>
-    /* 样式保持不变 */
+/* 样式保持不变 */
 </style>
