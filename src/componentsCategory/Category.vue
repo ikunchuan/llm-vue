@@ -352,6 +352,7 @@ export default {
                 if (response.data == 1) {
                     ElMessage({ message: '类别信息添加成功！', type: "success" });
                     this.getPageData(this.currentPage, this.pageSize, '', ''); // 刷新数据
+                    this.childCardVisible = false;
                     this.dialogFormVisible = false; // 关闭对话框
                 } else {
                     ElMessage({ message: '类别信息添加失败！', type: "error" });
