@@ -65,25 +65,30 @@ export default {
 
         getPageData(num, size, searchField, searchKeyword) {
 
-            if (this.selectedField === 'userSex') {
-                if (searchKeyword == '男') {
+            if (this.selectedField === 'loginboard') {
+                if (searchKeyword == '第一板块') {
                     searchKeyword = 1
-                } else if (searchKeyword == '女') {
+                } else if (searchKeyword == '第二板块') {
                     searchKeyword = 2
+                }else if (searchKeyword == '第三板块') {
+                    searchKeyword = 3
                 }
             }
 
             // 构建查询条件对象
             let userInfoSearch = {
                 userName: searchField === 'userName' ? searchKeyword : '',
-                userSex: searchField === 'userSex' ? searchKeyword : ''
+                userSex: searchField === 'loginboard' ? searchKeyword : ''
             };
 
             // 发送POST请求到后端
-            this.$http.post("/uis/v1/ui/search?pageNum=" + num + "&pageSize=" + size, userInfoSearch)
+            this.$http.post("/admin/user/login/logs?pageNum=" + num + "&pageSize=" + size, userInfoSearch)
                 .then(response => {
-                    this.pageInfo = response.data;
-                    this.tableData = this.pageInfo.list;
+                    const data =response.data;
+                    // this.pageInfo = response.data;
+                    // this.tableData = this.pageInfo.list;
+                    this.pageInfo.total = data.total;
+                    this.tableData = data.list;
                     console.log("查询结果:", this.tableData);
                 })
                 .catch(error => {
