@@ -66,6 +66,7 @@ export default {
       loginForm: {
         userName: '',
         password: '',
+        loginboard: ''
       },
     };
   },
@@ -83,6 +84,7 @@ export default {
     // 登录处理函数
     async handleLogin() {
       try {
+        this.loginForm.loginboard=1   //登陆第一板块时
         const response = await axios.post('http://localhost:10086/admin/user/login', this.loginForm);
         if (response.data.code === 200) {
           this.$message.success('登录成功');
