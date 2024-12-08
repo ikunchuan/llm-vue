@@ -94,7 +94,7 @@
             <template #footer>
                 <div style="flex: auto">
                     <el-button @click="refuseEvent">拒绝</el-button>
-                    <el-button type="primary" @click="agreeEvent">同意</el-button>
+                    <el-button type="primary" @click="agreeEvent">解冻</el-button>
                 </div>
             </template>
         </el-drawer>
