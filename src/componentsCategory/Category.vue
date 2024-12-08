@@ -1,5 +1,5 @@
 <template>
-
+    <!-- 父类别卡片 -->
     <el-card class="card">
         <template #header>
             <!-- 标题 -->
@@ -81,45 +81,25 @@
         <el-card class="card" v-if="childCardVisible">
             <template #header>
                 <!-- 标题 -->
-                <div slot="header" class="card-header">{{ childName }}</div>
-                <el-button type="text" @click="closeChildCard">关闭</el-button>
-                <!-- 搜索框 -->
+                <div slot="header" class="card-header">{{ childName }}</div><br>
                 <div class="header-actions">
-                    <!-- 选择查询字段 -->
-                    <el-select v-model="selectedField" placeholder="选择查询字段" style="width: 180px;" clearable>
-                        <el-option label="类别名称" value="1" />
-                        <el-option label="类别描述" value="2" />
-                    </el-select>&nbsp;
-
-                    <!-- 输入框 -->
-                    <el-input v-model="queryStr" style="width: 220px" placeholder="请输入查询内容" clearable />&nbsp;
-
                     <!-- 功能按钮 -->
-                    <el-button type="primary" @click="queryInfo">查询</el-button>
-                    <el-button class="button" type="success" @click="openAddDialog">添加</el-button>
+                    <el-button type="success" @click="openAddChild">添加</el-button>
                     <el-button class="button" type="warning" @click="multipleDelete">多选删除</el-button>
+                    <el-button type="text" @click="closeChildCard">关闭</el-button>
                 </div>
             </template>
-
-            <template>
-                <!-- 标题 -->
-                <div slot="header" class="card-header">{{ childName }}</div><br>
-                <!-- 功能按钮 -->
-                <el-button type="primary" @click="queryInfo">查询</el-button>
-                <el-button class="button" type="success" @click="openAddDialog">添加</el-button>
-                <el-button class="button" type="warning" @click="multipleDelete">多选删除</el-button>
-            </template>
-
+            <!-- 子类别表格 -->
             <el-table :data="childInfoData" style="width: 100%" @selection-change="handleSelectionChange"
                 v-loading="c_loading">
                 <el-table-column fixed type="selection" width="55" />
                 <el-table-column fixed type="index" label="序号" width="55" />
 
-                <el-table-column prop="sortOrder" label="类别排序" width="100">
+                <!-- <el-table-column prop="sortOrder" label="类别排序" width="100">
                     <template #default="scope">
                         <span class="truncate-text">{{ scope.row.sortOrder }}</span>
                     </template>
-                </el-table-column>
+                </el-table-column> -->
 
                 <el-table-column prop="categoryName" label="类别名称" width="120">
                     <template #default="scope">
@@ -144,8 +124,16 @@
                         <span>{{ formatDate(row.createdTime) }}</span>
                     </template>
                 </el-table-column>
+                <el-table-column fixed="right" label="操作" min-width="180">
+                    <template #default="scope">
+                        <el-button link size="small" type="primary"
+                            @click="openDetailDialog(scope.row.categoryId)">详情</el-button>
+                        <el-button link size="small" type="primary"
+                            @click="singleDelete(scope.row.categoryId)">删除</el-button>
+                        <el-button link size="small" type="primary" @click="openUpdateDialog(scope.row)">编辑</el-button>
+                    </template>
+                </el-table-column>
             </el-table>
-
         </el-card>
     </transition>
 
@@ -156,16 +144,16 @@
         </template>
 
         <el-form :model="form">
-            <!-- <el-form-item label="类别排序" :label-width="formLabelWidth">
-                <el-input v-model="form.sortOrder" type="number" autocomplete="off" autosize="true" />
-            </el-form-item> -->
+            <el-form-item label="父类别" :label-width="formLabelWidth" v-show="false">
+                <el-input v-model="form.parentId" type="number" autocomplete="off" autosize="true" />
+            </el-form-item>
 
             <el-form-item label="类别名称" :label-width="formLabelWidth">
                 <el-input v-model="form.categoryName" type="textarea" autocomplete="off" autosize="true" rows="7" />
             </el-form-item>
 
             <el-form-item label="类别描述" :label-width="formLabelWidth">
-                <el-input v-model="form.questionTitle" type="textarea" autocomplete="off" autosize="true" />
+                <el-input v-model="form.description" type="textarea" autocomplete="off" autosize="true" />
             </el-form-item>
         </el-form>
 
@@ -247,14 +235,15 @@ export default {
 
             tableData: [],  //表格数据。多条数据用数组（就是python中的序列），用`[]`表示空字典、
             childInfoData: [], //子类别信息
-            // catIdAndName: [], //全部类别id和名称
+            parentInfoData: [], //父类别信息
             queryData: [],      //查询数据
 
             form: {},
+            childForm: {},
             formLabelWidth: '150px',
 
-            loading: true,
-            c_loading: true,
+            loading: true,  //父类别加载框
+            c_loading: true,   ///子类别加载框
             childCardVisible: false,
             dialogFormVisible: false,
             dialogDetailVisible: false,
@@ -343,9 +332,19 @@ export default {
             this.dialogFormVisible = true;
         },
 
+        openAddChild() {
+            this.title = '添加子类别信息';
+            this.btnName = '添加';
+            this.form = {};  // 清空表单数据
+            this.dialogFormVisible = true;
+            this.form.parentId = this.parentInfoData.categoryId; // 设置子类别中的parent_id
+        },
+
+
+
         // 添加类别信息
         addCategory() {
-            if (!this.form.categoryId || !this.form.categoryName || !this.form.description || !this.form.sortOrder) {
+            if (!this.form.categoryName || !this.form.description) {
                 ElMessage({ message: '请填写完整的类别信息！', type: "warning" });
                 return;
             }
@@ -371,10 +370,10 @@ export default {
             this.dialogDetailVisible = false; //关闭详情框
         },
 
-        // 编辑题目信息
+        // 编辑类别信息
         updateCategory() {
             if (!this.form.categoryId || !this.form.categoryName || !this.form.description || !this.form.sortOrder) {
-                ElMessage({ message: '请填写完整的题目信息！', type: "warning" });
+                ElMessage({ message: '请填写完整的类别信息！', type: "warning" });
                 return;
             }
             this.$http.put(`/qst/v1`, this.form).then((response) => {
@@ -409,14 +408,18 @@ export default {
             this.c_loading = true;
             this.$http.get(`/cat/v1/subcategories/${categoryId}`).then((response) => {
                 console.log(response.data);
-                this.childInfoData = response.data.slice(1);
+                this.childInfoData = response.data.slice(1);  // 获取子类别信息
+                this.parentInfoData = response.data[0]; //获取父类别信息
+                this.childName = response.data[0].categoryName + " - 子类别"; // 显示父类别名称
+                console.log(this.parentInfoData);
+                if (this.childInfoData.length === 0) {
+                    ElMessage({ message: '没有子类别，请选择其他类别', type: "warning" });
+                    this.c_loading = false;
+                } else {
+                    this.c_loading = false;
+                }
 
-                this.childName = "子类别 - " + categoryName; // 设置子类别名称
-                this.c_loading = false;
-            }).catch(() => {
-                ElMessage({ message: '没有子类别，请选择其他类别', type: "warning" });
-                this.c_loading = false;
-            });
+            }).catch((err) => { ElMessage({ message: '请求失败，请重试', type: "error" }); });
         },
 
         //关闭子类别
