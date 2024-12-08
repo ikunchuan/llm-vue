@@ -8,23 +8,23 @@
                 <el-select v-model="selectedField" placeholder="选择查询字段" style="width: 180px;">
                     <el-option label="用户名" value="userName"></el-option>
                     <el-option label="用户性别" value="userSex"></el-option>
-            
+
                 </el-select>&nbsp;
 
                 <!-- 输入框：输入查询内容 -->
                 <el-input v-model="queryStr" style="width: 220px" placeholder="请输入查询内容" />&nbsp;
-                <el-button type="primary"  @click="queryInfo">查询</el-button>
+                <el-button type="primary" @click="queryInfo">查询</el-button>
             </div>
 
         </template>
 
-        <el-table :data="tableData" style="width: 100%" @selection-change="handleSelectionChange" v-loading="loading">
+        <el-table :data="tableData" style="width: 100%" @selection-change="handleSelectionChange">
             <el-table-column type="selection" width="55" />
 
             <el-table-column prop="userName" label="用户名" width="120" />
-            <el-table-column prop="userSex" label="性别" width="100" >
+            <el-table-column prop="userSex" label="性别" width="100">
                 <template #default="scope">
-                    {{ scope.row.userSex==1?'男':'女' }}
+                    {{ scope.row.userSex == 1 ? '男' : '女' }}
                 </template>
             </el-table-column>
             <el-table-column prop="userLocal" label="地区" width="120" />
@@ -40,7 +40,7 @@
                 </template>
             </el-table-column>
 
-            <el-table-column prop="createdTime" label="创建时间" width="100" >
+            <el-table-column prop="createdTime" label="创建时间" width="100">
                 <template #default="{ row }">
                     <span>{{ formatDate(row.createdTime) }}</span>
                 </template>
@@ -52,7 +52,7 @@
                     <el-button link type="primary" size="small" @click="openDetailDialog(scope.row.userId)">
                         详情
                     </el-button>
-                    
+
                 </template>
 
             </el-table-column>
@@ -66,18 +66,18 @@
 
     </el-card>
 
-    
+
     <!-- 详情对话框 -->
 
     <el-dialog v-model="dialogDetailVisible" title="用户详细信息显示" width="500">
         <el-form :model="form">
-        
+
             <el-form-item label="用户名" :label-width="formLabelWidth">
                 <el-form-item :label="form.userName"></el-form-item>
             </el-form-item>
 
             <el-form-item label="性别" :label-width="formLabelWidth">
-                {{ form.userSex==1?'男':'女' }}
+                {{ form.userSex == 1 ? '男' : '女' }}
             </el-form-item>
 
             <el-form-item label="地区" :label-width="formLabelWidth">
@@ -135,7 +135,7 @@ export default {
     data() {
         return {
             // cmnsInfoData:[],
-            loading:true,
+            loading: true,
             dialogDetailVisible: false,   //详细对话框
 
             name: '用户信息',
@@ -152,13 +152,15 @@ export default {
 
             queryData: [],
             pageInfo: {},       //分页信息对象
-            pageSize: 3,        //当前页条数
+            pageSize: 5,        //当前页条数
             pageNum: 1,     //当前页号
-            
+
             title: "",                           //对话框标题
             btnName: "",                     //对话框按钮文字
             // claInfoData: [],                  //加载到下拉框的班级信息
-            imageUrl: ""                     //图片URL
+            imageUrl: "",                     //图片URL
+            searchField: '',
+            searchKeyword: '',
         };
     },
 
@@ -174,26 +176,47 @@ export default {
         handleSizeChange(pageSize) {
             console.log("当前页大小: ", pageSize);
             this.pageSize = pageSize;
-            this.getPageData(this.currentPage, this.pageSize);
+            this.getPageData(this.currentPage, this.pageSize, this.selectedField, this.queryStr);
         },
+
         //切换页号时得到当时页号
         handleCurrentChange(pageNum) {
             console.log("当前页码: ", pageNum);
             this.currentPage = pageNum;
-            this.getPageData(this.currentPage, this.pageSize);
+            this.getPageData(this.currentPage, this.pageSize, this.selectedField, this.queryStr);
         },
 
-        getPageData(num, size) {
-            this.$http.get('/uis/v1/ui/search', { params: { pageNum: num, pageSize: size } })
-                .then((response) => {
-                    console.log(response.data);
+        getPageData(num, size, searchField, searchKeyword) {
+
+            if (this.selectedField === 'userSex') {
+                if (searchKeyword == '男') {
+                    searchKeyword = 1
+                } else if (searchKeyword == '女') {
+                    searchKeyword = 2
+                }
+            }
+
+            // 构建查询条件对象
+            let userInfoSearch = {
+                userName: searchField === 'userName' ? searchKeyword : '',
+                userSex: searchField === 'userSex' ? searchKeyword : ''
+            };
+
+            // 发送POST请求到后端
+            this.$http.post("/uis/v1/ui/search?pageNum=" + num + "&pageSize=" + size, userInfoSearch)
+                .then(response => {
                     this.pageInfo = response.data;
-                    this.tableData = this.pageInfo.records;
-                    if (response) {
-                        this.loading = false;
-                    }
+                    this.tableData = this.pageInfo.list;
+                    console.log("查询结果:", this.tableData);
+                })
+                .catch(error => {
+                    console.error("查询出错:", error);
+                    ElMessage({
+                        type: 'error',
+                        message: '查询失败'
+                    });
                 });
-                
+
         },
 
 
@@ -202,7 +225,7 @@ export default {
             console.log("closeDialog.....")
         },
 
-       //打开详情页
+        //打开详情页
         openDetailDialog(userid) {
             var _this = this
             this.$http.get("/uis/v1/ui/" + userid).then(function (response) {
@@ -218,47 +241,29 @@ export default {
             return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')} ${String(date.getHours()).padStart(2, '0')}:${String(date.getMinutes()).padStart(2, '0')}:${String(date.getSeconds()).padStart(2, '0')}`;
         },
 
-        
 
-        
+
+
 
         queryInfo() {
-    // 如果选择了查询字段和输入了查询条件
-    if (this.queryStr.trim().length > 0 && this.selectedField) {
-        let queryValue = this.queryStr.trim();
+            console.log("查询内容:", this.queryStr);
+            // 检查当前页码,如果未定义则使用默认值1
+            let num = this.currentPage || 1;
+            // 检查每页大小,如果未定义则使用默认值5
+            let size = this.pageSize || 5;
 
-        // 如果查询字段是 'userSex'，则将 '男' 转换为 1, '女' 转换为 0
-        if (this.selectedField === 'userSex') {
-            if (queryValue === '男') {
-                queryValue = 1;  // '男' 对应 1
-            } else if (queryValue === '女') {
-                queryValue = 0;  // '女' 对应 0
-            } else {
-                // 如果输入的不是 '男' 或 '女'，则不进行查询
-                ElMessage.error('请输入正确的性别（男/女）');
-                return;
-            }
-        }
+            // 构建查询参数
+            let field = this.selectedField || '';
+            let keyword = this.queryStr || '';
 
-        // 过滤数据
-        this.tableData = this.pageInfo.records.filter(item => {
-            // 根据选择的字段进行匹配
-            if (item[this.selectedField] && item[this.selectedField].toString().includes(queryValue)) {
-                return true;  // 匹配成功
-            }
-            return false;  // 不匹配
-        });
-    } else {
-        // 如果没有选择字段或者没有输入查询内容，恢复原数据
-        this.tableData = this.pageInfo.records;
-    }
-}
+            // 调用getPageData并传入所有参数
+            this.getPageData(num, size, field, keyword);
+        },
 
-
-    }, 
+    },
     mounted() {
         this.getPageData(this.currentPage, this.pageSize);
-        
+
     }
 
 }

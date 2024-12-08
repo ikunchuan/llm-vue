@@ -17,13 +17,13 @@
         <div>用户总数: {{ userTotalCount }}</div>
 
         <!-- 用户数据表格 -->
-        <el-table :data="tableData" style="width: 100%" @selection-change="handleSelectionChange" v-loading="loading">
+        <el-table :data="tableData" style="width: 100%" @selection-change="handleSelectionChange" >
             <el-table-column type="selection" width="55" />
 
             <el-table-column prop="userName" label="用户名" width="120" />
-            <el-table-column prop="userSex" label="性别" width="100" >
+            <el-table-column prop="userSex" label="性别" width="100">
                 <template #default="scope">
-                    {{ scope.row.userSex==1?'男':'女' }}
+                    {{ scope.row.userSex == 1 ? '男' : '女' }}
                 </template>
             </el-table-column>
             <el-table-column prop="userLocal" label="地区" width="120" />
@@ -39,7 +39,7 @@
                 </template>
             </el-table-column>
 
-            <el-table-column prop="createdTime" label="创建时间" width="100" >
+            <el-table-column prop="createdTime" label="创建时间" width="100">
                 <template #default="{ row }">
                     <span>{{ formatDate(row.createdTime) }}</span>
                 </template>
@@ -51,7 +51,7 @@
                     <el-button link type="primary" size="small" @click="openDetailDialog(scope.row.userId)">
                         详情
                     </el-button>
-                    
+
                 </template>
 
             </el-table-column>
@@ -76,7 +76,7 @@ import { ElMessage } from 'element-plus';
 export default {
     data() {
         return {
-            loading:true,
+            loading: true,
             dialogDetailVisible: false,
             queryStr: "",
             selectedField: "",
@@ -86,7 +86,9 @@ export default {
             tableData: [],
             sexDistributionData: [], // 用于存储性别分布数据
             userTotalCount: 0, // 存储用户总数
-            videoCompletionData: [] // 存储用户完成视频个数数
+            videoCompletionData: [], // 存储用户完成视频个数数
+            searchField: '',
+            searchKeyword: '',
         };
     },
     mounted() {
@@ -100,23 +102,33 @@ export default {
     methods: {
         handleSizeChange(pageSize) {
             this.pageSize = pageSize;
-            this.getPageData(this.currentPage, this.pageSize);
+            this.getPageData(this.currentPage, this.pageSize, this.selectedField, this.queryStr);
         },
         handleCurrentChange(pageNum) {
             this.currentPage = pageNum;
-            this.getPageData(this.currentPage, this.pageSize);
+            this.getPageData(this.currentPage, this.pageSize, this.selectedField, this.queryStr);
         },
-        getPageData(num, size) {
-            this.$http.get('/uis/v1/ui', { params: { pageNum: num, pageSize: size } })
-                .then((response) => {
+
+        getPageData(num, size, searchField, searchKeyword) {
+
+            // 构建查询条件对象
+            let userInfoSearch = {
+                userName: searchField === 'userName' ? searchKeyword : '',
+                userSex: searchField === 'userSex' ? searchKeyword : ''
+            };
+
+            this.$http.post("/uis/v1/ui/search?pageNum=" + num + "&pageSize=" + size, userInfoSearch)
+                .then(response => {
                     this.pageInfo = response.data;
-                    this.tableData = response.data.records;
-                    if (response) {
-                        this.loading = false;
-                    }
+                    this.tableData = this.pageInfo.list;
+                    console.log("查询结果:", this.tableData);
                 })
-                .catch((error) => {
-                    ElMessage.error('数据加载失败，请稍后重试');
+                .catch(error => {
+                    console.error("查询出错:", error);
+                    ElMessage({
+                        type: 'error',
+                        message: '查询失败'
+                    });
                 });
         },
         openDetailDialog(userid) {
@@ -130,21 +142,22 @@ export default {
             const date = new Date(value);
             return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')} ${String(date.getHours()).padStart(2, '0')}:${String(date.getMinutes()).padStart(2, '0')}:${String(date.getSeconds()).padStart(2, '0')}`;
         },
+
         queryInfo() {
-            if (!this.queryStr.trim() || !this.selectedField) {
-                ElMessage.error('请选择查询字段并输入查询条件');
-                return;
-            }
-            let queryValue = this.queryStr.trim();
-            if (this.selectedField === 'userSex') {
-                queryValue = queryValue === '男' ? 1 : (queryValue === '女' ? 0 : null);
-                if (queryValue === null) {
-                    ElMessage.error('性别只能是男或女');
-                    return;
-                }
-            }
-            this.tableData = this.pageInfo.records.filter(item => item[this.selectedField]?.toString().includes(queryValue));
+            console.log("查询内容:", this.queryStr);
+            // 检查当前页码,如果未定义则使用默认值1
+            let num = this.currentPage || 1;
+            // 检查每页大小,如果未定义则使用默认值5
+            let size = this.pageSize || 5;
+
+            // 构建查询参数
+            let field = this.selectedField || '';
+            let keyword = this.queryStr || '';
+
+            // 调用getPageData并传入所有参数
+            this.getPageData(num, size, field, keyword);
         },
+
         getUserTotalCount() {
             this.$http.get('/uis/v1/ui/user-total-count').then(response => {
                 this.userTotalCount = response.data; // 存储用户总数
@@ -251,7 +264,7 @@ export default {
             this.myVideoChart.dispose();
         }
     }
-    
+
 }
 </script>
 

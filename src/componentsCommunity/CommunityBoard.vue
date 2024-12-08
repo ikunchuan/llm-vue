@@ -424,7 +424,7 @@ export default {
             // 检查当前页码,如果未定义则使用默认值1
             let num = this.currentPage || 1;
             // 检查每页大小,如果未定义则使用默认值3 
-            let size = this.pageSize || 3;
+            let size = this.pageSize || 5;
 
             // 构建查询参数
             let field = this.selectedField || '';
@@ -445,18 +445,7 @@ export default {
     },
 
     mounted() {
-        // 初始化页面时调用getPageData,使用默认参数
-        this.currentPage = 1;  // 设置默认页码为1
-        this.pageSize = 5;     // 设置默认每页显示3条
-        this.getPageData(this.currentPage, this.pageSize, '', '');  // field和keyword传空字符串
-        
-
-        this.$http.get("cat/v1/all").then((response) => {
-            console.log(response.data);
-            this.catIdAndName = response.data;
-            console.log(this.catIdAndName)
-        })
-
+        this.getPageData(this.currentPage, this.pageSize);
     }
 
 }
