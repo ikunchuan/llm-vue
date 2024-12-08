@@ -8,8 +8,8 @@
             <div class="header-actions">
                 <!-- 选择查询字段 -->
                 <el-select v-model="selectedField" placeholder="选择查询字段" style="width: 180px;" clearable>
-                    <el-option label="类别名称" value="1" />
-                    <el-option label="类别描述" value="2" />
+                    <el-option label="类别名称" value="categoryName" />
+                    <el-option label="类别描述" value="description" />
                 </el-select>&nbsp;
 
                 <!-- 输入框 -->
@@ -281,21 +281,20 @@ export default {
         handleSizeChange(pageSize) {
             console.log("当前页大小: ", pageSize);
             this.pageSize = pageSize;
-            this.getPageData(this.currentPage, this.pageSize, this.searchField, this.queryStr);
+            this.getPageData(this.currentPage, this.pageSize, this.selectedField, this.queryStr);
         },
 
         // 页码变化
         handleCurrentChange(pageNum) {
             console.log("当前页码: ", pageNum);
             this.currentPage = pageNum;
-            this.getPageData(this.currentPage, this.pageSize, this.searchField, this.queryStr);
+            this.getPageData(this.currentPage, this.pageSize, this.selectedField, this.queryStr);
         },
 
         // 获取分页数据
         getPageData(num, size, searchField, searchKeyword) {
             // 构建查询条件对象
             let categorySearch = {
-                sortOrder: searchField === 'sortOrder' ? searchKeyword : '',
                 categoryName: searchField === 'categoryName' ? searchKeyword : '',
                 description: searchField === 'description' ? searchKeyword : ''
             };
@@ -486,18 +485,10 @@ export default {
             let size = this.pageSize || 5;
 
             // 构建查询参数
-            let field = '';
+            let field = this.selectedField || '';
             let keyword = this.queryStr || '';
 
-            if (this.selectedField === '1') {
-                field = 'questionLevel';
-            } else if (this.selectedField === '2') {
-                field = 'categoryName';
-            } else if (this.selectedField === '3') {
-                field = 'questionTitle';
-            } else {
-                field = '';
-            }
+
 
             // 调用getPageData并传入所有参数
             this.getPageData(num, size, field, keyword);
