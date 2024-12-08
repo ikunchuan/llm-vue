@@ -9,10 +9,10 @@
             <div class="header-actions">
                 <!-- 选择查询字段 -->
                 <el-select v-model="selectedField" placeholder="选择查询字段" style="width: 180px;" clearable>
-                    <el-option label="题目类别" value="1" />
-                    <el-option label="题目难度" value="2" />
-                    <el-option label="题目标题" value="3" />
-                    <el-option label="题目内容" value="4" />
+                    <el-option label="题目类别" value="categoryName" />
+                    <el-option label="题目难度" value="questionLevel" />
+                    <el-option label="题目标题" value="questionTitle" />
+                    <el-option label="题目内容" value="questionText" />
                 </el-select>&nbsp;
                 <!-- 输入框 -->
                 <el-input v-model="queryStr" style="width: 220px" placeholder="请输入查询内容" clearable />&nbsp;
@@ -27,9 +27,7 @@
         <el-table :data="tableData" style="width: 100%" @selection-change="handleSelectionChange" v-loading="loading">
             <el-table-column fixed type="selection" width="55" />
             <el-table-column fixed type="index" label="序号" width="55" />
-
             <el-table-column prop="categoryName" label="类别" width="120" />
-
             <el-table-column prop="questionLevel" label="题目难度" width="120">
                 <template #default="scope">
                     {{ formatLevel(scope.row.questionLevel) }}
@@ -282,18 +280,33 @@ export default {
         handleSizeChange(pageSize) {
             this.pageSize = pageSize;
             console.log("当前页大小: ", this.pageSize);
-            this.getPageData(this.currentPage, this.pageSize, this.searchField, this.queryStr);
+            this.getPageData(this.currentPage, this.pageSize, this.selectedField, this.queryStr);
         },
 
         // 页码变化
         handleCurrentChange(pageNum) {
             this.currentPage = pageNum;
             console.log("当前页码: ", this.currentPage);
-            this.getPageData(this.currentPage, this.pageSize, this.searchField, this.queryStr);
+            this.getPageData(this.currentPage, this.pageSize, this.selectedField, this.queryStr);
         },
 
         // 获取分页数据
         getPageData(num, size, searchField, searchKeyword) {
+            
+            if (this.selectedField === 'questionLevel') {
+                if (searchKeyword === '入门') {
+                    searchKeyword = 1;
+                } else if (searchKeyword === '简单') {
+                    searchKeyword = 2;
+                } else if (searchKeyword === '中等') {
+                    searchKeyword = 3;
+                } else if (searchKeyword === '困难') {
+                    searchKeyword = 4;
+                } else if (searchKeyword === '极难') {
+                    searchKeyword = 5;
+                }
+            } 
+
             // 构建查询条件对象，假设你希望根据 questionTitle 和 categoryName 搜索
             let questionSearch = {
                 categoryName: searchField === 'categoryName' ? searchKeyword : '',
@@ -301,6 +314,7 @@ export default {
                 questionTitle: searchField === 'questionTitle' ? searchKeyword : '',
                 questionText: searchField === 'questionText' ? searchKeyword : ''
             };
+
 
             console.log("请求分页参数: ", num, size, searchField, searchKeyword);
 
@@ -469,14 +483,10 @@ export default {
             let size = this.pageSize || 5;
 
             // 构建查询参数
-            let field = '';
+            let field = this.selectedField || '';
             let keyword = this.queryStr || '';
 
-
-            if (this.selectedField === '1') {
-                field = 'categoryName';
-            } else if (this.selectedField === '2') {
-                field = 'questionLevel';
+            if (this.selectedField === 'questionLevel') {
                 if (keyword === '入门') {
                     keyword = 1;
                 } else if (keyword === '简单') {
@@ -488,13 +498,7 @@ export default {
                 } else if (keyword === '极难') {
                     keyword = 5;
                 }
-            } else if (this.selectedField === '3') {
-                field = 'questionTitle';
-            } else if (this.selectedField === '4') {
-                field = 'questionText';
-            } else {
-                field = '';
-            }
+            } 
 
             // 调用getPageData并传入所有参数
             this.getPageData(num, size, field, keyword);
