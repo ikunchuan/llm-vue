@@ -6,21 +6,19 @@
             <div class="header-actions">
                 <!-- 查询字段选择：让用户选择查询的字段 -->
                 <el-select v-model="selectedField" placeholder="选择查询字段" style="width: 180px;">
-                    <el-option label="社区类别" value="1"></el-option>
-                    <el-option label="社区名" value="2"></el-option>
-                    <el-option label="社区描述" value="3"></el-option>
-                    <el-option label="创建者" value="4"></el-option>
+                    <el-option label="社区类别" value="categoryName"></el-option>
+                    <el-option label="社区名" value="communityName"></el-option>
+                    <el-option label="社区描述" value="communityDescription"></el-option>
+                    <el-option label="创建者" value="userName"></el-option>
                 </el-select>&nbsp;
 
                 <!-- 输入框：输入查询内容 -->
                 <el-input v-model="queryStr" style="width: 220px" placeholder="请输入查询内容" />&nbsp;
 
-
                 <!-- <el-input v-model="queryStr" style="width: 220px" placeholder="请输入课程名称" />&nbsp; -->
                 <el-button type="primary" @click="queryInfo">查询</el-button>
                 <el-button class="button" type="success" @click="openAddDialog">添加</el-button>
                 <el-button class="button" type="warning" @click="multipleDelete">多选删除</el-button>
-
 
             </div>
 
@@ -197,12 +195,12 @@ export default {
 
         handleSizeChange(pageSize) {
             this.pageSize = pageSize;
-            this.getPageData(this.currentPage, this.pageSize, this.searchField, this.queryStr);
+            this.getPageData(this.currentPage, this.pageSize, this.selectedField, this.queryStr);
             console.log("size:", pageSize);
         },
         handleCurrentChange(pageNum) {
             this.currentPage = pageNum;
-            this.getPageData(this.currentPage, this.pageSize, this.searchField, this.queryStr);
+            this.getPageData(this.currentPage, this.pageSize, this.selectedField, this.queryStr);
             console.log("num:", pageNum);
         },
         getPageData(num, size, searchField, searchKeyword) {
@@ -429,26 +427,9 @@ export default {
             let size = this.pageSize || 3;
 
             // 构建查询参数
-            let field = '';
+            let field = this.selectedField || '';
             let keyword = this.queryStr || '';
 
-            // 根据选择的查询字段设置field
-            switch (this.selectedField) {
-                case '1':
-                    field = 'categoryName';
-                    break;
-                case '2':
-                    field = 'communityName';
-                    break;
-                case '3':
-                    field = 'communityDescription';
-                    break;
-                case '4':
-                    field = 'userName';
-                    break;
-                default:
-                    field = '';
-            }
             // 调用getPageData并传入所有参数
             this.getPageData(num, size, field, keyword);
         },

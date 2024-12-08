@@ -150,6 +150,7 @@ export default {
             pageSize: 5,        //当前页条数
             pageNum: 1,     //当前页号
             users: {},
+            commentform: {},        //专门用来显示帖子的评论
             form: {},                       //对话框表单数据
             formLabelWidth: "150px",    //对话框label宽度
             title: "",                           //对话框标题
@@ -204,13 +205,13 @@ export default {
 
         handleSizeChange(pageSize) {            //选择每一页显示的记录数
             this.pageSize = pageSize;
-            this.getPageData(this.currentPage, this.pageSize)
+            this.getPageData(this.currentPage, this.pageSize, this.selectedField, this.queryStr)
             console.log("size:", pageSize);
         },
 
         handleCurrentChange(pageNum) {      //切换页号时得到当时页号
             this.currentPage = pageNum;
-            this.getPageData(this.currentPage, this.pageSize,searchField, searchKeyword)
+            this.getPageData(this.currentPage, this.pageSize, this.selectedField, this.queryStr)
             console.log("num:", pageNum);
             
         },
@@ -245,6 +246,7 @@ export default {
             console.log("closeDialog.....")
         },
 
+        //点击"帖子详情",弹出抽屉,里面是帖子的详细内容
         openDetailDialog(postid) {
             var _this = this
             this.$http.get("/v1/posts/post/" + postid).then(function (response) {
@@ -252,8 +254,17 @@ export default {
                 _this.form = response.data
             })
 
+            this.$http.get("/v1/posts/post/comment/" + postid).then(function (response) {
+                console.log(response.data);
+                _this.commentform = response.data
+            })
+
             this.dialogDetailVisible = true;
+
+
+
         },
+
 
         openAddDialog() {
             this.btnName = "添加";
@@ -411,29 +422,11 @@ export default {
             // 检查当前页码,如果未定义则使用默认值1
             let num = this.currentPage || 1;
             // 检查每页大小,如果未定义则使用默认值3 
-            let size = this.pageSize || 3;
+            let size = this.pageSize || 5;
 
             // 构建查询参数
-            let field = '';
+            let field = this.selectedField || '';
             let keyword = this.queryStr || '';
-
-            // 根据选择的查询字段设置field
-            switch (this.selectedField) {
-                case '1':
-                    field = 'communityName';
-                    break;
-                case '2':
-                    field = 'userName';
-                    break;
-                case '3':
-                    field = 'postTitle';
-                    break;
-                case '4':
-                    field = 'postContent';
-                    break;
-                default:
-                    field = '';
-            }
 
 
             // 调用getPageData并传入所有参数
