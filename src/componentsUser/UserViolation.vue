@@ -8,13 +8,13 @@
                 </div>
                 <!-- 这里可以放置违规用户处理的相关内容 -->
                 <!-- 用户数据表格 -->
-                <el-table :data="tableData" style="width: 100%" @selection-change="handleSelectionChange" v-loading="loading">
+                <el-table :data="tableData" style="width: 100%" @selection-change="handleSelectionChange">
                     <el-table-column type="selection" width="55" />
 
                     <el-table-column prop="userName" label="用户名" width="120" />
-                    <el-table-column prop="userSex" label="性别" width="100" >
+                    <el-table-column prop="userSex" label="性别" width="100">
                         <template #default="scope">
-                            {{ scope.row.userSex==1?'男':'女' }}
+                            {{ scope.row.userSex == 1 ? '男' : '女' }}
                         </template>
                     </el-table-column>
                     <el-table-column prop="userLocal" label="地区" width="120" />
@@ -42,16 +42,16 @@
                             <el-button link type="primary" size="small" @click="openDetailDialog(scope.row.userId)">
                                 详情
                             </el-button>
-                            
+
                         </template>
 
                     </el-table-column>
                 </el-table>
                 <!-- 分页 -->
                 <el-pagination v-model:current-page="currentPage" v-model:page-size="pageSize"
-                            :page-sizes="[3, 5, 10, 20]" layout="total, sizes, prev, pager, next, jumper"
-                            :total="pageInfo.total" @size-change="handleSizeChange" @current-change="handleCurrentChange" />
-                    </el-card>
+                    :page-sizes="[3, 5, 10, 20]" layout="total, sizes, prev, pager, next, jumper"
+                    :total="pageInfo.total" @size-change="handleSizeChange" @current-change="handleCurrentChange" />
+            </el-card>
         </el-main>
 
         <!-- 抽屉：查看社区申请并审核 -->
@@ -66,7 +66,7 @@
                 </el-form-item>
 
                 <el-form-item label="性别" :label-width="formLabelWidth">
-                    {{ form.userSex==1?'男':'女' }}
+                    {{ form.userSex == 1 ? '男' : '女' }}
                 </el-form-item>
 
                 <el-form-item label="地区" :label-width="formLabelWidth">
@@ -106,14 +106,14 @@ import { ElMessage, ElMessageBox } from 'element-plus';
 export default {
     data() {
         return {
-            loading:true,
+            loading: true,
             postData: [],
             dialogDetailVisible: false,
             multipleSelection: [],
             tableData: [],
             pageInfo: {},
-            pageSize: 5,
-            pageNum: 1,
+            pageSize: 5,        //每页显示的条数
+            currentPage: 1,    //当前页码
             form: {},
             formLabelWidth: "150px",
             title: "",
@@ -182,26 +182,44 @@ export default {
 
         handleSizeChange(pageSize) {
             this.pageSize = pageSize;
-            this.getPageData(this.currentPage, this.pageSize);
+            this.getPageData(this.currentPage, this.pageSize, this.selectedField, this.queryStr);
         },
         handleCurrentChange(pageNum) {
             this.currentPage = pageNum;
-            this.getPageData(this.currentPage, this.pageSize);
+            this.getPageData(this.currentPage, this.pageSize, this.selectedField, this.queryStr);
         },
-        getPageData(num, size) {
-            this.$http.get('/uis/v1/ui/search2', { params: { pageNum: num, pageSize: size } })
-                .then((response) => {
-                    this.pageInfo = response.data;
-                    this.tableData = response.data.records;
-                    if (response) {
-                        this.loading = false;
-                    }
+        getPageData(num, size, searchField, searchKeyword) {
 
+            if (this.selectedField === 'userSex') {
+                if (searchKeyword == '男') {
+                    searchKeyword = 1
+                } else if (searchKeyword == '女') {
+                    searchKeyword = 2
+                }
+            }
+
+            // 构建查询条件对象
+            let userInfoSearch = {
+                userName: searchField === 'userName' ? searchKeyword : '',
+                userSex: searchField === 'userSex' ? searchKeyword : ''
+            };
+
+            // 发送POST请求到后端
+            this.$http.post("/uis/v1/ui/search2?pageNum=" + num + "&pageSize=" + size, userInfoSearch)
+                .then(response => {
+                    this.pageInfo = response.data;
+                    this.tableData = this.pageInfo.list;
+                    console.log("查询结果:", this.tableData);
                 })
-                .catch((error) => {
-                    ElMessage.error('数据加载失败，请稍后重试');
+                .catch(error => {
+                    console.error("查询出错:", error);
+                    ElMessage({
+                        type: 'error',
+                        message: '查询失败'
+                    });
                 });
         },
+
         openDetailDialog(userid) {
             this.$http.get("/uis/v1/ui/" + userid).then(response => {
                 this.form = response.data;
@@ -214,7 +232,7 @@ export default {
     },
 
     mounted() {
-        this.getPageData(1, 5)
+        this.getPageData(this.currentPage, this.pageSize)
     }
 
 };
