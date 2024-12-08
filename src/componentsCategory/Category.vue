@@ -254,13 +254,6 @@ export default {
         };
     },
 
-    watch: {
-        currentPage: 'fetchData',
-        pageSize: 'fetchData',
-        queryStr: 'fetchData',
-        selectedField: 'fetchData'
-    },
-
     methods: {
         fetchData() {
             this.getPageData(this.currentPage, this.pageSize, this.selectedField, this.queryStr);
