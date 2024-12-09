@@ -27,9 +27,13 @@
         <el-table :data="tableData" style="width: 100%" @selection-change="handleSelectionChange">
             <el-table-column type="selection" width="55" />
 
-            <el-table-column prop="categoryName" label="社区类别" width="90" />
-            <el-table-column prop="communityName" label="社区名" width="100" />
-            <el-table-column prop="communityDescription" label="社区描述" width="100" />
+            <el-table-column prop="categoryName" label="社区类别" width="120" />
+            <el-table-column prop="communityName" label="社区名" width="160" />
+            <el-table-column prop="communityDescription" label="社区描述" width="130">
+                <template v-slot:default="{ row }">
+                    <span class="ellipsis">{{ row.communityDescription }}</span>
+                </template>
+            </el-table-column>
             <el-table-column prop="userName" label="创建者" width="100" />
 
             <el-table-column prop="updatedTime" label="更新时间" width="200">
@@ -80,7 +84,8 @@
         <el-form :model="form" label-width="120px">
             <el-form-item label="类别">
                 <el-select v-model="form.categoryId" placeholder="--请选择类别--">
-                    <el-option v-for="cat in catIdAndName" :key="cat.categoryId" :label="cat.categoryName" :value="cat.categoryId" />
+                    <el-option v-for="cat in catIdAndName" :key="cat.categoryId" :label="cat.categoryName"
+                        :value="cat.categoryId" />
                 </el-select>
             </el-form-item>
 
@@ -139,7 +144,8 @@ export default {
             tableData: [],    //社区信息数据
             userData: [],        //用户信息数据
             communityUsers: [], // 存储用户列表
-
+            currentPage: 1,
+            pageSize: 5,
 
             queryData: [],
             pageInfo: {},       //分页信息对象
@@ -281,7 +287,7 @@ export default {
             this.dialogFormVisible = true; // 打开对话框
             console.log("openAddDialog....");
         },
-        
+
         //打开修改对话框,修改数据回显
         openUpdateDialog(row) {
             this.btnName = "修改";
@@ -423,7 +429,7 @@ export default {
             console.log("查询内容:", this.queryStr);
             // 检查当前页码,如果未定义则使用默认值1
             let num = this.currentPage || 1;
-            // 检查每页大小,如果未定义则使用默认值3 
+            // 检查每页大小,如果未定义则使用默认值5
             let size = this.pageSize || 5;
 
             // 构建查询参数
@@ -495,6 +501,7 @@ export default {
 .dialog-footer {
     text-align: center;
 }
+
 /* 滚动条 */
 .scrollable {
     max-height: 400px;
@@ -502,4 +509,10 @@ export default {
     padding-right: 10px;
 }
 
+.ellipsis {
+    display: block;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
 </style>
