@@ -174,6 +174,7 @@
 
 <script >
 import { ElMessage, ElMessageBox } from 'element-plus';
+import { fa } from 'element-plus/es/locales.mjs';
 
 export default {
     data() {
@@ -215,6 +216,10 @@ export default {
             console.log("当前页大小: ", pageSize);
             this.pageSize = pageSize;
             this.getPageData(this.currentPage, this.pageSize);
+        },
+        //详情关闭
+        handleClose() {
+            this.dialogDetailVisible = false;
         },
 
         // 页码变化
@@ -348,19 +353,19 @@ export default {
             }).catch(() => { });
         },
 
-        // 批量删除
-        multipleDelete() {
+           //批量删除
+            multipleDelete() {
             if (this.multipleSelection.length > 0) {
                 ElMessageBox.confirm('是否删除选中的所有数据?', '批量删除提示', {
                     confirmButtonText: '确定',
                     cancelButtonText: '取消',
                     type: "warning",
                 }).then(() => {
-                    const ids = this.multipleSelection.map(item => item.competitionId);
-                    this.$http.post(`http://localhost:10086/comdetail/v1/detail/${ids}`,).then((response) => {
-                        if (response.data == 1) {
+                    const compeids = this.multipleSelection.map(item => item.competitionId);
+                    this.$http.delete(`/comdetail/v1/detail`, { data: compeids }).then((response) => {
+                        if (response.data > 0) {
                             ElMessage({ message: '批量删除成功', type: "success" });
-                            this.getPageData(this.currentPage, this.pageSize); // 刷新数据
+                            this.getPageData(this.currentPage, this.pageSize, '', ''); // 刷新数据
                         } else {
                             ElMessage({ message: '批量删除失败', type: "warning" });
                         }
@@ -372,6 +377,7 @@ export default {
                 ElMessage({ message: '请选择要删除的记录', type: "warning" });
             }
         },
+
 
         // 查询功能
         queryInfo() {

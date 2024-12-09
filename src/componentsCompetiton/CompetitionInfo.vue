@@ -147,7 +147,7 @@
 
     <template #footer>
         <div style="text-align: right; margin-top: 20px">
-            <el-button @click="dialogDetailVisible = false">关闭</el-button>
+            <el-button @click="dialogDetailVisible =false">关闭</el-button>
         </div>
     </template>
 </el-drawer>
@@ -172,7 +172,8 @@ export default {
             formLabelWidth: '150px',
 
             dialogFormVisible: false,
-            dialogDetailVisible: false, queryStr: "",
+            dialogDetailVisible: false,
+            queryStr: "",
             searchParams: {}, // 用于存储查询参数
             title: '',
             btnName: '',
@@ -242,7 +243,7 @@ export default {
                     ElMessage({ message: '竞赛信息添加成功！', type: "success" });
                     this.getPageData(this.currentPage, this.pageSize); // 刷新数据
                     this.dialogFormVisible = false; // 关闭对话框
-                   
+                    
 
                 } else {
                     ElMessage({ message: '信息添加失败！', type: "error" });
@@ -252,7 +253,7 @@ export default {
             ).catch((err) => {
                 ElMessage({ message: '请求失败，请重试', type: "error" });
             });
-           
+            
         },
 
         // 打开编辑对话框
@@ -319,7 +320,7 @@ export default {
             }).catch(() => { });
         },
 
-        //批量删除
+     //批量删除
         multipleDelete() {
             if (this.multipleSelection.length > 0) {
                 ElMessageBox.confirm('是否删除选中的所有数据?', '批量删除提示', {
@@ -331,7 +332,7 @@ export default {
                     this.$http.delete(`/comp/v1/compe`, { data: ids }).then((response) => {
                         if (response.data > 0) {
                             ElMessage({ message: '批量删除成功', type: "success" });
-                            this.getPageData(this.currentPage, this.pageSize); // 刷新数据
+                            this.getPageData(this.currentPage, this.pageSize, '', ''); // 刷新数据
                         } else {
                             ElMessage({ message: '批量删除失败', type: "warning" });
                         }
@@ -343,6 +344,8 @@ export default {
                 ElMessage({ message: '请选择要删除的记录', type: "warning" });
             }
         },
+
+
         
                 // 获取分页数据
         getPageData(num, size, searchField, searchKeyword) {
