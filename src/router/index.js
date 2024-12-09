@@ -12,6 +12,7 @@ import UserMonitor from "../componentsUser/UserMonitor.vue"; // 用户行为监�
 import UserViolation from "../componentsUser/UserViolation.vue"; // 违规用户处理
 import CompetitionInfo from "../componentsCompetiton/CompetitionInfo.vue"; // 竞赛信息管理
 import CompetitionDetail from "../componentsCompetiton/CompetitionDetail.vue"; // 竞赛详情信息管理
+import CompetitionAdd from "../componentsCompetiton/CompetitionAdd.vue"; // 竞赛详情信息管理
 import Category from "../componentsCategory/Category.vue"; // 类别管理
 import CourseInfo from "../componentsCourse/CourseInfo.vue"; // 课程信息管理
 import CourseDetail from "../componentsCourse/CourseDetail.vue"; // 课程详细内容管理
@@ -78,6 +79,8 @@ const routes = [
       { path: "userViolation", component: UserViolation },
       { path: "competitionInfo", component: CompetitionInfo },
       { path: "competitionDetail", component: CompetitionDetail },
+      { path: "competitionAdd", component: CompetitionAdd },
+
       { path: "category", component: Category },
       { path: "courseInfo", component: CourseInfo },
       { path: "courseDetail", component: CourseDetail },
