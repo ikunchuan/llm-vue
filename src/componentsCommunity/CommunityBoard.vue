@@ -88,9 +88,10 @@
     <!-- 修改抽屉 -->
     <el-drawer v-model="dialogFormVisible" :title="title" size="35%" direction="rtl">
         <el-form :model="form" label-width="120px">
+            
             <el-form-item label="类别">
                 <el-select v-model="form.categoryId" placeholder="--请选择类别--">
-                    <el-option v-for="cat in catIdAndName" :key="cat.categoryId" :label="cat.categoryName"
+                    <el-option v-for="cat in filteredCatIdAndName" :key="cat.categoryId" :label="cat.categoryName"
                         :value="cat.categoryId" />
                 </el-select>
             </el-form-item>
@@ -178,6 +179,11 @@ export default {
         };
     },
 
+    computed: {
+        filteredCatIdAndName() {
+            return this.catIdAndName.filter(item => item.parentId != null);
+        },
+    },
 
     methods: {
         handleSuccess(response) {            //图片上传成功后的回调函数
@@ -468,6 +474,12 @@ export default {
 
     mounted() {
         this.getPageData(this.currentPage, this.pageSize);
+
+        //在页面加载时获取所有分类，给到添加和编辑题目的分类下拉框
+        this.$http.get('/cat/v1/all').then((response) => {
+            this.catIdAndName = response.data;
+            console.log(this.catIdAndName);
+        });
     }
 
 }

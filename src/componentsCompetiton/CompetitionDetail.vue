@@ -75,7 +75,7 @@
             <el-input v-model="form.competitionName" type="textarea" autocomplete="off" />
         </el-form-item>
 
-        <el-form-item label="竞赛详情" :label-width="formLabelWidth">
+        <el-form-item label="竞赛描述" :label-width="formLabelWidth">
             <el-input v-model="form.competitionDescription" type="textarea" autocomplete="off" />
         </el-form-item>
 
@@ -104,25 +104,23 @@
             <el-input v-model="form.registrationDeadline" type="textarea" autocomplete="off" />
         </el-form-item>
 
-        <el-form-item label="作品提交指南" :label-width="formLabelWidth">
-            <el-input v-model="form.registrationGuide" type="textarea" autocomplete="off" />
+        <el-form-item label="竞赛详情" :label-width="formLabelWidth">
+            <div class="competition-details">
+                <Toolbar
+                    style="border-bottom: 1px solid #ccc"
+                    :editor="editorRef"
+                    :defaultConfig="toolbarConfig"
+                    :mode="mode"
+                />
+                <Editor
+                    v-model="form.detail"
+                    :defaultConfig="editorConfig"
+                    :mode="mode"
+                    @onCreated="handleCreated"
+                />
+            </div>
         </el-form-item>
 
-        <el-form-item label="优秀案例展示" :label-width="formLabelWidth">
-            <el-input v-model="form.outstandingCases" type="textarea" autocomplete="off" />
-        </el-form-item>
-
-        <el-form-item label="竞赛参赛资格要求" :label-width="formLabelWidth">
-            <el-input v-model="form.eligibilityCriteria" type="textarea" autocomplete="off" />
-        </el-form-item>
-
-        <el-form-item label="评审标准" :label-width="formLabelWidth">
-            <el-input v-model="form.judgingCriteria" type="textarea" autocomplete="off" />
-        </el-form-item>
-
-        <el-form-item label="奖品详情" :label-width="formLabelWidth">
-            <el-input v-model="form.prizeDetails" type="textarea" autocomplete="off" />
-        </el-form-item>
 
     </el-form>
 
@@ -143,7 +141,7 @@
         <el-descriptions direction="vertical" title="竞赛详细信息" column="3" border>
             <el-descriptions-item label="竞赛ID">{{ form.competitionId }}</el-descriptions-item>
             <el-descriptions-item label="竞赛名称">{{ form.competitionName }}</el-descriptions-item>
-            <el-descriptions-item label="竞赛详情">{{ form.competitionDescription }}</el-descriptions-item>
+            <el-descriptions-item label="竞赛描述">{{ form.competitionDescription }}</el-descriptions-item>
             <el-descriptions-item label="竞赛主办方">{{ form.competitionOrganizer }}</el-descriptions-item>
             <el-descriptions-item label="竞赛开始日期">{{ form.startDate }}</el-descriptions-item>
             <el-descriptions-item label="竞赛结束日期">{{ form.endDate }}</el-descriptions-item>
@@ -153,11 +151,7 @@
         </el-descriptions>
     
         <el-descriptions direction="vertical" column="3" :style="blockMargin">
-            <el-descriptions-item label="作品提交指南">{{ form.registrationGuide }}</el-descriptions-item>
-            <el-descriptions-item label="优秀案例展示">{{ form.outstandingCases }}</el-descriptions-item>
-            <el-descriptions-item label="竞赛参赛资格要求">{{ form.eligibilityCriteria }}</el-descriptions-item>
-            <el-descriptions-item label="评审标准">{{ form.judgingCriteria }}</el-descriptions-item>
-            <el-descriptions-item label="奖品详情">{{ form.prizeDetails }}</el-descriptions-item>
+            <el-descriptions-item label="竞赛详情">{{ form.detail }}</el-descriptions-item>
             <el-descriptions-item label="更新时间">{{ form.updatedTime }}</el-descriptions-item>
             <el-descriptions-item label="创建时间">{{ form.createdTime }}</el-descriptions-item>
         </el-descriptions>
@@ -174,12 +168,23 @@
 
 <script >
 import { ElMessage, ElMessageBox } from 'element-plus';
+import { fa } from 'element-plus/es/locales.mjs';
+import { Editor, Toolbar } from '@wangeditor/editor-for-vue';
 
 export default {
     data() {
         return {
             name: '竞赛详情信息',
             queryStr: "",
+
+            competition: {
+                name: '',
+                description: '', // 假设后端返回的竞赛详情是纯文本格式
+            },
+            editorRef: null,
+            editorConfig: { placeholder: '请输入竞赛详情...' },
+            mode: 'default',
+            
 
             currentPage: 1,
             pageSize: 5,
@@ -203,6 +208,16 @@ export default {
         };
     },
     methods: {
+        handleCreated(editor){
+            this.editorRef = editor;
+            },
+        onBeforeUnmount(){
+            if (this.editorRef) {
+                this.editorRef.destroy();
+            }
+        },
+
+
         // 处理时间格式化
         formatDate(value) {
             if (!value) return '-';
@@ -215,6 +230,10 @@ export default {
             console.log("当前页大小: ", pageSize);
             this.pageSize = pageSize;
             this.getPageData(this.currentPage, this.pageSize);
+        },
+        //详情关闭
+        handleClose() {
+            this.dialogDetailVisible = false;
         },
 
         // 页码变化
@@ -258,7 +277,7 @@ export default {
         addQuestion() {
             
              // 确保所有必填字段都已填写
-            if (!this.form.competitionDescription || !this.form.competitionOrganizer || !this.form.startDate||  !this.form.endDate||  !this.form.competitionUrl||  !this.form.competitionSchedule||  !this.form.startDate||  !this.form.registrationDeadline||  !this.form.registrationGuide||  !this.form.outstandingCases||  !this.form.eligibilityCriteria||  !this.form.judgingCriteria||  !this.form.prizeDetails) {
+            if (!this.form.competitionDescription || !this.form.competitionOrganizer || !this.form.startDate||  !this.form.endDate||  !this.form.competitionUrl||  !this.form.competitionSchedule||  !this.form.startDate||  !this.form.registrationDeadline||  !this.form.detail) {
                 ElMessage({ message: '请填写完整的竞赛信息！', type: "warning" });
                 return;
             }
@@ -348,19 +367,19 @@ export default {
             }).catch(() => { });
         },
 
-        // 批量删除
-        multipleDelete() {
+           //批量删除
+            multipleDelete() {
             if (this.multipleSelection.length > 0) {
                 ElMessageBox.confirm('是否删除选中的所有数据?', '批量删除提示', {
                     confirmButtonText: '确定',
                     cancelButtonText: '取消',
                     type: "warning",
                 }).then(() => {
-                    const ids = this.multipleSelection.map(item => item.competitionId);
-                    this.$http.post(`http://localhost:10086/comdetail/v1/detail/${ids}`,).then((response) => {
-                        if (response.data == 1) {
+                    const compeids = this.multipleSelection.map(item => item.competitionId);
+                    this.$http.delete(`/comdetail/v1/detail`, { data: compeids }).then((response) => {
+                        if (response.data > 0) {
                             ElMessage({ message: '批量删除成功', type: "success" });
-                            this.getPageData(this.currentPage, this.pageSize); // 刷新数据
+                            this.getPageData(this.currentPage, this.pageSize, '', ''); // 刷新数据
                         } else {
                             ElMessage({ message: '批量删除失败', type: "warning" });
                         }
@@ -372,6 +391,7 @@ export default {
                 ElMessage({ message: '请选择要删除的记录', type: "warning" });
             }
         },
+
 
         // 查询功能
         queryInfo() {
@@ -391,7 +411,9 @@ export default {
         handleSelectionChange(val) {
             this.multipleSelection = val;
         },
+        
     },
+    components: { Editor, Toolbar },
     mounted() {
         this.getPageData(this.currentPage, this.pageSize);
     },

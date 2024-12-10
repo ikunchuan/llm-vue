@@ -22,9 +22,13 @@
             <el-table-column prop="competitionName" label="竞赛名称" width="120" />
             <el-table-column prop="categoryName"  label="竞赛类别" width="120" />
             <el-table-column prop="levelName" label="竞赛等级" width="120" />
-            <el-table-column label="竞赛图片链接" width="180" >
-            <template #default="{ row }">
-                <a :href="row.competitionImgUrl" target="_blank" rel="noopener noreferrer">{{ row.competitionImgUrl }}</a>
+            <el-table-column label="竞赛图片" width="100" >
+            <template #default="scope">
+            <el-image 
+                style="width: 70px; height: 70px"
+                :src="'http://localhost:10086/images/upload/'+scope.row.competitionImgUrl" 
+                :preview-src-list="srcList">
+            </el-image>
             </template>
             </el-table-column>
             <el-table-column prop="competitionStatus" label="竞赛状态" width="120" />
@@ -58,46 +62,62 @@
 
 <el-drawer v-model="dialogFormVisible" :title="title" size="50%">
     <el-form :model="form">
-        <el-form-item label="类别" :label-width="formLabelWidth">
-                <el-select v-model="form.categoryName" placeholder="-- 请选择类别 --">
-                    <el-option v-for="cat in catIdAndName" :key="cat.categoryId" :label="cat.categoryName"
-                        :value="cat.categoryId" />
-                </el-select>
-            </el-form-item>
-        
-        <el-form-item label="竞赛名称" :label-width="formLabelWidth">
-            <el-input v-model="form.competitionName" autocomplete="off" />
-        </el-form-item>
+        <el-row :gutter="24">
+            <el-col :span="18">
+            
+                <el-form-item label="类别" :label-width="formLabelWidth">
+                        <el-select v-model="form.categoryId" placeholder="-- 请选择类别 --">
+                            <el-option v-for="cat in catIdAndName" :key="cat.categoryId" :label="cat.categoryName"
+                                :value="cat.categoryId" />
+                        </el-select>
+                    </el-form-item>
+            
+                <el-form-item label="竞赛名称" :label-width="formLabelWidth">
+                    <el-input v-model="form.competitionName" autocomplete="off" />
+                </el-form-item>
 
-        <el-form-item label="竞赛等级" :label-width="formLabelWidth">
-            <el-select v-model="form.levelName">
-                <el-option label="国际级" value="国际级" />
-                <el-option label="国家级A类" value="国家级A类" />
-                <el-option label="国家级B类" value="国家级B类" />
-                <el-option label="省级A类" value="省级A类" />
-            </el-select>
-        </el-form-item>
+                <el-form-item label="竞赛等级" :label-width="formLabelWidth">
+                    <el-select v-model="form.levelName">
+                        <el-option label="国际级" value="国际级" />
+                        <el-option label="国家级A类" value="国家级A类" />
+                        <el-option label="国家级B类" value="国家级B类" />
+                        <el-option label="省级A类" value="省级A类" />
+                    </el-select>
+                </el-form-item>
 
-        <el-form-item label="竞赛图片链接" :label-width="formLabelWidth">
-            <el-input v-model="form.competitionImgUrl" autocomplete="off" />
-        </el-form-item>
+                <el-form-item label="竞赛图片链接" :label-width="formLabelWidth">
+                    <el-input v-model="form.competitionImgUrl" autocomplete="off" />
+                </el-form-item>
 
-        <el-form-item label="竞赛状态" :label-width="formLabelWidth">
-            <el-select v-model="form.competitionStatus">
-                <el-option label="未开始" value="未开始" />
-                <el-option label="进行中" value="进行中" />
-                <el-option label="已结束" value="已结束" />
-            </el-select>
-        </el-form-item>
+                <el-form-item label="竞赛状态" :label-width="formLabelWidth">
+                    <el-select v-model="form.competitionStatus">
+                        <el-option label="未开始" value="未开始" />
+                        <el-option label="进行中" value="进行中" />
+                        <el-option label="已结束" value="已结束" />
+                    </el-select>
+                </el-form-item>
 
-        <el-form-item label="是否激活" :label-width="formLabelWidth">
-            <el-select v-model="form.isActive">
-                <el-option label="停用" value="停用" />
-                <el-option label="激活" value="激活" />
-            </el-select>
-        </el-form-item>
+                <el-form-item label="是否激活" :label-width="formLabelWidth">
+                    <el-select v-model="form.isActive">
+                        <el-option label="停用" value="停用" />
+                        <el-option label="激活" value="激活" />
+                    </el-select>
+                </el-form-item>
+                
+                </el-col>
+            <el-col :span="6">
+                    <el-upload
+                    class="avatar-uploader"
+                    action="http://localhost:10086/comp/v1/upload"
+                    :show-file-list="false"
+                    :on-success="handleSuccess"
+                    :before-upload="beforeAvatarUpload">
+                    <img v-if="form.competitionImgUrl" :src="'http://localhost:10086/images/upload/'+form.competitionImgUrl" class="avatar">
+                    <i v-else class="el-icon-plus avatar-uploader-icon"><Plus/></i>
+                    </el-upload>
+            </el-col>
+        </el-row>
     </el-form>
-
     <template #footer>
         <div style="flex: auto; text-align: right;">
             <el-button @click="dialogFormVisible = false">取消</el-button>
@@ -147,7 +167,7 @@
 
     <template #footer>
         <div style="text-align: right; margin-top: 20px">
-            <el-button @click="dialogDetailVisible = false">关闭</el-button>
+            <el-button @click="dialogDetailVisible =false">关闭</el-button>
         </div>
     </template>
 </el-drawer>
@@ -155,6 +175,7 @@
 
 <script>
 import { ElMessage, ElMessageBox } from 'element-plus';
+import { Plus } from '@element-plus/icons-vue';
 
 export default {
     data() {
@@ -172,10 +193,12 @@ export default {
             formLabelWidth: '150px',
 
             dialogFormVisible: false,
-            dialogDetailVisible: false, queryStr: "",
+            dialogDetailVisible: false,
+            queryStr: "",
             searchParams: {}, // 用于存储查询参数
             title: '',
             btnName: '',
+            imageUrl: "",//图片URL地址
 
 
             multipleSelection: [],
@@ -186,7 +209,18 @@ export default {
             ],
         };
     },
+    //编辑和添加回显不显示一级类别
+    computed: {
+        filteredCatIdAndName() {
+            return this.catIdAndName.filter(item => item.parentId != null);
+        },
+    },
     methods: {
+        //图片上传后回调函数
+        handleSuccess(response) {
+            console.log(response);
+            this.form.competitionImgUrl = response;
+        },
         //详情类别表信息展示
         isCorrectId() {
             return this.catIdAndName.filter(item => item.categoryId === this.form.categoryId)[0].categoryName
@@ -242,7 +276,7 @@ export default {
                     ElMessage({ message: '竞赛信息添加成功！', type: "success" });
                     this.getPageData(this.currentPage, this.pageSize); // 刷新数据
                     this.dialogFormVisible = false; // 关闭对话框
-                   
+                    
 
                 } else {
                     ElMessage({ message: '信息添加失败！', type: "error" });
@@ -252,7 +286,7 @@ export default {
             ).catch((err) => {
                 ElMessage({ message: '请求失败，请重试', type: "error" });
             });
-           
+            
         },
 
         // 打开编辑对话框
@@ -327,11 +361,11 @@ export default {
                     cancelButtonText: '取消',
                     type: "warning",
                 }).then(() => {
-                    const ids = this.multipleSelection.map(item => item.competitionId);
-                    this.$http.delete(`/comp/v1/compe`, { data: ids }).then((response) => {
+                    const compeids = this.multipleSelection.map(item => item.competitionId);
+                    this.$http.delete(`/comp/v1/compe`, { data: compeids }).then((response) => {
                         if (response.data > 0) {
                             ElMessage({ message: '批量删除成功', type: "success" });
-                            this.getPageData(this.currentPage, this.pageSize); // 刷新数据
+                            this.getPageData(this.currentPage, this.pageSize, '', ''); // 刷新数据
                         } else {
                             ElMessage({ message: '批量删除失败', type: "warning" });
                         }
@@ -343,6 +377,8 @@ export default {
                 ElMessage({ message: '请选择要删除的记录', type: "warning" });
             }
         },
+
+
         
                 // 获取分页数据
         getPageData(num, size, searchField, searchKeyword) {
@@ -397,7 +433,10 @@ export default {
             console.log(this.multipleSelection);
         },
     },
-    mounted() {
+    components: {
+        Plus
+    },
+        mounted() {
     this.getPageData(this.currentPage, this.pageSize, 'competitionName', this.queryStr);
 
     // 获取所有分类
@@ -408,3 +447,28 @@ export default {
     },
 };
 </script>
+<style>
+    .avatar-uploader .el-upload {
+        border: 1px dashed #d9d9d9;
+        border-radius: 6px;
+        cursor: pointer;
+        position: relative;
+        overflow: hidden;
+    }
+    .avatar-uploader .el-upload:hover {
+        border-color: #409EFF;
+    }
+    .avatar-uploader-icon {
+        font-size: 28px;
+        color: #8c939d;
+        width: 178px;
+        height: 178px;
+        line-height: 178px;
+        text-align: center;
+    }
+    .avatar {
+        width: 178px;
+        height: 178px;
+        display: block;
+    }
+</style>
