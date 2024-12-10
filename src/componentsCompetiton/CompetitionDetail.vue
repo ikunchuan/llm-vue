@@ -75,7 +75,7 @@
             <el-input v-model="form.competitionName" type="textarea" autocomplete="off" />
         </el-form-item>
 
-        <el-form-item label="竞赛详情" :label-width="formLabelWidth">
+        <el-form-item label="竞赛描述" :label-width="formLabelWidth">
             <el-input v-model="form.competitionDescription" type="textarea" autocomplete="off" />
         </el-form-item>
 
@@ -105,7 +105,20 @@
         </el-form-item>
 
         <el-form-item label="竞赛详情" :label-width="formLabelWidth">
-            <el-input v-model="form.detail" type="textarea" autocomplete="off" />
+            <div class="competition-details">
+                <Toolbar
+                    style="border-bottom: 1px solid #ccc"
+                    :editor="editorRef"
+                    :defaultConfig="toolbarConfig"
+                    :mode="mode"
+                />
+                <Editor
+                    v-model="form.detail"
+                    :defaultConfig="editorConfig"
+                    :mode="mode"
+                    @onCreated="handleCreated"
+                />
+            </div>
         </el-form-item>
 
 
@@ -128,7 +141,7 @@
         <el-descriptions direction="vertical" title="竞赛详细信息" column="3" border>
             <el-descriptions-item label="竞赛ID">{{ form.competitionId }}</el-descriptions-item>
             <el-descriptions-item label="竞赛名称">{{ form.competitionName }}</el-descriptions-item>
-            <el-descriptions-item label="竞赛详情">{{ form.competitionDescription }}</el-descriptions-item>
+            <el-descriptions-item label="竞赛描述">{{ form.competitionDescription }}</el-descriptions-item>
             <el-descriptions-item label="竞赛主办方">{{ form.competitionOrganizer }}</el-descriptions-item>
             <el-descriptions-item label="竞赛开始日期">{{ form.startDate }}</el-descriptions-item>
             <el-descriptions-item label="竞赛结束日期">{{ form.endDate }}</el-descriptions-item>
@@ -156,12 +169,22 @@
 <script >
 import { ElMessage, ElMessageBox } from 'element-plus';
 import { fa } from 'element-plus/es/locales.mjs';
+import { Editor, Toolbar } from '@wangeditor/editor-for-vue';
 
 export default {
     data() {
         return {
             name: '竞赛详情信息',
             queryStr: "",
+
+            competition: {
+                name: '',
+                description: '', // 假设后端返回的竞赛详情是纯文本格式
+            },
+            editorRef: null,
+            editorConfig: { placeholder: '请输入竞赛详情...' },
+            mode: 'default',
+            
 
             currentPage: 1,
             pageSize: 5,
@@ -185,6 +208,16 @@ export default {
         };
     },
     methods: {
+        handleCreated(editor){
+            this.editorRef = editor;
+            },
+        onBeforeUnmount(){
+            if (this.editorRef) {
+                this.editorRef.destroy();
+            }
+        },
+
+
         // 处理时间格式化
         formatDate(value) {
             if (!value) return '-';
@@ -244,7 +277,7 @@ export default {
         addQuestion() {
             
              // 确保所有必填字段都已填写
-            if (!this.form.competitionDescription || !this.form.competitionOrganizer || !this.form.startDate||  !this.form.endDate||  !this.form.competitionUrl||  !this.form.competitionSchedule||  !this.form.startDate||  !this.form.registrationDeadline||  !this.form.registrationGuide||  !this.form.outstandingCases||  !this.form.eligibilityCriteria||  !this.form.judgingCriteria||  !this.form.prizeDetails) {
+            if (!this.form.competitionDescription || !this.form.competitionOrganizer || !this.form.startDate||  !this.form.endDate||  !this.form.competitionUrl||  !this.form.competitionSchedule||  !this.form.startDate||  !this.form.registrationDeadline||  !this.form.detail) {
                 ElMessage({ message: '请填写完整的竞赛信息！', type: "warning" });
                 return;
             }
@@ -378,7 +411,9 @@ export default {
         handleSelectionChange(val) {
             this.multipleSelection = val;
         },
+        
     },
+    components: { Editor, Toolbar },
     mounted() {
         this.getPageData(this.currentPage, this.pageSize);
     },
