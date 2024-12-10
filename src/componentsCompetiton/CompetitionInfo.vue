@@ -57,7 +57,9 @@
     <!-- 编辑、添加对话框 -->
 
 <el-drawer v-model="dialogFormVisible" :title="title" size="50%">
-    <el-form :model="form">
+    <el-row :gutter="24">
+        <el-col :span="18">
+            <el-form :model="form">
         <el-form-item label="类别" :label-width="formLabelWidth">
                 <el-select v-model="form.categoryName" placeholder="-- 请选择类别 --">
                     <el-option v-for="cat in catIdAndName" :key="cat.categoryId" :label="cat.categoryName"
@@ -96,7 +98,20 @@
                 <el-option label="激活" value="激活" />
             </el-select>
         </el-form-item>
-    </el-form>
+            </el-form>
+        </el-col>
+        <el-col :span="6">
+            <el-upload
+        class="avatar-uploader"
+        action="http://localhost:10086/comp/v1/upload"
+        :show-file-list="false"
+        :on-success="handleSuccess"
+        :before-upload="beforeAvatarUpload">
+        <img v-if="imageUrl" :src="imageUrl" class="avatar">
+        <i v-else class="el-icon-plus avatar-uploader-icon"><Plus/></i>
+</el-upload>
+        </el-col>
+    </el-row>
 
     <template #footer>
         <div style="flex: auto; text-align: right;">
@@ -155,6 +170,7 @@
 
 <script>
 import { ElMessage, ElMessageBox } from 'element-plus';
+import { Plus } from '@element-plus/icons-vue';
 
 export default {
     data() {
@@ -177,6 +193,7 @@ export default {
             searchParams: {}, // 用于存储查询参数
             title: '',
             btnName: '',
+            imageUrl: "",//图片URL地址
 
 
             multipleSelection: [],
@@ -188,6 +205,11 @@ export default {
         };
     },
     methods: {
+        //图片上传后回调函数
+        handleSuccess(response) {
+            console.log(response);
+            this.imageUrl = response;
+        },
         //详情类别表信息展示
         isCorrectId() {
             return this.catIdAndName.filter(item => item.categoryId === this.form.categoryId)[0].categoryName
@@ -328,8 +350,8 @@ export default {
                     cancelButtonText: '取消',
                     type: "warning",
                 }).then(() => {
-                    const ids = this.multipleSelection.map(item => item.competitionId);
-                    this.$http.delete(`/comp/v1/compe`, { data: ids }).then((response) => {
+                    const compeids = this.multipleSelection.map(item => item.competitionId);
+                    this.$http.delete(`/comp/v1/compe`, { data: compeids }).then((response) => {
                         if (response.data > 0) {
                             ElMessage({ message: '批量删除成功', type: "success" });
                             this.getPageData(this.currentPage, this.pageSize, '', ''); // 刷新数据
@@ -400,7 +422,10 @@ export default {
             console.log(this.multipleSelection);
         },
     },
-    mounted() {
+    components: {
+        Plus
+    },
+        mounted() {
     this.getPageData(this.currentPage, this.pageSize, 'competitionName', this.queryStr);
 
     // 获取所有分类
@@ -411,3 +436,28 @@ export default {
     },
 };
 </script>
+<style>
+    .avatar-uploader .el-upload {
+        border: 1px dashed #d9d9d9;
+        border-radius: 6px;
+        cursor: pointer;
+        position: relative;
+        overflow: hidden;
+    }
+    .avatar-uploader .el-upload:hover {
+        border-color: #409EFF;
+    }
+    .avatar-uploader-icon {
+        font-size: 28px;
+        color: #8c939d;
+        width: 178px;
+        height: 178px;
+        line-height: 178px;
+        text-align: center;
+    }
+    .avatar {
+        width: 178px;
+        height: 178px;
+        display: block;
+    }
+</style>
