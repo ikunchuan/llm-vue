@@ -97,7 +97,7 @@
         <el-form :model="form">
             <el-form-item label="类别" :label-width="formLabelWidth">
                 <el-select v-model="form.categoryId" placeholder="-- 请选择类别 --">
-                    <el-option v-for="cat in catIdAndName" :key="cat.categoryId" :label="cat.categoryName"
+                    <el-option v-for="cat in filteredCatIdAndName" :key="cat.categoryId" :label="cat.categoryName"
                         :value="cat.categoryId" />
                 </el-select>
             </el-form-item>
@@ -245,6 +245,11 @@ export default {
         };
     },
 
+    computed: {
+        filteredCatIdAndName() {
+            return this.catIdAndName.filter(item => item.parentId != null);
+        },
+    },
     methods: {
         isCorrectId() {
             return this.catIdAndName.filter(item => item.categoryId === this.form.categoryId)[0].categoryName
@@ -292,7 +297,7 @@ export default {
 
         // 获取分页数据
         getPageData(num, size, searchField, searchKeyword) {
-            
+
             if (this.selectedField === 'questionLevel') {
                 if (searchKeyword === '入门') {
                     searchKeyword = 1;
@@ -305,7 +310,7 @@ export default {
                 } else if (searchKeyword === '极难') {
                     searchKeyword = 5;
                 }
-            } 
+            }
 
             // 构建查询条件对象，假设你希望根据 questionTitle 和 categoryName 搜索
             let questionSearch = {
@@ -314,7 +319,6 @@ export default {
                 questionTitle: searchField === 'questionTitle' ? searchKeyword : '',
                 questionText: searchField === 'questionText' ? searchKeyword : ''
             };
-
 
             console.log("请求分页参数: ", num, size, searchField, searchKeyword);
 
@@ -498,7 +502,7 @@ export default {
                 } else if (keyword === '极难') {
                     keyword = 5;
                 }
-            } 
+            }
 
             // 调用getPageData并传入所有参数
             this.getPageData(num, size, field, keyword);

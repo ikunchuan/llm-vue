@@ -38,6 +38,9 @@
               <RouterLink to="/home/competitionDetail" :style="{ color: '#98c6f6' }">竞赛详情管理</RouterLink>
             </el-menu-item>
             <el-menu-item index="2-3">
+              <RouterLink to="/home/competitionAdd" :style="{ color: '#98c6f6' }">竞赛信息添加</RouterLink>
+            </el-menu-item>
+            <el-menu-item index="2-4">
               <RouterLink to="/home/category" :style="{ color: '#98c6f6' }">类别管理</RouterLink>
             </el-menu-item>
           </el-sub-menu>
@@ -210,6 +213,7 @@ export default {
         'userMonitor': '用户行为监控管理',
         'userViolation': '违规用户处理',
         'competitionInfo': '竞赛信息管理',
+        'competitionAdd': '竞赛信息添加',
         'category1': '类别一级分类管理',
         'category2': '类别二级分类管理',
         'courseInfo': '课程信息管理',

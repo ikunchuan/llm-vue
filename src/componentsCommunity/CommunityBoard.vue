@@ -27,9 +27,19 @@
         <el-table :data="tableData" style="width: 100%" @selection-change="handleSelectionChange">
             <el-table-column type="selection" width="55" />
 
-            <el-table-column prop="categoryName" label="社区类别" width="90" />
-            <el-table-column prop="communityName" label="社区名" width="100" />
-            <el-table-column prop="communityDescription" label="社区描述" width="100" />
+            <el-table-column prop="communityImageUrl" label="社区图片" width="100" >
+                <template #default="scope">
+                    <el-image style="width:70px;height:70px" :src="'http://localhost:10086/images/upload/'+scope.row.communityImageUrl" />
+                </template>
+            </el-table-column>
+
+            <el-table-column prop="categoryName" label="社区类别" width="120" />
+            <el-table-column prop="communityName" label="社区名" width="160" />
+            <el-table-column prop="communityDescription" label="社区描述" width="130">
+                <template v-slot:default="{ row }">
+                    <span class="ellipsis">{{ row.communityDescription }}</span>
+                </template>
+            </el-table-column>
             <el-table-column prop="userName" label="创建者" width="100" />
 
             <el-table-column prop="updatedTime" label="更新时间" width="200">
@@ -80,7 +90,8 @@
         <el-form :model="form" label-width="120px">
             <el-form-item label="类别">
                 <el-select v-model="form.categoryId" placeholder="--请选择类别--">
-                    <el-option v-for="cat in catIdAndName" :key="cat.categoryId" :label="cat.categoryName" :value="cat.categoryId" />
+                    <el-option v-for="cat in catIdAndName" :key="cat.categoryId" :label="cat.categoryName"
+                        :value="cat.categoryId" />
                 </el-select>
             </el-form-item>
 
@@ -91,6 +102,15 @@
             <el-form-item label="社区描述">
                 <el-input v-model="form.communityDescription" type="textarea" />
             </el-form-item>
+
+            <el-upload class="avatar-uploader" action="http://localhost:10086/v1/cmns/upload"
+                :show-file-list="false" :on-success="handleSuccess" >
+                <img v-if="form.communityImageUrl" :src="'http://localhost:10086/images/upload/' + form.communityImageUrl" class="avatar" />
+                <el-icon v-else class="avatar-uploader-icon">
+                    <Plus />
+                </el-icon>
+            </el-upload>
+
         </el-form>
         <template #footer>
             <el-button @click="dialogFormVisible = false">取消</el-button>
@@ -139,7 +159,8 @@ export default {
             tableData: [],    //社区信息数据
             userData: [],        //用户信息数据
             communityUsers: [], // 存储用户列表
-
+            currentPage: 1,
+            pageSize: 5,
 
             queryData: [],
             pageInfo: {},       //分页信息对象
@@ -149,21 +170,21 @@ export default {
             formLabelWidth: "150px",    //对话框label宽度
             title: "",                           //对话框标题
             btnName: "",                     //对话框按钮文字
-            imageUrl: "",                     //图片URL
             catIdAndName: [],        //全部类别id和名称
             selectedField: "",          // 选择的查询字段
             searchField: '',
             searchKeyword: '',
+            communityImageUrl: "",                   //图片URL
         };
     },
 
 
     methods: {
-        // handleSuccess(response) {            //图片上传成功后的回调函数
-        //     console.log(response);
-        //     // this.imageUrl = response
-        //     this.form.stu_image_url = response
-        // },
+        handleSuccess(response) {            //图片上传成功后的回调函数
+            console.log(response);
+            // this.communityImageUrl = response
+            this.form.communityImageUrl = response
+        },
 
         fetchCommunityUsers(communityId) {
             this.$http.get(`/v1/cmns/cmnpostuser/${communityId}`)
@@ -246,6 +267,7 @@ export default {
                 communityDescription: '',    // 社区描述
                 communityUnderview: null,    // 社区概览字段
                 createdBy: null,             // 创建者
+                communityImageUrl:'',   //社区图片
             };
         },
 
@@ -281,7 +303,7 @@ export default {
             this.dialogFormVisible = true; // 打开对话框
             console.log("openAddDialog....");
         },
-        
+
         //打开修改对话框,修改数据回显
         openUpdateDialog(row) {
             this.btnName = "修改";
@@ -423,7 +445,7 @@ export default {
             console.log("查询内容:", this.queryStr);
             // 检查当前页码,如果未定义则使用默认值1
             let num = this.currentPage || 1;
-            // 检查每页大小,如果未定义则使用默认值3 
+            // 检查每页大小,如果未定义则使用默认值5
             let size = this.pageSize || 5;
 
             // 构建查询参数
@@ -495,6 +517,7 @@ export default {
 .dialog-footer {
     text-align: center;
 }
+
 /* 滚动条 */
 .scrollable {
     max-height: 400px;
@@ -502,4 +525,33 @@ export default {
     padding-right: 10px;
 }
 
+.ellipsis {
+    display: block;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+</style>
+
+<style>
+.avatar-uploader .el-upload {
+  border: 1px dashed var(--el-border-color);
+  border-radius: 6px;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+  transition: var(--el-transition-duration-fast);
+}
+
+.avatar-uploader .el-upload:hover {
+  border-color: var(--el-color-primary);
+}
+
+.el-icon.avatar-uploader-icon {
+  font-size: 28px;
+  color: #8c939d;
+  width: 178px;
+  height: 178px;
+  text-align: center;
+}
 </style>

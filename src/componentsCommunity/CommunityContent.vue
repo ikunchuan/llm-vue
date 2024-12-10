@@ -22,7 +22,7 @@
 
                 <el-table :data="tableData" style="width: 100%" @selection-change="handleSelectionChange">
                     <el-table-column type="selection" width="55" />
-                    <el-table-column prop="communityName" label="社区名" width="120" />
+                    <el-table-column prop="communityName" label="社区名" width="160" />
                     <el-table-column prop="userName" label="发帖用户" width="120" />
                     <el-table-column prop="postTitle" label="帖子标题" width="200" />
                     <el-table-column prop="postContent" label="帖子内容" width="200">
