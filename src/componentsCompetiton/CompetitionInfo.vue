@@ -22,9 +22,13 @@
             <el-table-column prop="competitionName" label="竞赛名称" width="120" />
             <el-table-column prop="categoryName"  label="竞赛类别" width="120" />
             <el-table-column prop="levelName" label="竞赛等级" width="120" />
-            <el-table-column label="竞赛图片链接" width="180" >
-            <template #default="{ row }">
-                <a :href="row.competitionImgUrl" target="_blank" rel="noopener noreferrer">{{ row.competitionImgUrl }}</a>
+            <el-table-column label="竞赛图片" width="100" >
+            <template #default="scope">
+            <el-image 
+                style="width: 70px; height: 70px"
+                :src="'http://localhost:10086/images/upload/'+scope.row.competitionImgUrl" 
+                :preview-src-list="srcList">
+            </el-image>
             </template>
             </el-table-column>
             <el-table-column prop="competitionStatus" label="竞赛状态" width="120" />
@@ -57,62 +61,63 @@
     <!-- 编辑、添加对话框 -->
 
 <el-drawer v-model="dialogFormVisible" :title="title" size="50%">
-    <el-row :gutter="24">
-        <el-col :span="18">
-            <el-form :model="form">
-        <el-form-item label="类别" :label-width="formLabelWidth">
-                <el-select v-model="form.categoryName" placeholder="-- 请选择类别 --">
-                    <el-option v-for="cat in catIdAndName" :key="cat.categoryId" :label="cat.categoryName"
-                        :value="cat.categoryId" />
-                </el-select>
-            </el-form-item>
-        
-        <el-form-item label="竞赛名称" :label-width="formLabelWidth">
-            <el-input v-model="form.competitionName" autocomplete="off" />
-        </el-form-item>
+    <el-form :model="form">
+        <el-row :gutter="24">
+            <el-col :span="18">
+            
+                <el-form-item label="类别" :label-width="formLabelWidth">
+                        <el-select v-model="form.categoryId" placeholder="-- 请选择类别 --">
+                            <el-option v-for="cat in catIdAndName" :key="cat.categoryId" :label="cat.categoryName"
+                                :value="cat.categoryId" />
+                        </el-select>
+                    </el-form-item>
+            
+                <el-form-item label="竞赛名称" :label-width="formLabelWidth">
+                    <el-input v-model="form.competitionName" autocomplete="off" />
+                </el-form-item>
 
-        <el-form-item label="竞赛等级" :label-width="formLabelWidth">
-            <el-select v-model="form.levelName">
-                <el-option label="国际级" value="国际级" />
-                <el-option label="国家级A类" value="国家级A类" />
-                <el-option label="国家级B类" value="国家级B类" />
-                <el-option label="省级A类" value="省级A类" />
-            </el-select>
-        </el-form-item>
+                <el-form-item label="竞赛等级" :label-width="formLabelWidth">
+                    <el-select v-model="form.levelName">
+                        <el-option label="国际级" value="国际级" />
+                        <el-option label="国家级A类" value="国家级A类" />
+                        <el-option label="国家级B类" value="国家级B类" />
+                        <el-option label="省级A类" value="省级A类" />
+                    </el-select>
+                </el-form-item>
 
-        <el-form-item label="竞赛图片链接" :label-width="formLabelWidth">
-            <el-input v-model="form.competitionImgUrl" autocomplete="off" />
-        </el-form-item>
+                <el-form-item label="竞赛图片链接" :label-width="formLabelWidth">
+                    <el-input v-model="form.competitionImgUrl" autocomplete="off" />
+                </el-form-item>
 
-        <el-form-item label="竞赛状态" :label-width="formLabelWidth">
-            <el-select v-model="form.competitionStatus">
-                <el-option label="未开始" value="未开始" />
-                <el-option label="进行中" value="进行中" />
-                <el-option label="已结束" value="已结束" />
-            </el-select>
-        </el-form-item>
+                <el-form-item label="竞赛状态" :label-width="formLabelWidth">
+                    <el-select v-model="form.competitionStatus">
+                        <el-option label="未开始" value="未开始" />
+                        <el-option label="进行中" value="进行中" />
+                        <el-option label="已结束" value="已结束" />
+                    </el-select>
+                </el-form-item>
 
-        <el-form-item label="是否激活" :label-width="formLabelWidth">
-            <el-select v-model="form.isActive">
-                <el-option label="停用" value="停用" />
-                <el-option label="激活" value="激活" />
-            </el-select>
-        </el-form-item>
-            </el-form>
-        </el-col>
-        <el-col :span="6">
-            <el-upload
-        class="avatar-uploader"
-        action="http://localhost:10086/comp/v1/upload"
-        :show-file-list="false"
-        :on-success="handleSuccess"
-        :before-upload="beforeAvatarUpload">
-        <img v-if="imageUrl" :src="imageUrl" class="avatar">
-        <i v-else class="el-icon-plus avatar-uploader-icon"><Plus/></i>
-</el-upload>
-        </el-col>
-    </el-row>
-
+                <el-form-item label="是否激活" :label-width="formLabelWidth">
+                    <el-select v-model="form.isActive">
+                        <el-option label="停用" value="停用" />
+                        <el-option label="激活" value="激活" />
+                    </el-select>
+                </el-form-item>
+                
+                </el-col>
+            <el-col :span="6">
+                    <el-upload
+                    class="avatar-uploader"
+                    action="http://localhost:10086/comp/v1/upload"
+                    :show-file-list="false"
+                    :on-success="handleSuccess"
+                    :before-upload="beforeAvatarUpload">
+                    <img v-if="form.competitionImgUrl" :src="'http://localhost:10086/images/upload/'+form.competitionImgUrl" class="avatar">
+                    <i v-else class="el-icon-plus avatar-uploader-icon"><Plus/></i>
+                    </el-upload>
+            </el-col>
+        </el-row>
+    </el-form>
     <template #footer>
         <div style="flex: auto; text-align: right;">
             <el-button @click="dialogFormVisible = false">取消</el-button>
@@ -204,11 +209,17 @@ export default {
             ],
         };
     },
+    //编辑和添加回显不显示一级类别
+    computed: {
+        filteredCatIdAndName() {
+            return this.catIdAndName.filter(item => item.parentId != null);
+        },
+    },
     methods: {
         //图片上传后回调函数
         handleSuccess(response) {
             console.log(response);
-            this.imageUrl = response;
+            this.form.competitionImgUrl = response;
         },
         //详情类别表信息展示
         isCorrectId() {
@@ -342,7 +353,7 @@ export default {
             }).catch(() => { });
         },
 
-     //批量删除
+        //批量删除
         multipleDelete() {
             if (this.multipleSelection.length > 0) {
                 ElMessageBox.confirm('是否删除选中的所有数据?', '批量删除提示', {
