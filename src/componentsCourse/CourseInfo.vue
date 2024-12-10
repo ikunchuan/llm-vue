@@ -75,7 +75,7 @@
         <el-form :model="form" label-width="150px">
 
             <el-form-item label="类别" :label-width="formLabelWidth">
-                <el-select v-model="form.categoryId" placeholder="-- 请选择类别 --">
+                <el-select v-model="form.categoryName" placeholder="-- 请选择类别 --">
                     <el-option v-for="cat in filteredCatIdAndName" :key="cat.categoryId" :label="cat.categoryName"
                         :value="cat.categoryId" />
                 </el-select>
