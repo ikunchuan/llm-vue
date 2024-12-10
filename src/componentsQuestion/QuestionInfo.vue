@@ -27,8 +27,8 @@
         <el-table :data="tableData" style="width: 100%" @selection-change="handleSelectionChange" v-loading="loading">
             <el-table-column fixed type="selection" width="55" />
             <el-table-column fixed type="index" label="序号" width="55" />
-            <el-table-column prop="categoryName" label="类别" width="120" />
-            <el-table-column prop="questionLevel" label="题目难度" width="120">
+            <el-table-column prop="categoryName" label="类别" width="150" />
+            <el-table-column prop="questionLevel" label="题目难度" width="150">
                 <template #default="scope">
                     {{ formatLevel(scope.row.questionLevel) }}
                 </template>
@@ -89,7 +89,7 @@
     </el-card>
 
     <!-- 抽屉：添加修改 -->
-    <el-drawer v-model="dialogFormVisible" :direction="direction" size="35%">
+    <el-drawer v-model="dialogFormVisible" size="35%">
         <template #header>
             <h3>{{ title }}</h3>
         </template>
@@ -138,8 +138,8 @@
     </el-drawer>
 
     <!-- 抽屉：详情 -->
-    <el-drawer v-model="dialogDetailVisible" :direction="direction" size="35%">
-        <el-descriptions class="margin-top" title="题目详情信息" :column="2" :size="size" border>
+    <el-drawer v-model="dialogDetailVisible" size="35%">
+        <el-descriptions title="题目详情信息" :column="2" border>
             <template #extra>
                 <el-button type="primary" @click="openUpdateDialog(form)">编辑</el-button>
             </template>
@@ -250,6 +250,7 @@ export default {
             return this.catIdAndName.filter(item => item.parentId != null);
         },
     },
+
     methods: {
         isCorrectId() {
             return this.catIdAndName.filter(item => item.categoryId === this.form.categoryId)[0].categoryName
@@ -344,7 +345,6 @@ export default {
                 }).catch(() => {
                     ElMessage({ message: '请求失败，请重试', type: "error" });
                 });
-
         },
 
         // 添加或编辑按钮点击事件
@@ -480,15 +480,19 @@ export default {
 
         //查询功能
         queryInfo() {
-            console.log("查询内容:", this.queryStr);
+            if (this.queryStr.trim() === '' || this.selectedField === '') {
+                ElMessage({ message: '已为您查询全部数据', type: "warning" });
+            }
+
+            console.log("查询内容:", this.queryStr.trim());
             // 检查当前页码,如果未定义则使用默认值1
             let num = this.currentPage || 1;
-            // 检查每页大小,如果未定义则使用默认值3 
+            // 检查每页大小,如果未定义则使用默认值5
             let size = this.pageSize || 5;
 
             // 构建查询参数
             let field = this.selectedField || '';
-            let keyword = this.queryStr || '';
+            let keyword = this.queryStr.trim() || '';
 
             if (this.selectedField === 'questionLevel') {
                 if (keyword === '入门') {
