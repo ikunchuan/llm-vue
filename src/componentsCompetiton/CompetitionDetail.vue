@@ -104,25 +104,10 @@
             <el-input v-model="form.registrationDeadline" type="textarea" autocomplete="off" />
         </el-form-item>
 
-        <el-form-item label="作品提交指南" :label-width="formLabelWidth">
-            <el-input v-model="form.registrationGuide" type="textarea" autocomplete="off" />
+        <el-form-item label="竞赛详情" :label-width="formLabelWidth">
+            <el-input v-model="form.detail" type="textarea" autocomplete="off" />
         </el-form-item>
 
-        <el-form-item label="优秀案例展示" :label-width="formLabelWidth">
-            <el-input v-model="form.outstandingCases" type="textarea" autocomplete="off" />
-        </el-form-item>
-
-        <el-form-item label="竞赛参赛资格要求" :label-width="formLabelWidth">
-            <el-input v-model="form.eligibilityCriteria" type="textarea" autocomplete="off" />
-        </el-form-item>
-
-        <el-form-item label="评审标准" :label-width="formLabelWidth">
-            <el-input v-model="form.judgingCriteria" type="textarea" autocomplete="off" />
-        </el-form-item>
-
-        <el-form-item label="奖品详情" :label-width="formLabelWidth">
-            <el-input v-model="form.prizeDetails" type="textarea" autocomplete="off" />
-        </el-form-item>
 
     </el-form>
 
@@ -153,11 +138,7 @@
         </el-descriptions>
     
         <el-descriptions direction="vertical" column="3" :style="blockMargin">
-            <el-descriptions-item label="作品提交指南">{{ form.registrationGuide }}</el-descriptions-item>
-            <el-descriptions-item label="优秀案例展示">{{ form.outstandingCases }}</el-descriptions-item>
-            <el-descriptions-item label="竞赛参赛资格要求">{{ form.eligibilityCriteria }}</el-descriptions-item>
-            <el-descriptions-item label="评审标准">{{ form.judgingCriteria }}</el-descriptions-item>
-            <el-descriptions-item label="奖品详情">{{ form.prizeDetails }}</el-descriptions-item>
+            <el-descriptions-item label="竞赛详情">{{ form.detail }}</el-descriptions-item>
             <el-descriptions-item label="更新时间">{{ form.updatedTime }}</el-descriptions-item>
             <el-descriptions-item label="创建时间">{{ form.createdTime }}</el-descriptions-item>
         </el-descriptions>
