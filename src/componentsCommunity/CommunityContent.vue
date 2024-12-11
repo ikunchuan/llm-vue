@@ -1,8 +1,6 @@
 <template>
+            <div slot="header" class="card-header">{{ 社区内容管理 }}</div><br>
             <el-card class="card">
-                <el-tabs title="社区模块管理" v-model="activeName" class="demo-tabs" @tab-click="handleClick">
-                    <el-tab-pane label="帖子" name="first">
-
                     <div class="header-actions">
                         <!-- 查询字段选择：让用户选择查询的字段 -->
                         <el-select v-model="selectedField" placeholder="选择查询字段" style="width: 180px;">
@@ -47,19 +45,20 @@
                             <el-button link type="primary" size="small" @click="openUpdateDialog(scope.row)">
                                 编辑
                             </el-button>
+                            <el-button type="primary" size="small" @click="viewComments(scope.row.postId)">
+                                查看评论
+                            </el-button>
                         </template>
-
                     </el-table-column>
+                    
                 </el-table>
-            </el-tab-pane>
-            <el-tab-pane label="帖子评论" name="second"></el-tab-pane>
-                        </el-tabs>
+
                 <br />
                 <!-- 分页 -->
                 <el-pagination v-model:current-page="currentPage" v-model:page-size="pageSize"
                     :page-sizes="[3, 5, 10, 20]" layout="total, sizes, prev, pager, next, jumper"
                     :total="pageInfo.total" @size-change="handleSizeChange" @current-change="handleCurrentChange" />
- </el-card>
+</el-card>
 
 
     <!-- 对话框:添加,修改功能 -->
@@ -86,41 +85,38 @@
 
 
     <!-- 详情抽屉 -->
-<el-drawer v-model="dialogDetailVisible" :title="'帖子详情'" size="35%" direction="rtl">
-    <el-descriptions title="帖子详情信息" :column="1" border>
-        <el-descriptions-item label="帖子标题">
-            <span>{{ form.postTitle }}</span>
-        </el-descriptions-item>
-        <el-descriptions-item label="帖子内容">
-            <span>{{ form.postContent }}</span>
-        </el-descriptions-item>
-    </el-descriptions>
-
-    <template #footer>
-        <div class="drawer-footer">
-            <el-button @click="dialogDetailVisible = false">关闭</el-button>
-        </div>
-    </template>
-</el-drawer>
-
-
-    <!-- 用户详细表 -->
-    <el-dialog v-model="dialogUserInfoVisible" title="用户详细信息显示" width="600px">
-
-        <el-table :data="users" style="width: 100%">
-            <el-table-column prop="createTime" label="Date" width="180" />
-            <el-table-column prop="createBy" label="Name" width="180" />
-        </el-table>
+    <el-drawer v-model="dialogDetailVisible" :title="'帖子详情'" size="35%" direction="rtl">
+        <el-descriptions title="帖子详情信息" :column="1" border>
+            <el-descriptions-item label="帖子标题">
+                <span>{{ form.postTitle }}</span>
+            </el-descriptions-item>
+            <el-descriptions-item label="帖子内容">
+                <span>{{ form.postContent }}</span>
+            </el-descriptions-item>
+        </el-descriptions>
 
         <template #footer>
-            <div class="dialog-footer">
-                <el-button @click="dialogUserInfoVisible = false">取消</el-button>
+            <div style="flex: auto">
+                <el-button @click="closeDrawer">关闭</el-button>
             </div>
         </template>
-    </el-dialog>
+    </el-drawer>
 
-
-
+    <!-- 评论抽屉 -->
+    <el-drawer v-model="dialogCommentVisible" title="评论详情" direction="rtl" size="50%">
+        <el-table :data="comments" style="width: 100%" border>
+            <el-table-column prop="commentContent" label="评论内容" />
+            <el-table-column prop="userName" label="评论作者" />
+            <el-table-column prop="createdTime" label="评论时间" >
+                <template v-slot:default="{ row }">
+                    <span>{{ formatDate(row.createdTime) }}</span>
+                </template>
+            </el-table-column>
+        </el-table>
+        <template #footer>
+        <el-button @click="dialogCommentVisible = false">关闭</el-button>
+        </template>
+    </el-drawer>
 
 </template>
 
@@ -134,7 +130,6 @@ export default {
         return {
 
             isPostSelected: false, // 控制表格显示
-            activeName: 'first', // 当前 Tab
 
             postData: [],
             dialogUserInfoVisible: false,
@@ -144,6 +139,9 @@ export default {
             queryStr: "",                   //查询条件
             multipleSelection: [],       //多选删除
             tableData: [],    //帖子信息数据
+            comments: [], // 评论数据
+            dialogCommentVisible: false, // 评论抽屉是否可见
+
             userData: [],        //用户信息数据
             queryData: [],
             pageInfo: {},       //分页信息对象
@@ -163,45 +161,22 @@ export default {
                 { categoryId: 3, catName: '物理' },
             ],
             selectedField: "",  // 选择的查询字段
-            formatDate(date) {
-                const d = new Date(date);
-                return d.toLocaleString('zh-CN', {
-                    year: 'numeric',
-                    month: '2-digit',
-                    day: '2-digit',
-                    hour: '2-digit',
-                    minute: '2-digit',
-                    second: '2-digit',
-                    hour12: false // 24小时制
-                }).replace(/\//g, '-'); // 将日期中的“/”替换为“－”
-            },
+
         };
     },
 
 
     methods: {
-
-        handleClick(tab) {
-        if (tab.name === 'second') {
-            this.fetchComments();
-        }
-    },
-    // fetchComments() { 第二层处理
-    //     if (!this.selectedPostId) {
-    //         ElMessage.warning("请先选择一个帖子！");
-    //         return;
-    //     }
-    //     this.$http.get(`/v1/posts/${this.selectedPostId}/comments`).then((response) => {
-    //         this.commentsData = response.data;
-    //     }).catch(() => {
-    //         ElMessage.error("加载评论失败");
-    //     });
-    // },
-        // handleSuccess(response) {            //图片上传成功后的回调函数
-        //     console.log(response);
-        //     // this.imageUrl = response
-        //     this.form.stu_image_url = response
-        // },
+        // 处理时间格式化
+        formatDate(value) {
+            if (!value) return '-';
+            const date = new Date(value);
+            return `${date.getFullYear()}-
+                    ${String(date.getMonth() + 1).padStart(2, '0')}-
+                    ${String(date.getDate()).padStart(2, '0')} 
+                    ${String(date.getHours()).padStart(2, '0')}:
+                    ${String(date.getMinutes()).padStart(2, '0')}:
+                    ${String(date.getSeconds()).padStart(2, '0')}`;        },
 
         handleSizeChange(pageSize) {            //选择每一页显示的记录数
             this.pageSize = pageSize;
@@ -245,7 +220,6 @@ export default {
             this.form = []
             console.log("closeDialog.....")
         },
-
         //点击"帖子详情",弹出抽屉,里面是帖子的详细内容
         openDetailDialog(postid) {
             var _this = this
@@ -261,10 +235,24 @@ export default {
 
             this.dialogDetailVisible = true;
 
-
-
         },
-
+        viewComments(postId) {
+            this.$http
+                .get(`/v1/posts/post/comment/${postId}`)
+                .then((response) => {
+                    console.log("返回的评论数据：", response.data);
+                    if (response.data && response.data.length > 0) {
+                        this.comments = response.data; // 赋值评论数据
+                        this.dialogCommentVisible = true; // 打开评论抽屉
+                    } else {
+                        ElMessage.warning("该帖子暂无评论"); // 提示暂无评论
+                    }
+                })
+                .catch((error) => {
+                    ElMessage.error("加载评论失败，请稍后再试");
+                    console.error(error);
+                });
+        },
 
         openAddDialog() {
             this.btnName = "添加";
