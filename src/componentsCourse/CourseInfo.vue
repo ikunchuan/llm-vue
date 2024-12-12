@@ -241,7 +241,7 @@ export default {
                 courseRating: searchField === 'courseRating' ? searchKeyword : ''
             };
 
-            this.$http.post('/crs/search', courseSearch, { params: { pageNum: num, pageSize: size } })
+            this.$http.post('/api/crs/search', courseSearch, { params: { pageNum: num, pageSize: size } })
                 .then((response) => {
                     this.pageInfo = response.data;
                     this.tableData = this.pageInfo.list;
@@ -311,7 +311,7 @@ export default {
                 ElMessage({ message: '请填写完整的题目信息！', type: "warning" });
                 return;
             }
-            this.$http.post('/crs/v1', this.form).then((response) => {
+            this.$http.post('/api/crs/v1', this.form).then((response) => {
                 if (response.data === 1) {
                     ElMessage({ message: '课程信息添加成功！', type: 'success' });
                     this.getPageData(this.currentPage, this.pageSize, '', ''); // 刷新数据
@@ -339,7 +339,7 @@ export default {
                 ElMessage({ message: '请填写完整的信息！', type: "warning" });
                 return;
             }
-            this.$http.put(`/crs/v1`, this.form).then((response) => {
+            this.$http.put(`/api/crs/v1`, this.form).then((response) => {
                 if (response.data == 1) {
                     ElMessage({ message: '更新成功', type: "success" });
                     this.getPageData(this.currentPage, this.pageSize); // 刷新数据
@@ -355,7 +355,7 @@ export default {
         //打开详情页
         openDetailDialog(courseId) {
             // 打开详情对话框时，发送请求获取数据
-            this.$http.get(`/crs/v1/${courseId}`).then((response) => {
+            this.$http.get(`/api/crs/v1/${courseId}`).then((response) => {
                 if (response.data) {
                     this.form = response.data;  // 设置表单数据
                     this.dialogDetailVisible = true;  // 打开详情对话框
@@ -373,7 +373,7 @@ export default {
                 cancelButtonText: '取消',
                 type: 'warning',
             }).then(() => {
-                this.$http.delete(`/crs/v1/${courseId}`).then((response) => {
+                this.$http.delete(`/api/crs/v1/${courseId}`).then((response) => {
                     if (response.data === 1) {
                         ElMessage({ message: '删除成功', type: "success" });
                         this.getPageData(this.currentPage, this.pageSize); // 刷新数据
@@ -399,7 +399,7 @@ export default {
                     type: "warning",
                 }).then(() => {
                     // 发送 DELETE 请求，携带选中的课程 IDs
-                    this.$http.delete(`/crs/v1`, { data: ids }).then((response) => {
+                    this.$http.delete(`/api/crs/v1`, { data: ids }).then((response) => {
                         if (response.data > 0) {
                             ElMessage({ message: '批量删除成功', type: "success" });
                             this.getPageData(this.currentPage, this.pageSize, '', ''); // 刷新数据
@@ -424,7 +424,7 @@ export default {
         this.getPageData(this.currentPage, this.pageSize, '', '');
 
         //在页面加载时获取所有分类，给到添加和编辑题目的分类下拉框
-        this.$http.get('/cat/v1/all').then((response) => {
+        this.$http.get('/api/cat/v1/all').then((response) => {
             this.catIdAndName = response.data;
             console.log(this.catIdAndName);
         });

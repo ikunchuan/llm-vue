@@ -82,7 +82,7 @@ export default {
             };
 
             // 发送POST请求到后端
-            this.$http.post("/admin/user/login/logs?pageNum=" + num + "&pageSize=" + size, userInfoSearch)
+            this.$http.post("/api/admin/user/login/logs?pageNum=" + num + "&pageSize=" + size, userInfoSearch)
                 .then(response => {
                     const data =response.data;
                     // this.pageInfo = response.data;

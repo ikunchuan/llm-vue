@@ -74,7 +74,7 @@ export default {
         },
         //获取用户总数
         getUserTotalCount() {
-            this.$http.get('/uis/v1/ui/user-total-count').then(response => {
+            this.$http.get('/api/uis/v1/ui/user-total-count').then(response => {
                 this.userTotalCount = response.data; // 存储用户总数
             }).catch(error => {
                 ElMessage.error('获取用户总数失败，请稍后重试');
@@ -82,7 +82,7 @@ export default {
         },
         //获取性别数量
         getUserData() {
-            this.$http.get('/uis/v1/ui/sex-distribution').then(response => {
+            this.$http.get('/api/uis/v1/ui/sex-distribution').then(response => {
                 this.sexDistributionData = response.data; // 存储性别分布数据
                 this.updatePieChart(); // 更新性别分布图表
             }).catch(error => {
@@ -176,7 +176,7 @@ updatePieChart() {
 },
         // 获取用户年龄分布数据
         getAgeDistributionData() {
-            this.$http.get('/uis/v1/ui/userageall').then(response => {
+            this.$http.get('/api/uis/v1/ui/userageall').then(response => {
                 this.ageDistributionData = response.data;
                 this.updateAgeChart(); // 更新年龄分布图表
             }).catch(error => {
@@ -269,7 +269,7 @@ updateAgeChart() {
 },
         // 获取用户地区分布数据
         getRegionDistributionData() {
-            this.$http.get('/uis/v1/ui/cityuserall').then(response => {
+            this.$http.get('/api/uis/v1/ui/cityuserall').then(response => {
                 this.regionDistributionData = response.data;
                 this.updateRegionChart(); // 更新地区分布图表
             }).catch(error => {

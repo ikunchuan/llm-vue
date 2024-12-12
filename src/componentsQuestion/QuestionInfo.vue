@@ -329,7 +329,7 @@ export default {
                 this.$http.post('/qst/v1/search?pageNum=' + num + '&pageSize=' + size, questionSearch)，
                 这样默认就是页面在前，查询在后。
             */
-            this.$http.post('/qst/v1/search', questionSearch, { params: { pageNum: num, pageSize: size } })
+            this.$http.post('/api/qst/v1/search', questionSearch, { params: { pageNum: num, pageSize: size } })
                 .then((response) => {
                     console.log(response.data);  // 检查后端返回的数据
                     this.pageInfo = response.data;
@@ -370,7 +370,7 @@ export default {
                 ElMessage({ message: '请填写完整的题目信息！', type: "warning" });
                 return;
             }
-            this.$http.post('/qst/v1', this.form).then((response) => {
+            this.$http.post('/api/qst/v1', this.form).then((response) => {
                 if (response.data == 1) {
                     ElMessage({ message: '题目信息添加成功！', type: "success" });
                     this.getPageData(this.currentPage, this.pageSize, '', ''); // 刷新数据
@@ -399,7 +399,7 @@ export default {
                 ElMessage({ message: '请填写完整的题目信息！', type: "warning" });
                 return;
             }
-            this.$http.put(`/qst/v1`, this.form).then((response) => {
+            this.$http.put(`/api/qst/v1`, this.form).then((response) => {
                 if (response.data == 1) {
                     ElMessage({ message: '更新成功', type: "success" });
                     this.getPageData(this.currentPage, this.pageSize, '', ''); // 刷新数据
@@ -415,7 +415,7 @@ export default {
         //打开详情页
         openDetailDialog(questionId) {
             // 打开详情对话框时，发送请求获取数据
-            this.$http.get(`/qst/v1/${questionId}`).then((response) => {
+            this.$http.get(`/api/qst/v1/${questionId}`).then((response) => {
                 if (response.data) {
                     this.form = response.data;  // 设置表单数据
                     this.dialogDetailVisible = true;  // 打开详情对话框
@@ -440,7 +440,7 @@ export default {
                 cancelButtonText: '取消',
                 type: "warning",
             }).then(() => {
-                this.$http.delete(`/qst/v1/${questionId}`).then((response) => {
+                this.$http.delete(`/api/qst/v1/${questionId}`).then((response) => {
                     if (response.data === 1) {
                         ElMessage({ message: '删除成功', type: "success" });
                         this.getPageData(this.currentPage, this.pageSize, '', ''); // 刷新数据
@@ -462,7 +462,7 @@ export default {
                     type: "warning",
                 }).then(() => {
                     const ids = this.multipleSelection.map(item => item.questionId);
-                    this.$http.delete(`/qst/v1`, { data: ids }).then((response) => {
+                    this.$http.delete(`/api/qst/v1`, { data: ids }).then((response) => {
                         if (response.data > 0) {
                             ElMessage({ message: '批量删除成功', type: "success" });
                             this.getPageData(this.currentPage, this.pageSize, '', ''); // 刷新数据
@@ -531,7 +531,7 @@ export default {
         this.getPageData(this.currentPage, this.pageSize, '', '');
 
         //在页面加载时获取所有分类，给到添加和编辑题目的分类下拉框
-        this.$http.get('/cat/v1/all').then((response) => {
+        this.$http.get('/api/cat/v1/all').then((response) => {
             this.catIdAndName = response.data;
             console.log(this.catIdAndName);
         });

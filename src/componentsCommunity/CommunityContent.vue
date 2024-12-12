@@ -201,7 +201,7 @@ export default {
             };
 
             // 发送POST请求到后端
-            this.$http.post("/v1/posts/search?pageNum=" + num + "&pageSize=" + size, communitySearch)
+            this.$http.post("/api/v1/posts/search?pageNum=" + num + "&pageSize=" + size, communitySearch)
                 .then(response => {
                     this.pageInfo = response.data;
                     this.tableData = this.pageInfo.list;
@@ -223,12 +223,12 @@ export default {
         //点击"帖子详情",弹出抽屉,里面是帖子的详细内容
         openDetailDialog(postid) {
             var _this = this
-            this.$http.get("/v1/posts/post/" + postid).then(function (response) {
+            this.$http.get("/api/v1/posts/post/" + postid).then(function (response) {
                 console.log(response.data);
                 _this.form = response.data
             })
 
-            this.$http.get("/v1/posts/post/comment/" + postid).then(function (response) {
+            this.$http.get("/api/v1/posts/post/comment/" + postid).then(function (response) {
                 console.log(response.data);
                 _this.commentform = response.data
             })
@@ -238,7 +238,7 @@ export default {
         },
         viewComments(postId) {
             this.$http
-                .get(`/v1/posts/post/comment/${postId}`)
+                .get(`/api/v1/posts/post/comment/${postId}`)
                 .then((response) => {
                     console.log("返回的评论数据：", response.data);
                     if (response.data && response.data.length > 0) {
@@ -273,7 +273,7 @@ export default {
             console.log(this.form);
             var _this = this;
             // this.form.stu_interest = this.form.stu_interest.join(',')              //将数据转为字符串
-            this.$http.put("v1/posts/post", this.form).then(function (response) {
+            this.$http.put("/api/v1/posts/post", this.form).then(function (response) {
                 console.log(response.data);
 
                 if (response.data == 1) {
@@ -295,7 +295,7 @@ export default {
         addCmn() {           //添加功能
             var _this = this;
             // this.form.stu_interest = this.form.stu_interest.join(',');
-            this.$http.post("v1/posts/post", this.form).then(function (response) {
+            this.$http.post("/api/v1/posts/post", this.form).then(function (response) {
                 console.log(response.data);
 
                 if (response.data == 1) {
@@ -344,7 +344,7 @@ export default {
             )
                 .then(() => {
                     var _this = this;
-                    this.$http.delete("v1/posts/post" + cmnid).then(function (response) {
+                    this.$http.delete("/api/v1/posts/post" + cmnid).then(function (response) {
                         console.log(response.data);
                     })
                     if (response.data == 1) {
@@ -384,7 +384,7 @@ export default {
                     this.multipleSelection.forEach(item => {
                         var _this = this;
                         var cmnid = item.communityId
-                        this.$http.delete("v1/posts/post/" + cmnid).then(function (response) {
+                        this.$http.delete("/api/v1/posts/post/" + cmnid).then(function (response) {
                             console.log(response.data);
                             if (response.data == 1) {
                                 num = num + 1

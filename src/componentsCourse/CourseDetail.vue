@@ -160,7 +160,7 @@ export default {
             this.getPageData();  // 加载初始课程数据
 
             //在页面加载时获取所有分类，给到添加和编辑题目的分类下拉框
-            this.$http.get('/cat/v1/all').then((response) => {
+            this.$http.get('/api/cat/v1/all').then((response) => {
             this.catIdAndName = response.data;
             console.log(this.catIdAndName);
         });
@@ -201,7 +201,7 @@ export default {
                 }
                 this.loading = true;
                 const params = { courseName: this.courseInfo }; // 使用课程名称查询
-                this.$http.post('/crs/search/chapter', params)``
+                this.$http.post('/api/crs/search/chapter', params)``
                     .then(response => {
                         if (response.data && response.data.length > 0) {
                             this.chapters = response.data; // 绑定章节数据
@@ -237,7 +237,7 @@ export default {
                     return;
                 }
 
-                this.$http.get('/crs/searchParagraph/' + queryStr)
+                this.$http.get('/api/crs/searchParagraph/' + queryStr)
                     .then(response => {
                         const data = response.data;
                         console.log(data);  // 打印返回的数据
@@ -285,7 +285,7 @@ export default {
                     return;
                 }
 
-                this.$http.put(`/crs/v1`, this.form).then((response) => {
+                this.$http.put(`/api/crs/v1`, this.form).then((response) => {
                     if (response.data === 1) {
                         ElMessage({ message: '课程信息更新成功！', type: 'success' });
                         this.getPageData(this.queryStr);  // 刷新课程列表数据

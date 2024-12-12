@@ -105,7 +105,7 @@ methods: {
         this.form.content=this.valueHtml
         this.form.author="shen"
         console.log(this.form);
-        this.$http.post("http://localhost:8080/comp/v1/compe",this.form).then((res)=>{
+        this.$http.post("/api/comp/v1/compe",this.form).then((res)=>{
             console.log(res.data);
         }).catch()
     },

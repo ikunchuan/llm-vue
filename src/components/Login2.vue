@@ -82,7 +82,7 @@
       async handleLogin() {
         try {
           this.loginForm.loginboard=2   //登陆第一板块时
-          const response = await axios.post('http://localhost:10086/admin/user/login', this.loginForm);
+          const response = await axios.post('/api/admin/user/login', this.loginForm);
           if (response.data.code === 200) {
             this.$message.success('登录成功');
             // 登录成功后跳转到首页或用户主页

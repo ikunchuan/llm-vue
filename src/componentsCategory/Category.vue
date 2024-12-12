@@ -295,7 +295,7 @@ export default {
             console.log("请求分页参数: ", num, size, searchField, searchKeyword);
 
             this.loading = true;
-            this.$http.post('/cat/v1/search', categorySearch, { params: { pageNum: num, pageSize: size } })
+            this.$http.post('/api/cat/v1/search', categorySearch, { params: { pageNum: num, pageSize: size } })
                 .then((response) => {
                     console.log(response.data);  // 检查后端返回的数据
                     this.pageInfo = response.data;
@@ -340,7 +340,7 @@ export default {
                 ElMessage({ message: '请填写完整的类别信息！', type: "warning" });
                 return;
             }
-            this.$http.post('/cat/v1', this.form).then((response) => {
+            this.$http.post('/api/cat/v1', this.form).then((response) => {
                 if (response.data == 1) {
                     ElMessage({ message: '类别信息添加成功！', type: "success" });
                     this.getPageData(this.currentPage, this.pageSize, '', ''); // 刷新数据
@@ -369,7 +369,7 @@ export default {
                 ElMessage({ message: '请填写完整的类别信息！', type: "warning" });
                 return;
             }
-            this.$http.put(`/qst/v1`, this.form).then((response) => {
+            this.$http.put(`/api/qst/v1`, this.form).then((response) => {
                 if (response.data == 1) {
                     ElMessage({ message: '更新成功', type: "success" });
                     this.getPageData(this.currentPage, this.pageSize, '', ''); // 刷新数据
@@ -384,7 +384,7 @@ export default {
 
         // 打开详情框
         openDetailDialog(categoryId) {
-            this.$http.get(`/cat/v1/${categoryId}`).then((response) => {
+            this.$http.get(`/api/cat/v1/${categoryId}`).then((response) => {
                 if (response.data) {
                     this.form = response.data;
                     this.dialogDetailVisible = true;
@@ -399,7 +399,7 @@ export default {
         openChildCard(categoryId) {
             this.childCardVisible = true; // 显示子类别卡片
             this.c_loading = true;
-            this.$http.get(`/cat/v1/subcategories/${categoryId}`).then((response) => {
+            this.$http.get(`/api/cat/v1/subcategories/${categoryId}`).then((response) => {
                 console.log(response.data);
                 this.childInfoData = response.data.slice(1);  // 获取子类别信息
                 this.parentInfoData = response.data[0]; //获取父类别信息
@@ -431,7 +431,7 @@ export default {
                 cancelButtonText: '取消',
                 type: "warning",
             }).then(() => {
-                this.$http.delete(`/cat/v1/${categoryId}`).then((response) => {
+                this.$http.delete(`/api/cat/v1/${categoryId}`).then((response) => {
                     if (response.data === 1) {
                         ElMessage({ message: '删除成功', type: "success" });
                         this.getPageData(this.currentPage, this.pageSize, '', ''); // 刷新数据
@@ -453,7 +453,7 @@ export default {
                     type: "warning",
                 }).then(() => {
                     const ids = this.multipleSelection.map(item => item.competitionId);
-                    this.$http.post(`/cat/v1`, { data: ids }).then((response) => {
+                    this.$http.post(`/api/cat/v1`, { data: ids }).then((response) => {
                         if (response.data == 1) {
                             ElMessage({ message: '批量删除成功', type: "success" });
                             this.getPageData(this.currentPage, this.pageSize, '', ''); // 刷新数据

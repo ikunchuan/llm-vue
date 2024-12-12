@@ -193,7 +193,7 @@ export default {
         },
 
         fetchCommunityUsers(communityId) {
-            this.$http.get(`/v1/cmns/cmnpostuser/${communityId}`)
+            this.$http.get(`/api/v1/cmns/cmnpostuser/${communityId}`)
                 .then((response) => {
                     if (response.data && response.data.length) {
                         this.communityUsers = response.data;
@@ -240,7 +240,7 @@ export default {
             };
 
             // 发送POST请求到后端
-            this.$http.post("/v1/cmns/search?pageNum=" + num + "&pageSize=" + size, communitySearch)
+            this.$http.post("/api/v1/cmns/search?pageNum=" + num + "&pageSize=" + size, communitySearch)
                 .then(response => {
                     this.pageInfo = response.data;
                     this.tableData = this.pageInfo.list;
@@ -257,7 +257,7 @@ export default {
 
         openUserDialog(cmnid) {
             var _this = this
-            this.$http.get("/ucmns/v1/ucmn/user/" + cmnid).then(function (response) {
+            this.$http.get("/api/ucmns/v1/ucmn/user/" + cmnid).then(function (response) {
                 console.log(response.data);
                 _this.users = response.data
             })
@@ -287,7 +287,7 @@ export default {
 
         openDetailDialog(cmnid) {
             var _this = this
-            this.$http.get("v1/cmns/cmn/" + cmnid).then(function (response) {
+            this.$http.get("/api/v1/cmns/cmn/" + cmnid).then(function (response) {
                 console.log(response.data);
                 _this.form = response.data
             })
@@ -318,7 +318,7 @@ export default {
             this.dialogFormVisible = true;
         },
         updateCmn() {
-            this.$http.put("/v1/cmns/cmn", this.form)
+            this.$http.put("/api/v1/cmns/cmn", this.form)
                 .then(response => {
                     if (response.data === 1) {
                         ElMessage.success("社区信息修改成功");
@@ -337,7 +337,7 @@ export default {
         addCmn() {           // 添加功能
             this.form.communityUnderview = 1;
             this.form.createdBy = 1;
-            this.$http.post("v1/cmns/cmn", this.form).then((response) => {
+            this.$http.post("/api/v1/cmns/cmn", this.form).then((response) => {
                 console.log(response.data);
                 if (response.data == 1) {
                     ElMessage.success('社区添加成功');
@@ -390,7 +390,7 @@ export default {
             )
                 .then(() => {
                     var _this = this;
-                    this.$http.delete("v1/cmns/cmn/" + cmnid).then(function (response) {
+                    this.$http.delete("/api/v1/cmns/cmn/" + cmnid).then(function (response) {
                         console.log(response.data);
                     })
                     if (response.data == 1) {
@@ -428,7 +428,7 @@ export default {
                     this.multipleSelection.forEach(item => {
                         var _this = this;
                         var cmnid = item.communityId
-                        this.$http.delete("v1/cmns/cmn/" + cmnid).then(function (response) {
+                        this.$http.delete("/api/v1/cmns/cmn/" + cmnid).then(function (response) {
                             console.log(response.data);
                             if (response.data == 1) {
                                 num = num + 1
@@ -476,7 +476,7 @@ export default {
         this.getPageData(this.currentPage, this.pageSize);
 
         //在页面加载时获取所有分类，给到添加和编辑题目的分类下拉框
-        this.$http.get('/cat/v1/all').then((response) => {
+        this.$http.get('/api/cat/v1/all').then((response) => {
             this.catIdAndName = response.data;
             console.log(this.catIdAndName);
         });

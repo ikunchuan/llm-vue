@@ -203,7 +203,7 @@ export default {
             };
 
             // 发送POST请求到后端
-            this.$http.post("/uis/v1/ui/search?pageNum=" + num + "&pageSize=" + size, userInfoSearch)
+            this.$http.post("/api/uis/v1/ui/search?pageNum=" + num + "&pageSize=" + size, userInfoSearch)
                 .then(response => {
                     this.pageInfo = response.data;
                     this.tableData = this.pageInfo.list;
@@ -228,7 +228,7 @@ export default {
         //打开详情页
         openDetailDialog(userid) {
             var _this = this
-            this.$http.get("/uis/v1/ui/" + userid).then(function (response) {
+            this.$http.get("/api/uis/v1/ui/" + userid).then(function (response) {
                 console.log(response.data);
                 _this.form = response.data
             })

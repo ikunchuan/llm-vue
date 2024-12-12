@@ -124,7 +124,7 @@ export default {
     methods: {
         agreeEvent() {
             this.form.userUnderview = 1;
-            this.$http.put("uis/v1/ui", this.form).then(function (response) {
+            this.$http.put("/api/uis/v1/ui", this.form).then(function (response) {
                 console.log(response.data);
 
                 if (response.data == 1) {
@@ -156,7 +156,7 @@ export default {
             )
                 .then(() => {
                     var _this = this;
-                    this.$http.delete("uis/v1/ui" + this.form.userId).then(function (response) {
+                    this.$http.delete("/api/uis/v1/ui" + this.form.userId).then(function (response) {
                         console.log(response.data);
                     })
                     if (response.data == 1) {
@@ -205,7 +205,7 @@ export default {
             };
 
             // 发送POST请求到后端
-            this.$http.post("/uis/v1/ui/search2?pageNum=" + num + "&pageSize=" + size, userInfoSearch)
+            this.$http.post("/api/uis/v1/ui/search2?pageNum=" + num + "&pageSize=" + size, userInfoSearch)
                 .then(response => {
                     this.pageInfo = response.data;
                     this.tableData = this.pageInfo.list;
@@ -221,7 +221,7 @@ export default {
         },
 
         openDetailDialog(userid) {
-            this.$http.get("/uis/v1/ui/" + userid).then(response => {
+            this.$http.get("/api/uis/v1/ui/" + userid).then(response => {
                 this.form = response.data;
             });
             this.dialogDetailVisible = true;

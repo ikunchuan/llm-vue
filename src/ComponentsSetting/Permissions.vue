@@ -184,7 +184,7 @@ export default {
         },
 
         getPageData(num, size) {
-            this.$http.get('/uis/v1/ui/search', { params: { pageNum: num, pageSize: size } })
+            this.$http.get('/api/uis/v1/ui/search', { params: { pageNum: num, pageSize: size } })
                 .then((response) => {
                     console.log(response.data);
                     this.pageInfo = response.data;
@@ -205,7 +205,7 @@ export default {
        //打开详情页
         openDetailDialog(userid) {
             var _this = this
-            this.$http.get("/uis/v1/ui/" + userid).then(function (response) {
+            this.$http.get("/api/uis/v1/ui/" + userid).then(function (response) {
                 console.log(response.data);
                 _this.form = response.data
             })

@@ -117,7 +117,7 @@ export default {
                 userSex: searchField === 'userSex' ? searchKeyword : ''
             };
 
-            this.$http.post("/uis/v1/ui/search?pageNum=" + num + "&pageSize=" + size, userInfoSearch)
+            this.$http.post("/api/uis/v1/ui/search?pageNum=" + num + "&pageSize=" + size, userInfoSearch)
                 .then(response => {
                     this.pageInfo = response.data;
                     this.tableData = this.pageInfo.list;
@@ -132,7 +132,7 @@ export default {
                 });
         },
         openDetailDialog(userid) {
-            this.$http.get("/uis/v1/ui/" + userid).then(response => {
+            this.$http.get("/api/uis/v1/ui/" + userid).then(response => {
                 this.form = response.data;
             });
             this.dialogDetailVisible = true;
@@ -159,14 +159,14 @@ export default {
         },
 
         getUserTotalCount() {
-            this.$http.get('/uis/v1/ui/user-total-count').then(response => {
+            this.$http.get('/api/uis/v1/ui/user-total-count').then(response => {
                 this.userTotalCount = response.data; // 存储用户总数
             }).catch(error => {
                 ElMessage.error('获取用户总数失败，请稍后重试');
             });
         },
         getUserData() {
-            this.$http.get('/uis/v1/ui/sex-distribution').then(response => {
+            this.$http.get('/api/uis/v1/ui/sex-distribution').then(response => {
                 this.sexDistributionData = response.data; // 存储性别分布数据
                 this.updatePieChart(); // 更新性别分布图表
             }).catch(error => {
@@ -211,7 +211,7 @@ export default {
             this.myPieChart.setOption(pieOption);
         },
         getVideoCompletionData() {
-            this.$http.get('/uis/v1/ui/countCourseAll').then(response => {
+            this.$http.get('/api/uis/v1/ui/countCourseAll').then(response => {
                 this.videoCompletionData = response.data;
                 this.updateVideoChart(); // 更新图表
             }).catch(error => {

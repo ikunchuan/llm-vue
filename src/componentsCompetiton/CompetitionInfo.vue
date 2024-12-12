@@ -271,7 +271,7 @@ export default {
                 return;
             }
             // 发送 POST 请求以添加竞赛信息
-            this.$http.post('comp/v1/compe', this.form).then((response) => {
+            this.$http.post('/api/comp/v1/compe', this.form).then((response) => {
                 if (response.data == 1) {
                     ElMessage({ message: '竞赛信息添加成功！', type: "success" });
                     this.getPageData(this.currentPage, this.pageSize); // 刷新数据
@@ -302,7 +302,7 @@ export default {
                 ElMessage({ message: '请填写完整的竞赛信息！', type: "warning" });
                 return;
             }
-            this.$http.put(`http://localhost:10086/comp/v1/compe`, this.form).then((response) => {
+            this.$http.put(`/api/comp/v1/compe`, this.form).then((response) => {
                 if (response.data == 1) {
                     ElMessage({ message: '更新成功', type: "success" });
                     this.getPageData(this.currentPage, this.pageSize); // 刷新数据
@@ -318,7 +318,7 @@ export default {
 
                     // 打开详情页
         openDetailDialog(competitionId) {
-            this.$http.get(`http://localhost:10086/comp/v1/compe/${competitionId}`).then((response) => {
+            this.$http.get(`/api/comp/v1/compe/${competitionId}`).then((response) => {
                 console.log(response.data); // 检查返回的数据
                 if (response.data) {
                     this.form = response.data;
@@ -340,7 +340,7 @@ export default {
                 cancelButtonText: '取消',
                 type: "warning",
             }).then(() => {
-                this.$http.delete(`http://localhost:10086/comp/v1/compe/${competitionId}`).then((response) => {
+                this.$http.delete(`/api/comp/v1/compe/${competitionId}`).then((response) => {
                     if (response.data == 1) {
                         ElMessage({ message: '删除成功', type: "success" });
                         this.getPageData(this.currentPage, this.pageSize); // 刷新数据
@@ -362,7 +362,7 @@ export default {
                     type: "warning",
                 }).then(() => {
                     const compeids = this.multipleSelection.map(item => item.competitionId);
-                    this.$http.delete(`/comp/v1/compe`, { data: compeids }).then((response) => {
+                    this.$http.delete(`/api/comp/v1/compe`, { data: compeids }).then((response) => {
                         if (response.data > 0) {
                             ElMessage({ message: '批量删除成功', type: "success" });
                             this.getPageData(this.currentPage, this.pageSize, '', ''); // 刷新数据
@@ -392,7 +392,7 @@ export default {
             
             console.log("请求分页参数: ", num, size, searchField, searchKeyword);
             
-            this.$http.post('/comp/v1/search', questionSearch, { params: { pageNum: num, pageSize: size } })
+            this.$http.post('/api/comp/v1/search', questionSearch, { params: { pageNum: num, pageSize: size } })
                 .then((response) => {
                     console.log(response.data);  // 检查后端返回的数据
                     this.pageInfo = response.data;
@@ -440,7 +440,7 @@ export default {
     this.getPageData(this.currentPage, this.pageSize, 'competitionName', this.queryStr);
 
     // 获取所有分类
-    this.$http.get('/cat/v1/all').then((response) => {
+    this.$http.get('/api/cat/v1/all').then((response) => {
         this.catIdAndName = response.data;
         console.log(this.catIdAndName);
         });

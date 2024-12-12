@@ -120,7 +120,7 @@ export default {
     // 注册处理函数
     async handleRegister() {
       try {
-        const response = await axios.post('http://localhost:10086/admin/user/register', this.registerForm);
+        const response = await axios.post('/api/admin/user/register', this.registerForm);
         if (response.data.code === 200) {
           this.$message.success('注册成功');
           // 注册成功后跳转到登录页面

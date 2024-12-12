@@ -85,7 +85,7 @@ export default {
     methods: {
         agreeEvent() {
             this.form.communityUnderview = 1;
-            this.$http.put("/v1/cmns/cmn", this.form).then(function (response) {
+            this.$http.put("/api/v1/cmns/cmn", this.form).then(function (response) {
                 console.log(response.data);
 
                 if (response.data == 1) {
@@ -117,7 +117,7 @@ export default {
             )
                 .then(() => {
                     var _this = this;
-                    this.$http.delete("v1/cmns/cmn/" + this.form.communityId).then(function (response) {
+                    this.$http.delete("/api/v1/cmns/cmn/" + this.form.communityId).then(function (response) {
                         console.log(response.data);
                     })
                     if (response.data == 1) {
@@ -156,7 +156,7 @@ export default {
                 communityType: searchField === 'communityType' ? searchKeyword : ''
             };
 
-            this.$http.post("/v1/cmns/search2?pageNum=" + num + "&pageSize=" + size, communitySearch)
+            this.$http.post("/api/v1/cmns/search2?pageNum=" + num + "&pageSize=" + size, communitySearch)
                 .then(response => {
                     this.pageInfo = response.data;
                     this.tableData = this.pageInfo.list;
@@ -172,7 +172,7 @@ export default {
         //打开详情页
         openDetailDialog(cmnid) {
             // 打开详情对话框时，发送请求获取数据
-            this.$http.get("/v1/cmns/cmn/" + cmnid).then((response) => {
+            this.$http.get("/api/v1/cmns/cmn/" + cmnid).then((response) => {
                 if (response.data) {
                     this.form = response.data;  // 设置表单数据
                     this.dialogDetailVisible = true;  // 打开详情对话框

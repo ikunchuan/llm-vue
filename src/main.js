@@ -21,5 +21,22 @@ import store from './store/index.js'
 
 const app = createApp(App)
 app.component('e-charts',ECharts).use(router).use(store).use(ViewUIPlus).use(ElementPlus).mount('#app')
-axios.defaults.baseURL="http://localhost:10086"
+axios.defaults.baseURL="/"
 app.config.globalProperties.$http=axios
+
+
+axios.defaults.withCredentials = true;
+
+axios.interceptors.request.use(
+    (config) => {
+      const token = localStorage.getItem('satoken');
+      if (token) {
+        config.headers['satoken']  = token;
+        console.log('satoken:'+token);
+      }
+      
+      return config;
+    },
+    (error) => Promise.reject(error)
+  );
+  

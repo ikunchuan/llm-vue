@@ -245,7 +245,7 @@ export default {
 
         // 获取分页数据
         getPageData(num, size) {
-            this.$http.get('http://localhost:10086/comdetail/v1/v1', { params: { pageNum: num, pageSize: size } })
+            this.$http.get('/api/comdetail/v1/v1', { params: { pageNum: num, pageSize: size } })
                 .then((response) => {
                     console.log(response.data);  // 检查后端返回的数据
                     this.pageInfo = response.data;
@@ -284,7 +284,7 @@ export default {
 
             
            // 发送 POST 请求以添加竞赛信息
-            this.$http.post('http://localhost:10086/comdetail/v1/detail', this.form).then((response) => {
+            this.$http.post('/api/comdetail/v1/detail', this.form).then((response) => {
                 if (response.data == 1) {
                     ElMessage({ message: '信息添加成功！', type: "success" });
                     this.getPageData(this.currentPage, this.pageSize); // 刷新数据
@@ -314,7 +314,7 @@ export default {
                 ElMessage({ message: '请填写完整的竞赛信息！', type: "warning" });
                 return;
             }
-            this.$http.put(`http://localhost:10086/comdetail/v1/detail`, this.form).then((response) => {
+            this.$http.put(`/api/comdetail/v1/detail`, this.form).then((response) => {
                 if (response.data == 1) {
                     ElMessage({ message: '更新成功', type: "success" });
                     this.getPageData(this.currentPage, this.pageSize); // 刷新数据
@@ -331,7 +331,7 @@ export default {
 
                     // 打开详情页
         openDetailDialog(competitionId) {
-            this.$http.get(`http://localhost:10086/comdetail/v1/detail/${competitionId}`).then((response) => {
+            this.$http.get(`/api/comdetail/v1/detail/${competitionId}`).then((response) => {
                 console.log(response.data); // 检查返回的数据
                 if (response.data) {
                     this.form = response.data;
@@ -354,7 +354,7 @@ export default {
                 cancelButtonText: '取消',
                 type: "warning",
             }).then(() => {
-                this.$http.delete(`http://localhost:10086/comdetail/v1/detail/${competitionId}`).then((response) => {
+                this.$http.delete(`/api/comdetail/v1/detail/${competitionId}`).then((response) => {
                     if (response.data == 1) {
                         ElMessage({ message: '删除成功', type: "success" });
                         this.getPageData(this.currentPage, this.pageSize); // 刷新数据
@@ -376,7 +376,7 @@ export default {
                     type: "warning",
                 }).then(() => {
                     const compeids = this.multipleSelection.map(item => item.competitionId);
-                    this.$http.delete(`/comdetail/v1/detail`, { data: compeids }).then((response) => {
+                    this.$http.delete(`/api/comdetail/v1/detail`, { data: compeids }).then((response) => {
                         if (response.data > 0) {
                             ElMessage({ message: '批量删除成功', type: "success" });
                             this.getPageData(this.currentPage, this.pageSize, '', ''); // 刷新数据
