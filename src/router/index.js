@@ -89,6 +89,7 @@ const routes = [
       { path: "communityBoard", component: CommunityBoard },
       { path: "communityContent", component: CommunityContent },
       { path: "communityAudit", component: CommunityAudit },
+      { path: "communityActivity", component: CommunityActivity },
     ],
   },
   {
